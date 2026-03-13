@@ -65,13 +65,16 @@ Score scale used for evaluation:
 - **1 = Low**
 - **2 = Medium**
 - **3 = High**
-| Criteria | Idea 1 (Organiser) | Idea 2 (Legal AI) | Idea 3 (Learning) | Max Score |
-|----------|--------------------|-------------------|-------------------|-----------|
-| Feasibility | 3 | 1 | 2 | 3 |
-| User Value | 3 | 3 | 3 | 3 |
-| Innovation | 3 | 3 | 3 | 3 |
-| Technical Alignment | 3 | 1 | 2 | 3 |
-| **Total Score** | **12 ★** | **8** | **10** | **12** |
+
+
+| Criteria            | Idea 1 (Organiser) | Idea 2 (Legal AI) | Idea 3 (Learning) | Max Score |
+| ------------------- | ------------------ | ----------------- | ----------------- | --------- |
+| Feasibility         | 3                  | 1                 | 2                 | 3         |
+| User Value          | 3                  | 3                 | 3                 | 3         |
+| Innovation          | 3                  | 3                 | 3                 | 3         |
+| Technical Alignment | 3                  | 1                 | 2                 | 3         |
+| **Total Score**     | **12 ★**           | **8**             | **10**            | **12**    |
+
 
 The **Subscriptions Organiser Platform** received the highest score, indicating that it is the most feasible and well-aligned with the team's current technical capabilities.
 ---
