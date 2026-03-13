@@ -164,7 +164,6 @@ Therefore, the **Subscriptions Organiser Platform** was selected because it is m
 
 ---
 
----
 
 ## Summary
 
