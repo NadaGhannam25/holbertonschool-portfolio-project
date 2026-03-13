@@ -11,7 +11,7 @@ Initial roles were defined to organize the work during this stage, including a p
 | Name | Role | Technical Background | Strengths & Interests |
 | :--- | :--- | :--- | :--- |
 | Sondos Al-Rubaish | Project Coordinator | Software Engineer | IoT & Cloud Computing |
-| Nada Al-Mutairi | Documentation Lead | Information Systems Specialist & Software Engineer | AI |
+| Nada Al-Mutairi | Documentation Lead | Information Systems Specialist & Software Engineer | Data Analysis & Business Intelligence |
 | Shaden Al-Alwani | Backend Developer | Full-Stack Developer & Data Analyst | Financial Automation |
 | Rahaf Al-Harthi | Frontend Developer | Full-Stack Developer | Machine Learning |
 
