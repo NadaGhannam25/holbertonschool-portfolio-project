@@ -86,3 +86,23 @@ After evaluating the ideas, the team selected the **Subscriptions Organiser Plat
 This idea was chosen because it provides strong user value while remaining technically feasible within the project timeline.
 
 ---
+
+## Problem the Project Solves
+
+Many users struggle to keep track of their subscriptions and organise important recurring payments.
+
+This often leads to **missed payments, poor financial organisation, or forgotten subscriptions**.
+
+The proposed platform aims to solve this problem by providing a **centralised system for organising and managing subscriptions in one place**.
+
+---
+
+## Target Audience
+
+The platform is designed for users who need a simple way to manage their subscriptions and financial commitments.
+
+Target users include:
+
+- Individuals who manage **multiple digital subscriptions**
+- Users who want to **organise personal subscriptions in one place**
+- People who need an **easier way to track recurring payments**
