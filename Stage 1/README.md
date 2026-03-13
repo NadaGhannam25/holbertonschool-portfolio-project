@@ -163,3 +163,13 @@ Therefore, the **Subscriptions Organiser Platform** was selected because it is m
    Building this platform will allow the team to strengthen practical skills in **full-stack development, UI/UX design, and database management**, which are directly relevant to the program curriculum.
 
 ---
+
+---
+
+## Summary
+
+During this stage, the team successfully formed an organised working group and established **Discord** as the primary communication platform.
+
+The team conducted brainstorming sessions to explore several potential project ideas. After evaluating the ideas based on **feasibility, user value, innovation, and technical alignment**, the team selected the **Subscriptions Organiser Platform** as the main MVP concept.
+
+This report documents the team formation process, idea exploration, evaluation, and decision-making process, providing the foundation for the next stages of the project.
