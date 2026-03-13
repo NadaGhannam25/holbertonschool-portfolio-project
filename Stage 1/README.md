@@ -77,6 +77,7 @@ Score scale used for evaluation:
 
 
 The **Subscriptions Organiser Platform** received the highest score, indicating that it is the most feasible and well-aligned with the team's current technical capabilities.
+
 ---
 
 ## Decision and Concept Refinement
