@@ -42,12 +42,15 @@ These questions guided the team toward user-centred thinking and helped generate
 
 ### Ideas Discussed
 **Idea 1: Subscriptions Organisers Platform**
+
 This platform aims to help users collect and organise important subscriptions in one place. It would also provide reminders before due dates to help users manage their commitments.
 
 **Idea 2: Smart Legal Advisor**
+
 A platform that uses artificial intelligence to analyse legal contracts and simplify them for users by highlighting important clauses and answering user questions through a chatbot.
 
 **Idea 3: Programming Learning and Error Analysis Platform**
+
 An educational platform that provides programming tutorials and includes a tool that analyses programming error messages, explains their causes, and suggests possible solutions.
 
 ## Idea Evaluation
