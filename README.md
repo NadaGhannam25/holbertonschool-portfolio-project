@@ -39,3 +39,26 @@ This idea was chosen because it is:
 - Practical and useful for users  
 - Feasible to implement within the project timeline  
 - Well aligned with the team’s current technical skills
+
+---
+## Authors
+
+### Shaden Majed Alalwani  
+Riyadh, Saudi Arabia  
+Student at Holberton School  
+GitHub: https://github.com/Shadenm-404  
+
+### Nada Ghannam Al-Mutairi  
+Riyadh, Saudi Arabia  
+Student at Holberton School  
+GitHub: https://github.com/NadaGhannam25  
+
+### Sondos Saleh Alrubaish  
+Riyadh, Saudi Arabia  
+Student at Holberton School  
+GitHub: https://github.com/sondos04  
+
+### Rahaf Alharthi  
+Riyadh, Saudi Arabia  
+Student at Holberton School  
+GitHub: https://github.com/rahafalharthi1111-png
