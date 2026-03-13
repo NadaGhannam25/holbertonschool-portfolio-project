@@ -49,3 +49,37 @@ A platform that uses artificial intelligence to analyse legal contracts and simp
 
 **Idea 3: Programming Learning and Error Analysis Platform**
 An educational platform that provides programming tutorials and includes a tool that analyses programming error messages, explains their causes, and suggests possible solutions.
+
+## Idea Evaluation
+
+After discussing the proposed ideas, the team evaluated them using several criteria such as **feasibility, user value, innovation, and alignment with the team's technical skills**.
+
+These criteria helped the team compare the ideas and determine which concept would be the most suitable for development as a **Minimum Viable Product (MVP).**
+
+---
+
+## Idea Scoring Rubric
+
+Score scale used for evaluation:
+
+- **1 = Low**
+- **2 = Medium**
+- **3 = High**
+| Criteria | Idea 1 (Organiser) | Idea 2 (Legal AI) | Idea 3 (Learning) | Max Score |
+|----------|--------------------|-------------------|-------------------|-----------|
+| Feasibility | 3 | 1 | 2 | 3 |
+| User Value | 3 | 3 | 3 | 3 |
+| Innovation | 3 | 3 | 3 | 3 |
+| Technical Alignment | 3 | 1 | 2 | 3 |
+| **Total Score** | **12 ★** | **8** | **10** | **12** |
+
+The **Subscriptions Organiser Platform** received the highest score, indicating that it is the most feasible and well-aligned with the team's current technical capabilities.
+---
+
+## Decision and Concept Refinement
+
+After evaluating the ideas, the team selected the **Subscriptions Organiser Platform** as the main project concept for development.
+
+This idea was chosen because it provides strong user value while remaining technically feasible within the project timeline.
+
+---
