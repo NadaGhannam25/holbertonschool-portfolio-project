@@ -110,3 +110,43 @@ Target users include:
 - Individuals who manage **multiple digital subscriptions**
 - Users who want to **organise personal subscriptions in one place**
 - People who need an **easier way to track recurring payments**
+
+---
+
+## Key Features of the MVP
+
+The Minimum Viable Product (MVP) of the platform will include the following core features:
+
+- User account creation and login  
+- Uploading and organising subscriptions  
+- Adding and managing subscriptions  
+- Displaying subscription information in a dashboard  
+- Sending reminders before subscription due dates  
+
+---
+
+## Reasons for Rejecting Other Ideas
+
+The **Smart Legal Advisor** idea was not selected because analysing legal contracts may involve complex legal considerations and could lead to legal interpretation challenges.
+
+The **Programming Learning and Error Analysis Platform** was also not selected because analysing programming errors effectively would require advanced artificial intelligence techniques, and the team currently has limited experience in AI development.
+
+Therefore, the **Subscriptions Organiser Platform** was selected because it is more feasible within the project timeline and better aligned with the team's current technical skills.
+
+---
+
+## Potential Challenges and Opportunities
+
+### Challenges Identified
+
+1. **User Authentication Security**  
+   Implementing a secure login and account management system requires careful handling of user credentials and data privacy, which adds technical complexity to the MVP.
+
+2. **Reminder System Implementation**  
+   Building a reliable notification and reminder system that works across different time zones and devices will require additional backend logic and testing.
+
+3. **Scope Management**  
+   Keeping the MVP focused and avoiding feature creep will be an ongoing challenge, especially as new ideas may emerge during development.
+
+---
+
