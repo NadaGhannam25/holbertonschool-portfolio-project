@@ -150,3 +150,16 @@ Therefore, the **Subscriptions Organiser Platform** was selected because it is m
 
 ---
 
+
+### Opportunities Identified
+
+1. **Large Target Market**  
+   Many users across online services struggle to track their recurring subscriptions and renewal dates. This presents a wide and underserved market that the platform can address effectively.
+
+2. **Future Scalability**  
+   The platform can be expanded in future stages to include advanced features such as **AI-powered subscription categorisation** and **expense analytics**.
+
+3. **Skill Development**  
+   Building this platform will allow the team to strengthen practical skills in **full-stack development, UI/UX design, and database management**, which are directly relevant to the program curriculum.
+
+---
