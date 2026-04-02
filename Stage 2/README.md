@@ -1,5 +1,22 @@
 
+# 1. Project Objectives
 
+## 1.1 Purpose
+
+Many users today struggle to keep track of multiple digital subscriptions, leading to forgotten renewals, missed payments, and poor financial awareness. The Subscriptions Organiser Platform aims to solve this problem by providing a centralised, easy-to-use web platform where users can manage all their subscriptions in one place. This platform empowers users to take control of their recurring expenses and make more informed financial decisions.
+
+---
+
+## 1.2 SMART Objectives
+
+The MVP will achieve the following three SMART objectives:
+
+| # | Objective | Description |
+|:-:|:---------:|:------------|
+| 1 | **User Management** | Enable at least 80% of new users to successfully register an account and log in within 2 minutes of visiting the platform, measured during user acceptance testing. |
+| 2 | **Subscription Tracking** | Allow users to add, categorise, and manage subscriptions, with full CRUD functionality available in the MVP by the end of Stage 4. |
+| 3 | **Reminders & Insights** | Deliver automated email reminders at least 3 days before each subscription renewal date and display a monthly spending summary on the user dashboard. |
+     
 # 5. High-Level Project Plan
 
 ## 5.1 Project Timeline
