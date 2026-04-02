@@ -26,7 +26,7 @@
 | Team Formation & Concept Selection   | End of Week 2   | Completed     | 
 | Project Charter Submitted            | End of Week 4   | In Progress   |
 | Technical Documentation Finalised    | End of Week 6   | Not Started   | 
-| MVP Build Complete| MVP Development  | End of Week 10  | Not Started   |
+| MVP Build Complete                   | End of Week 10  | Not Started   |
 | Final Presentation & Project Closure | End of Week 12  | Not Started   | 
   ------------------------------------------------------------------------
 
