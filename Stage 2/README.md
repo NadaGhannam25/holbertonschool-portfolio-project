@@ -3,7 +3,7 @@
 
 ## 1.1 Purpose
 
-Many users today struggle to keep track of multiple digital subscriptions, leading to forgotten renewals, missed payments, and poor financial awareness. The Subscriptions Organiser Platform aims to solve this problem by providing a centralised, easy-to-use web platform where users can manage all their subscriptions in one place. This platform empowers users to take control of their recurring expenses and make more informed financial decisions،
+Many users today struggle to keep track of multiple digital subscriptions, leading to forgotten renewals, missed payments, and poor financial awareness. The Subscriptions Organiser Platform aims to solve this problem by providing a centralised, easy-to-use web platform where users can manage all their subscriptions in one place. This platform empowers users to take control of their recurring expenses and make more informed financial decisions.
 
 
 ---
