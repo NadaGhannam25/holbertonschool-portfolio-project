@@ -8,7 +8,7 @@ Many users today struggle to keep track of multiple digital subscriptions, leadi
 
 ---
 
-## 1.2 SMART Objectives
+## 1.2 SMART Objective
 
 The MVP will achieve the following three SMART objectives:
 
