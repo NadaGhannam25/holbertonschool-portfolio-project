@@ -51,7 +51,17 @@ The objective of this stage was to define the foundation of the project by creat
 This stage focuses on turning the selected idea into a structured project plan. It explains why the project is being built, what features are included in the MVP, who is responsible for each part of the work, what risks may affect progress, and how the project will move across its planned stages.
 
 
+### What We Did
 
+During this stage, the team completed several important planning activities:
+
+Defined the purpose of the Subscriptions Organiser Platform and the problem it aims to solve.
+Wrote three SMART objectives for user management, subscription tracking, and reminders with spending insights.
+Identified the main stakeholders involved in the project, including the development team, project manager, instructors, end users, and external partner/client.
+Assigned team roles and responsibilities across project management, frontend development, and backend development.
+Defined the project scope by listing the MVP features that are included and the features that are excluded.
+Identified key project risks and prepared mitigation strategies for each one.
+Created a high-level project plan with stages, milestones, and target dates.
 
 
 ### Outcome
