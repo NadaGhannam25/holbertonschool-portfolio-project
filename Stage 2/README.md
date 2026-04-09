@@ -72,6 +72,21 @@ The following items are explicitly excluded from the MVP to keep the project foc
 
 ---
 
+## 4. Risk Identification and Mitigation
+
+
+| # | Risk                                                                                             | Likelihood | Impact | Mitigation Strategy                                                                                                                                                        |
+| - | ------------------------------------------------------------------------------------------------ | ---------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | **User Authentication Security** — Improper handling of credentials or user data privacy issues. | Medium     | High   | Use industry-standard authentication libraries such as **bcrypt** for password hashing and **JWT** for session management. Conduct a security review before deployment.    |
+| 2 | **Reminder System Reliability** — Notifications may fail across different time zones or devices. | Medium     | High   | Use a proven scheduling solution such as **node-cron** or a cloud-based notification service. Test the reminder system across multiple scenarios, devices, and time zones. |
+| 3 | **Scope Creep** — New feature ideas may be added during development, causing delays.             | High       | Medium | Maintain a strict **MVP feature list**. Record additional ideas in a backlog for future phases. The project manager should review and approve any proposed additions.      |
+| 4 | **Team Skill Gaps** — Some team members may be unfamiliar with required tools or technologies.   | Medium     | Medium | Identify skill gaps early, allocate time for learning, and use pair programming and peer review to support knowledge sharing.                                              |
+| 5 | **Timeline Delays** — Tasks may take longer than estimated, affecting deliverables.              | Medium     | High   | Break work into smaller sub-tasks with weekly check-ins. Use **Discord** for regular communication and encourage team members to raise blockers early.                     |
+| 6 | **Data Loss or Database Issues** — Risk of losing user subscription data.                        | Low        | High   | Implement regular database backups, use a reliable and well-supported database system, and validate data input on both the client and server sides.                        |
+
+
+---
+
 # 5. High-Level Project Plan
 
 ## 5.1 Project Timeline
