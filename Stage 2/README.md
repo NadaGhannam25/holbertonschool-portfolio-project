@@ -44,6 +44,10 @@ The MVP will achieve the following three SMART objectives:
 
 ---
 
+# 3. Project Scope
+
+---
+
 # 5. High-Level Project Plan
 
 ## 5.1 Project Timeline
