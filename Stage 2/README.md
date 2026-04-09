@@ -59,6 +59,8 @@ The following features and deliverables are included in the MVP:
 
 ---
 
+
+
 ### 3.2 Out-of-Scope
 
 The following items are explicitly excluded from the MVP to keep the project focused:
