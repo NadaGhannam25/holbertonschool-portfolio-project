@@ -62,7 +62,9 @@ Defined the project scope by listing the MVP features that are included and the 
 Identified key project risks and prepared mitigation strategies for each one.
 Created a high-level project plan with stages, milestones, and target dates.
 
+### Outcome
 
+By the end of this stage, the team produced a complete Project Charter that serves as the main reference for the project. It provides a clear direction for development and helps ensure the team stays focused on delivering a practical, user-centered MVP within the planned timeline.
 
 ---
 ## Authors
