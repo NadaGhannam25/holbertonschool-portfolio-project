@@ -17,7 +17,33 @@ The MVP will achieve the following three SMART objectives:
 | 1 | **User Management** | Enable at least 80% of new users to successfully register an account and log in within 2 minutes of visiting the platform, measured during user acceptance testing. |
 | 2 | **Subscription Tracking** | Allow users to add, categorise, and manage subscriptions, with full CRUD functionality available in the MVP by the end of Stage 4. |
 | 3 | **Reminders & Insights** | Deliver automated email reminders at least 3 days before each subscription renewal date and display a monthly spending summary on the user dashboard. |
-     
+
+---
+
+# 2. Stakeholders and Team Roles
+
+### 2.1 Stakeholders
+
+| Type     | Stakeholder            | Interest / Role |
+|----------|----------------------|----------------|
+| Internal | Development Team      | Design, build, and deliver the platform MVP. |
+| Internal | Project Manager       | Oversees planning, coordination, and deadline adherence. |
+| Internal | Instructors / Tutors  | Provide guidance, review deliverables, and evaluate progress. |
+| External | End Users             | Individuals who will use the platform to manage their subscriptions. |
+| External | External Partner / Client | Organisation or entity providing the MVP brief and feedback. |
+
+
+### 2.2 Team Roles and Responsibilities
+
+| Role               | Assigned To         | Responsibilities |
+|--------------------|--------------------|------------------|
+| Project Manager    | Sondos Al-Rubaish  | Manages timeline, coordinates team tasks, tracks milestones, and communicates progress. |
+| Frontend Developer | Rahaf Al-Harthi    | Builds the user interface, dashboard, and responsive layout. |
+| Backend Developer  | Shaden Al-Alwani   | Develops server-side logic, APIs, database models, and reminder system. |
+| Backend Developer  | Nada Al-Mutairi    | Develops server-side logic, APIs, database models, and reminder system. |
+
+---
+
 # 5. High-Level Project Plan
 
 ## 5.1 Project Timeline
