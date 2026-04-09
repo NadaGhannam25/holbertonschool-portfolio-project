@@ -46,6 +46,30 @@ The MVP will achieve the following three SMART objectives:
 
 # 3. Project Scope
 
+### 3.1 In-Scope
+
+The following features and deliverables are included in the MVP:
+
+- User account registration and secure login  
+- Add, edit, delete, and view subscriptions  
+- Dashboard displaying all active subscriptions and their details  
+- Subscription categorisation (e.g., Entertainment, Productivity, Utilities)  
+- Spending analysis and summary  
+- Automated reminder notifications before subscription renewal dates  
+
+---
+
+### 3.2 Out-of-Scope
+
+The following items are explicitly excluded from the MVP to keep the project focused:
+
+- AI-powered subscription categorisation or recommendations  
+- Integration with bank accounts or payment systems  
+- Multi-currency support or advanced financial planning tools  
+- Mobile application (iOS/Android) — web platform only for MVP  
+- Social or sharing features between users  
+- Third-party API integrations with subscription services  
+
 ---
 
 # 5. High-Level Project Plan
