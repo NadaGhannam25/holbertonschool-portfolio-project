@@ -38,9 +38,9 @@ The platform exposes a RESTful API built with Node.js and Express. All endpoints
 |---|---|---|---|---|
 | GET | `/api/subscriptions` | List all subscriptions | Header: Bearer `<token>` | `{ subscriptions: [ { id, name, category, amount, renewalDate, status } ] }` |
 | POST | `/api/subscriptions` | Add subscription | JSON: `{ name, categoryId, amount, currency, billingCycle, renewalDate }` | `{ message, subscription: { id, ... } }` |
-| GET | `/api/subscriptions/:id` | Get one subscription | URL param: id + Bearer token | `{ id, name, category, amount, renewalDate, notes, status }` |
-| PUT | `/api/subscriptions/:id` | Update subscription | URL param: id + JSON body | `{ message, subscription: { updated fields } }` |
-| DELETE | `/api/subscriptions/:id` | Delete subscription | URL param: id + Bearer token | `{ message: 'Subscription deleted' }` |
+| GET | `/api/subscriptions/:id` | Get one subscription | URL param: `id` + Bearer token | `{ id, name, category, amount, renewalDate, notes, status }` |
+| PUT | `/api/subscriptions/:id` | Update subscription | URL param: `id` + JSON body | `{ message, subscription: { updated fields } }` |
+| DELETE | `/api/subscriptions/:id` | Delete subscription | URL param: `id` + Bearer token | `{ message: 'Subscription deleted' }` |
 
 #### Dashboard & Analytics Endpoints
 
@@ -59,7 +59,7 @@ The platform exposes a RESTful API built with Node.js and Express. All endpoints
 
 | Method | URL Path | Description | Input | Output (JSON) |
 |---|---|---|---|---|
-| PATCH | `/api/subscriptions/:id/cancel` | Cancel a subscription via email link. No login required — token validated via cancelToken query param. | URL param: id + Query: `?cancelToken=<token>` | `{ message: 'Subscription cancelled successfully', subscriptionId, status: 'cancelled' }` |
+| PATCH | `/api/subscriptions/:id/cancel` | Cancel a subscription via email link. No login required — token validated via cancelToken query param | URL param: `id` + Query: `?cancelToken=<token>` | `{ message: 'Subscription cancelled successfully', subscriptionId, status: 'cancelled' }` |
 
 ---
 
@@ -68,6 +68,7 @@ The platform exposes a RESTful API built with Node.js and Express. All endpoints
 #### POST /api/subscriptions — Add a New Subscription
 
 **Request Body:**
+
 ```json
 {
   "name": "Netflix",
@@ -80,6 +81,7 @@ The platform exposes a RESTful API built with Node.js and Express. All endpoints
 ```
 
 **Success Response (201 Created):**
+
 ```json
 {
   "message": "Subscription added successfully",
@@ -95,8 +97,10 @@ The platform exposes a RESTful API built with Node.js and Express. All endpoints
 ```
 
 **Error Response (400 Bad Request):**
+
 ```json
 {
   "error": "Validation failed",
   "details": "renewalDate is required and must be a valid date."
 }
+```
