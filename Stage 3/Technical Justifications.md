@@ -1,5 +1,4 @@
-# Technical Documentation  
-## Technical Justifications: Rationales for Chosen Technologies  
+# Technical Justifications: Rationales for Chosen Technologies  
 
 ---
 
