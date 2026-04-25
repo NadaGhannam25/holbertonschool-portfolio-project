@@ -1,6 +1,4 @@
 # Technical Documentation
-## Task 2 — Components, Classes & Database Design
-**Subscription Organiser Platform**
 
 ---
 
