@@ -8,7 +8,7 @@
 
 The following UML class diagram illustrates the five core backend classes, their attributes, methods, and relationships.
 
-<img width="641" height="646" alt="class-d drawio" src="https://github.com/user-attachments/assets/bdb08176-5ca4-45d9-84bd-1513e1419851" />
+<img width="642" height="646" alt="class-diagram-f drawio" src="https://github.com/user-attachments/assets/693d4346-742a-44b0-b39c-b40bd592639f" />
 
 ---
 
@@ -99,7 +99,7 @@ Each class encapsulates the data and behaviour for one domain entity.
 
 The database consists of five related tables.
 
-<img width="721" height="622" alt="er-derha drawio" src="https://github.com/user-attachments/assets/03c11690-6b81-4b37-8771-9be20c427669" />
+<img width="722" height="621" alt="er-diagram-final drawio" src="https://github.com/user-attachments/assets/25e13ce0-b4e1-442d-864c-0f23816dca2d" />
 
 ---
 
