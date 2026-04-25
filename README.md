@@ -69,6 +69,64 @@ Created a high-level project plan with stages, milestones, and target dates.
 By the end of this stage, the team produced a complete Project Charter that serves as the main reference for the project. It provides a clear direction for development and helps ensure the team stays focused on delivering a practical, user-centered MVP within the planned timeline.
 
 ---
+## Stage 3: Technical Documentation
+
+### Objective
+
+The objective of this stage was to prepare the complete technical documentation for the **Subscriptions Organiser Platform** before moving into implementation. This included defining the MVP requirements from the user’s perspective, creating mockups, documenting the system architecture, describing data structures and API interactions, and preparing diagrams and strategies that support development, testing, and maintenance.
+
+---
+
+### What This Stage Is About
+
+This stage focuses on transforming the project plan into a clear technical design. It explains how the platform should work, how users will interact with it, how the main system components communicate, how data will be stored and exchanged, and how the team will manage code quality during development.
+
+The technical documentation helps the team build a shared understanding of the system before writing code. It also provides a reference for future implementation decisions and ensures that the MVP remains aligned with the project goals.
+
+---
+
+### What We Did
+
+During this stage, the team completed several key documentation activities:
+
+- Defined the main **User Stories** using the required format:
+  - “As a [user type], I want to [perform an action], so that [achieve a goal].”
+- Prioritized the user stories using the **MoSCoW method**:
+  - Must Have
+  - Should Have
+  - Could Have
+  - Won’t Have
+- Created mockups and wireframes for the key MVP screens, including:
+  - Login / Register
+  - Dashboard
+  - My Subscriptions
+  - Add Subscription
+- Documented the main system architecture and identified the core components of the platform, such as:
+  - Front-end
+  - Back-end
+  - Database
+  - Authentication service
+  - Reminder scheduler
+  - Notification service
+- Described the database structure needed to store users, subscriptions, categories, renewal dates, and reminder settings.
+- Defined key API interactions to explain how the front-end communicates with the back-end for authentication, subscription management, and reminder handling.
+- Created high-level sequence diagrams for critical use cases:
+  - User login
+  - Add subscription
+  - Send reminder
+- Identified external services and tools that may support the MVP, such as authentication, scheduling, PDF export, and notifications.
+- Prepared a source control management strategy to organize branches, commits, collaboration, and GitHub usage.
+- Prepared a quality assurance strategy to support testing, code review, error reduction, and future maintainability.
+
+---
+
+### Outcome
+
+By the end of this stage, the team produced a complete technical documentation package for the **Subscriptions Organiser Platform**. This documentation provides a clear foundation for the implementation phase by explaining what the system should do, how the main components should interact, and how the MVP should be developed and tested.
+
+Stage 3 helped the team move from planning to technical design with a more organized and realistic understanding of the platform. It also ensured that the user requirements, interface design, system structure, data flow, and quality practices are clearly documented before development begins.
+
+---
 ## Authors
 
 ### Shaden Majed Alalwani  
