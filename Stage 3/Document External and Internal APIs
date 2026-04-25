@@ -1,1 +1,48 @@
+Task 4: Document External and Internal APIs
+This section documents the external APIs and libraries integrated into the Subscriptions Organiser Platform, and defines the platform's own internal REST API endpoints with full input and output specifications.
 
+4.1 External APIs
+The following external APIs and libraries were selected based on reliability, ease of integration, cost, and direct alignment with the project's SMART objectives and risk mitigation strategies.
+API / LibraryProviderMethodURL / UsagePurposeReason for SelectionResend Email APIResendPOSTapi.resend.com/emailsSend automated renewal reminder emails 3 days before each subscription renews.Reliable transactional delivery, free tier (100 emails/day), simple REST API. Directly enables the 3-day reminder SMART objective.JWT (jsonwebtoken)npm / Auth0Libraryjwt.sign() / jwt.verify()Stateless user session auth and secure API route protection.Eliminates server-side sessions. Widely adopted. Mitigates Auth Security risk (Project Charter Risk #1).bcrypt (bcryptjs)npm libraryLibrarybcrypt.hash() / bcrypt.compare()Secure password hashing before storing credentials in PostgreSQL.Gold-standard adaptive hashing. Protects against database breaches. Recommended in Project Charter risk mitigation.node-cronnpm libraryLibrarycron.schedule('0 8 * * *', ...)Schedule daily jobs to check upcoming renewals and trigger email sending.Runs inside Node.js process — no extra infrastructure. Timezone-aware. Mitigates Reminder Reliability risk (Risk #2).jsPDFnpm libraryLibrarynew jsPDF() — client-sideGenerate monthly spending reports as downloadable PDF files from the dashboard.Lightweight client-side PDF generation. No external API calls required.
+
+4.2 Internal API Endpoints
+The platform exposes a RESTful API built with Node.js and Express. All endpoints use JSON for data exchange. Protected endpoints require a valid JWT in the Authorization header as Bearer <token>.
+Authentication Endpoints
+MethodURL PathDescriptionInputOutput (JSON)POST/api/auth/registerRegister new userJSON: { name, email, password }{ message, token, userId }POST/api/auth/loginAuthenticate userJSON: { email, password }{ token, userId, name }POST/api/auth/logoutEnd sessionHeader: Bearer <token>{ message }GET/api/auth/profileGet user profileHeader: Bearer <token>{ userId, name, email, createdAt }
+Subscription Endpoints
+MethodURL PathDescriptionInputOutput (JSON)GET/api/subscriptionsList all subscriptionsHeader: Bearer <token>{ subscriptions: [ { id, name, category, amount, renewalDate, status } ] }POST/api/subscriptionsAdd subscriptionJSON: { name, categoryId, amount, currency, billingCycle, renewalDate }{ message, subscription: { id, ... } }GET/api/subscriptions/:idGet one subscriptionURL param: id + Bearer token{ id, name, category, amount, renewalDate, notes, status }PUT/api/subscriptions/:idUpdate subscriptionURL param: id + JSON body{ message, subscription: { updated fields } }DELETE/api/subscriptions/:idDelete subscriptionURL param: id + Bearer token{ message: 'Subscription deleted' }
+Dashboard & Analytics Endpoints
+MethodURL PathDescriptionInputOutput (JSON)GET/api/dashboard/summaryMonthly spend summaryHeader: Bearer <token>{ totalMonthlySpend, activeCount, upcomingRenewals: [ ... ] }GET/api/dashboard/categoriesSpend by categoryHeader: Bearer <token>{ categories: [ { name, totalSpend, count } ] }
+Reminders Endpoint
+MethodURL PathDescriptionInputOutput (JSON)GET/api/reminders/upcomingUpcoming renewals — includes a cancel URL embedded in the reminder emailQuery: ?days=3 + Bearer token{ reminders: [ { subscriptionId, name, renewalDate, amount, cancelUrl } ] }
+Cancellation Endpoint
+MethodURL PathDescriptionInputOutput (JSON)PATCH/api/subscriptions/:id/cancelCancel a subscription via email link. No login required — token validated via cancelToken query param.URL param: id + Query: ?cancelToken=<token>{ message: 'Subscription cancelled successfully', subscriptionId, status: 'cancelled' }
+
+4.3 Sample Request and Response
+POST /api/subscriptions — Add a New Subscription
+Request Body:
+json{
+  "name": "Netflix",
+  "categoryId": 1,
+  "amount": 49.99,
+  "currency": "SAR",
+  "billingCycle": "monthly",
+  "renewalDate": "2025-05-15"
+}
+Success Response (201 Created):
+json{
+  "message": "Subscription added successfully",
+  "subscription": {
+    "id": 42,
+    "name": "Netflix",
+    "category": "Entertainment",
+    "amount": 49.99,
+    "renewalDate": "2025-05-15",
+    "status": "active"
+  }
+}
+Error Response (400 Bad Request):
+json{
+  "error": "Validation failed",
+  "details": "renewalDate is required and must be a valid date."
+}
