@@ -1,4 +1,4 @@
-# Task 5: Plan SCM and QA Strategies
+# Plan SCM and QA Strategies
 
 This section defines the Source Code Management (SCM) approach and Quality Assurance (QA) strategy for the Subscriptions Organiser Platform.
 
