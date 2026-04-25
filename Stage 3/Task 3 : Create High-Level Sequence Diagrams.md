@@ -36,7 +36,7 @@ The login process is one of the most important use cases in the platform because
 
 This sequence diagram shows how the user enters their login credentials, how the front-end sends the request to the back-end, how the authentication service validates the credentials, and how the database confirms whether the user exists.
 
-<img src="./Diagrams/Login%20Sequence%20Diagram.png" alt="Login Sequence Diagram" width="100%">
+<img width="1122" height="1402" alt="Login_Sequence Diagram" src="https://github.com/user-attachments/assets/25f47ba9-41b2-407c-a1ad-12aa71486ab4" />
 
 #### Description
 
@@ -57,7 +57,7 @@ This diagram helps ensure that the authentication flow is clear, secure, and ali
 
 Adding a subscription is a core function of the Subscriptions Organiser Platform. This use case allows users to store important subscription details such as subscription name, price, billing cycle, renewal date, category, and reminder preferences.
 
-<img src="./Diagrams/Add%20Subscription%20Diagram.png" alt="Add Subscription Diagram" width="100%">
+<img width="1086" height="1448" alt="Add Subscription_Sequence Diagram" src="https://github.com/user-attachments/assets/76b444aa-d36e-4cb5-8625-dc7e04566314" />
 
 #### Description
 
@@ -80,7 +80,7 @@ This diagram shows how a new record is saved in the system and how the front-end
 
 The reminder feature is important because it helps users avoid missing renewal dates for their subscriptions. This use case shows how the system checks upcoming renewals and sends reminders to users.
 
-<img src="./Diagrams/Send%20Reminder%20Diagram.png" alt="Send Reminder Diagram" width="100%">
+<img width="1086" height="1448" alt="Send Reminder_Sequence Diagram" src="https://github.com/user-attachments/assets/48b4af45-c988-46e7-ad0d-f6e70f4014d9" />
 
 
 #### Description
