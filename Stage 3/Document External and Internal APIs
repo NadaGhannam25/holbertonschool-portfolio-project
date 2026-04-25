@@ -100,4 +100,3 @@ The platform exposes a RESTful API built with Node.js and Express. All endpoints
   "error": "Validation failed",
   "details": "renewalDate is required and must be a valid date."
 }
-```
