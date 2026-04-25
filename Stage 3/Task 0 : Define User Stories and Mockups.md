@@ -42,13 +42,13 @@ The user stories are prioritised using the MoSCoW method to distinguish essentia
 
 ### Design Table
 
-<img src="Stage 3/mockups and design/design table.png" alt="Design Table" width="100%">
+<img src="./mockups%20and%20design/Design%20Table.png" alt="Design Table" width="100%">
 
 The design table presents the visual identity of the platform, including the logo concept, typography, color palette, icon style, and UI style preview.
 
 ### Wireframe Table
 
-<img src="Stage 3/mockups and design/wireframe table.png" alt="Wireframe Table" width="100%">
+<img src="./mockups%20and%20design/WireFrame%20Table.png" alt="Wireframe Table" width="100%">
 
 The wireframe table presents the main screens of the MVP, including Login / Register, Dashboard, My Subscriptions, and Add Subscription.
 
