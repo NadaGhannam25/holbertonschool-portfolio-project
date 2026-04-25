@@ -75,29 +75,3 @@ Request Body:
   "billingCycle": "monthly",
   "renewalDate": "2025-05-15"
 }
-```
-
-Success Response 201:
-
-```json
-{
-  "message": "Subscription added successfully",
-  "subscription": {
-    "id": 42,
-    "name": "Netflix",
-    "category": "Entertainment",
-    "amount": 49.99,
-    "renewalDate": "2025-05-15",
-    "status": "active"
-  }
-}
-```
-
-Error Response 400:
-
-```json
-{
-  "error": "Validation failed",
-  "details": "renewalDate is required and must be a valid date."
-}
-```
