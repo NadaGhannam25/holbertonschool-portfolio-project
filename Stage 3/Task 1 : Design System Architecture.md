@@ -1,4 +1,4 @@
-# Task 1 — System Architecture
+# Task 1: System Architecture
 ---
 
 ## 1. System Architecture Overview
