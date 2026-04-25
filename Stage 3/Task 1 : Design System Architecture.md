@@ -5,7 +5,7 @@
 
 The Subscription Organiser Platform follows a three-tier client-server architecture. The system is divided into a Client Layer, a Backend Layer, and a Database Layer, each with well-defined responsibilities and communication protocols.
 
-<img width="1480" height="867" alt="system-arch" src="https://github.com/user-attachments/assets/beff4d5e-390b-4869-8322-dd691e7b27e8" />
+<img width="1072" height="634" alt="system_Architecture" src="https://github.com/user-attachments/assets/e13af611-25f4-4134-b6e4-0e6c67fffd6c" />
 
 ---
 
