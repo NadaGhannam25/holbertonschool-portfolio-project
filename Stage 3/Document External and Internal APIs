@@ -1,3 +1,8 @@
+# Technical Documentation — Stage 3
+
+## Subscriptions Organiser Platform
+
+---
 
 ## Task 4: Document External and Internal APIs
 
@@ -104,3 +109,6 @@ The platform exposes a RESTful API built with Node.js and Express. All endpoints
   "details": "renewalDate is required and must be a valid date."
 }
 ```
+
+---
+
