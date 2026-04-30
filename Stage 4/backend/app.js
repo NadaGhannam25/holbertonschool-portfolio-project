@@ -14,5 +14,6 @@ app.get('/', async (req, res) => {
 })
 
 app.use('/api/auth', require('./routes/auth'))
+app.use('/api/categories', require('./routes/categories'))
 
 module.exports = app
