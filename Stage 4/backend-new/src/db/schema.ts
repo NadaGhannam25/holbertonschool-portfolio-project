@@ -55,4 +55,5 @@ export const reminders = pgTable("reminders", {
   subscriptionId: integer("subscription_id").references(() => subscriptions.id),
   remindAt: timestamp("remind_at").notNull(),
   sent: boolean("sent").default(false),
+  sentAt: timestamp("sent_at"),
 });

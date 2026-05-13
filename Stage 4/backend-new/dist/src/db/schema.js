@@ -39,5 +39,6 @@ exports.reminders = (0, pg_core_1.pgTable)("reminders", {
     subscriptionId: (0, pg_core_1.integer)("subscription_id").references(() => exports.subscriptions.id),
     remindAt: (0, pg_core_1.timestamp)("remind_at").notNull(),
     sent: (0, pg_core_1.boolean)("sent").default(false),
+    sentAt: (0, pg_core_1.timestamp)("sent_at"),
 });
 //# sourceMappingURL=schema.js.map
