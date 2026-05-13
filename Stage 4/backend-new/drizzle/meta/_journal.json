@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1777933527910,
+      "tag": "0000_hot_miracleman",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777933849811,
+      "tag": "0001_normal_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777939731477,
+      "tag": "0002_nosy_tombstone",
+      "breakpoints": true
+    }
+  ]
+}
