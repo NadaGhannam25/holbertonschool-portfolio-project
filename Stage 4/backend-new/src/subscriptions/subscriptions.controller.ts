@@ -1,63 +1,85 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
   Body,
+  Controller,
+  Delete,
+  Get,
   Param,
   ParseIntPipe,
-  UseGuards,
+  Patch,
+  Post,
+  Put,
   Req,
+  UseGuards,
 } from '@nestjs/common';
-import type { Request } from 'express';
-import { SubscriptionsService } from './subscriptions.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import type { AuthenticatedRequest } from '../auth/guards/jwt-auth.guard';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
-import { JwtGuard } from '../common/jwt.guard';
+import { SubscriptionsService } from './subscriptions.service';
 
-@UseGuards(JwtGuard)
-@Controller('subscriptions')
+@Controller('api/subscriptions')
+@UseGuards(JwtAuthGuard)
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
-  @Get('summary')
-  getSummary(@Req() req: any) {
-    const userId = req.userId as number;
-    return this.subscriptionsService.getSummary(userId);
-  }
-
   @Get()
-  findAll(@Req() req: any) {
-    const userId = req.userId as number;
-    return this.subscriptionsService.findAll(userId);
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-    const userId = req.userId as number;
-    return this.subscriptionsService.findOne(id, userId);
+  findAll(@Req() request: AuthenticatedRequest) {
+    return this.subscriptionsService.findAll(request.user!.sub);
   }
 
   @Post()
-  create(@Body() body: CreateSubscriptionDto, @Req() req: any) {
-    const userId = req.userId as number;
-    return this.subscriptionsService.create(userId, body);
+  create(
+    @Req() request: AuthenticatedRequest,
+    @Body() createSubscriptionDto: CreateSubscriptionDto,
+  ) {
+    return this.subscriptionsService.create(
+      request.user!.sub,
+      createSubscriptionDto,
+    );
   }
 
-  @Patch(':id')
-  update(
+  @Get(':id/history')
+  findPriceHistory(
+    @Req() request: AuthenticatedRequest,
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: UpdateSubscriptionDto,
-    @Req() req: any,
   ) {
-    const userId = req.userId as number;
-    return this.subscriptionsService.update(id, userId, body);
+    return this.subscriptionsService.findPriceHistory(request.user!.sub, id);
+  }
+
+  @Get(':id')
+  findOne(
+    @Req() request: AuthenticatedRequest,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.subscriptionsService.findOne(request.user!.sub, id);
+  }
+
+  @Put(':id')
+  update(
+    @Req() request: AuthenticatedRequest,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateSubscriptionDto: UpdateSubscriptionDto,
+  ) {
+    return this.subscriptionsService.update(
+      request.user!.sub,
+      id,
+      updateSubscriptionDto,
+    );
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-    const userId = req.userId as number;
-    return this.subscriptionsService.remove(id, userId);
+  remove(
+    @Req() request: AuthenticatedRequest,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.subscriptionsService.remove(request.user!.sub, id);
+  }
+
+  @Patch(':id/toggle')
+  toggle(
+    @Req() request: AuthenticatedRequest,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.subscriptionsService.toggle(request.user!.sub, id);
   }
 }
