@@ -1,154 +1,174 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { eq, and, lte } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db';
-import { subscriptions, categories, priceHistory, reminders } from '../db/schema';
+import { categories, priceHistory, reminders, subscriptions } from '../db/schema';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 
 @Injectable()
 export class SubscriptionsService {
-
   async findAll(userId: number) {
-    return await db
+    return db
       .select({
         id: subscriptions.id,
+        userId: subscriptions.userId,
         name: subscriptions.name,
         price: subscriptions.price,
-        billingCycle: subscriptions.billingCycle,
+        categoryId: subscriptions.categoryId,
         renewalDate: subscriptions.renewalDate,
-        status: subscriptions.status,
+        billingCycle: subscriptions.billingCycle,
         notes: subscriptions.notes,
+        status: subscriptions.status,
         cancelUrl: subscriptions.cancelUrl,
         createdAt: subscriptions.createdAt,
-        categoryId: subscriptions.categoryId,
-        categoryName: categories.name,
+        category: {
+          id: categories.id,
+          name: categories.name,
+        },
       })
       .from(subscriptions)
       .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
       .where(eq(subscriptions.userId, userId));
   }
 
-  async getSummary(userId: number) {
-    const all = await this.findAll(userId);
-    const active = all.filter((s) => s.status === 'active');
-
-    const monthlyTotal = active.reduce((sum, s) => {
-      const price = parseFloat(s.price);
-      return sum + (s.billingCycle === 'yearly' ? price / 12 : price);
-    }, 0);
-
-    const today = new Date();
-    const in7Days = new Date();
-    in7Days.setDate(today.getDate() + 7);
-
-    const upcoming = active.filter((s) => {
-      const renewal = new Date(s.renewalDate);
-      return renewal >= today && renewal <= in7Days;
-    });
-
-    return {
-      monthlyTotal: Math.round(monthlyTotal * 100) / 100,
-      activeCount: active.length,
-      upcomingCount: upcoming.length,
-      upcomingRenewals: upcoming.map((s) => ({
-        id: s.id,
-        name: s.name,
-        renewalDate: s.renewalDate,
-        price: s.price,
-        billingCycle: s.billingCycle,
-        daysLeft: Math.ceil(
-          (new Date(s.renewalDate).getTime() - today.getTime()) /
-            (1000 * 60 * 60 * 24),
-        ),
-      })),
-    };
-  }
-
-  async findOne(id: number, userId: number) {
-    const result = await db
-      .select()
-      .from(subscriptions)
-      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)));
-
-    if (!result[0]) throw new NotFoundException('Subscription not found');
-    return result[0];
-  }
-
   async create(userId: number, dto: CreateSubscriptionDto) {
-    const newSub = await db
+    const [subscription] = await db
       .insert(subscriptions)
       .values({
         userId,
         name: dto.name,
-        price: dto.price,
-        categoryId: dto.categoryId ?? null,
+        price: this.formatPrice(dto.price),
+        categoryId: dto.categoryId,
         renewalDate: dto.renewalDate,
         billingCycle: dto.billingCycle,
-        notes: dto.notes ?? null,
-        cancelUrl: dto.cancelUrl ?? null,
+        notes: dto.notes,
         status: dto.status ?? 'active',
+        cancelUrl: dto.cancelUrl,
       })
       .returning();
 
-    const sub = newSub[0];
-
-    await db.insert(priceHistory).values({
-      subscriptionId: sub.id,
-      oldPrice: null,
-      newPrice: dto.price,
-      effectiveFrom: dto.renewalDate,
-    });
-
-    const renewalDate = new Date(dto.renewalDate);
-    const remindAt = new Date(renewalDate);
-    remindAt.setDate(remindAt.getDate() - 3);
-
-    if (remindAt > new Date()) {
-      await db.insert(reminders).values({
-        subscriptionId: sub.id,
-        remindAt,
-        sent: false,
-      });
-    }
-
-    return sub;
+    return subscription;
   }
 
-  async update(id: number, userId: number, dto: UpdateSubscriptionDto) {
-    const existing = await this.findOne(id, userId);
+  async findOne(userId: number, id: number) {
+    return this.getOwnedSubscription(userId, id);
+  }
 
-    if (dto.price && dto.price !== existing.price) {
+  async update(userId: number, id: number, dto: UpdateSubscriptionDto) {
+    const currentSubscription = await this.getOwnedSubscription(userId, id);
+    const updateData: Partial<typeof subscriptions.$inferInsert> = {};
+
+    if (dto.name !== undefined) updateData.name = dto.name;
+    if (dto.price !== undefined) updateData.price = this.formatPrice(dto.price);
+    if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
+    if (dto.renewalDate !== undefined) updateData.renewalDate = dto.renewalDate;
+    if (dto.billingCycle !== undefined) updateData.billingCycle = dto.billingCycle;
+    if (dto.notes !== undefined) updateData.notes = dto.notes;
+    if (dto.status !== undefined) updateData.status = dto.status;
+    if (dto.cancelUrl !== undefined) updateData.cancelUrl = dto.cancelUrl;
+
+    if (Object.keys(updateData).length === 0) {
+      return currentSubscription;
+    }
+
+    const oldPrice = Number(currentSubscription.price);
+    const newPrice = dto.price;
+
+    if (newPrice !== undefined && oldPrice !== newPrice) {
       await db.insert(priceHistory).values({
-        subscriptionId: id,
-        oldPrice: existing.price,
-        newPrice: dto.price,
-        effectiveFrom: dto.renewalDate ?? existing.renewalDate,
+        subscriptionId: currentSubscription.id,
+        oldPrice: this.formatPrice(oldPrice),
+        newPrice: this.formatPrice(newPrice),
+        effectiveFrom: new Date().toISOString().slice(0, 10),
       });
     }
 
-    const updated = await db
+    const [updatedSubscription] = await db
       .update(subscriptions)
-      .set({
-        ...(dto.name !== undefined && { name: dto.name }),
-        ...(dto.price !== undefined && { price: dto.price }),
-        ...(dto.categoryId !== undefined && { categoryId: dto.categoryId }),
-        ...(dto.renewalDate !== undefined && { renewalDate: dto.renewalDate }),
-        ...(dto.billingCycle !== undefined && { billingCycle: dto.billingCycle }),
-        ...(dto.notes !== undefined && { notes: dto.notes }),
-        ...(dto.cancelUrl !== undefined && { cancelUrl: dto.cancelUrl }),
-        ...(dto.status !== undefined && { status: dto.status }),
-      })
+      .set(updateData)
+      .where(
+        and(
+          eq(subscriptions.id, currentSubscription.id),
+          eq(subscriptions.userId, userId),
+        ),
+      )
+      .returning();
+
+    return updatedSubscription;
+  }
+
+  async findPriceHistory(userId: number, id: number) {
+    const currentSubscription = await this.getOwnedSubscription(userId, id);
+
+    return db
+      .select()
+      .from(priceHistory)
+      .where(eq(priceHistory.subscriptionId, currentSubscription.id))
+      .orderBy(desc(priceHistory.changedAt));
+  }
+
+  async remove(userId: number, id: number) {
+    await this.getOwnedSubscription(userId, id);
+
+    await db.delete(reminders).where(eq(reminders.subscriptionId, id));
+    await db.delete(priceHistory).where(eq(priceHistory.subscriptionId, id));
+
+    const [deletedSubscription] = await db
+      .delete(subscriptions)
       .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
       .returning();
 
-    return updated[0];
+    return {
+      message: 'Subscription deleted successfully',
+      subscription: deletedSubscription,
+    };
   }
 
-  async remove(id: number, userId: number) {
-    await this.findOne(id, userId);
-    await db.delete(reminders).where(eq(reminders.subscriptionId, id));
-    await db.delete(priceHistory).where(eq(priceHistory.subscriptionId, id));
-    await db.delete(subscriptions).where(eq(subscriptions.id, id));
-    return { message: 'Subscription deleted successfully' };
+  async toggle(userId: number, id: number) {
+    const currentSubscription = await this.getOwnedSubscription(userId, id);
+    const nextStatus =
+      currentSubscription.status === 'active' ? 'inactive' : 'active';
+
+    const [updatedSubscription] = await db
+      .update(subscriptions)
+      .set({ status: nextStatus })
+      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+      .returning();
+
+    return updatedSubscription;
+  }
+
+  private async getOwnedSubscription(userId: number, id: number) {
+    const [subscription] = await db
+      .select({
+        id: subscriptions.id,
+        userId: subscriptions.userId,
+        name: subscriptions.name,
+        price: subscriptions.price,
+        categoryId: subscriptions.categoryId,
+        renewalDate: subscriptions.renewalDate,
+        billingCycle: subscriptions.billingCycle,
+        notes: subscriptions.notes,
+        status: subscriptions.status,
+        cancelUrl: subscriptions.cancelUrl,
+        createdAt: subscriptions.createdAt,
+        category: {
+          id: categories.id,
+          name: categories.name,
+        },
+      })
+      .from(subscriptions)
+      .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
+      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)));
+
+    if (!subscription) {
+      throw new NotFoundException('Subscription not found');
+    }
+
+    return subscription;
+  }
+
+  private formatPrice(price: number) {
+    return price.toFixed(2);
   }
 }
