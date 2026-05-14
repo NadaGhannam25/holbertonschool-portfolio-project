@@ -25,7 +25,13 @@ export class CreateSubscriptionDto {
   @IsInt()
   @Min(1)
   categoryId: number;
-
+  
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  providerId?: number;
+  
   @IsDateString()
   renewalDate: string;
 
