@@ -51,7 +51,7 @@ function buildEmailHtml(data: ReminderEmailData): string {
       </div>
       ${data.cancelUrl ? `<a href="${data.cancelUrl}" class="btn-cancel">الغاء الاشتراك</a>` : ''}
     </div>
-    <div class="footer"><p>2026 دierها</p></div>
+    <div class="footer"><p>2026 Dierha</p></div>
   </div>
 </body>
 </html>`;
@@ -66,14 +66,18 @@ export async function sendReminderEmail(data: ReminderEmailData): Promise<boolea
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'Dierha <reminders@dierha.com>',
+        from: 'onboarding@resend.dev',
         to: [data.to],
         subject: `تذكير: ${data.subscriptionName} سيتجدد خلال 3 ايام`,
         html: buildEmailHtml(data),
       }),
     });
 
-    if (!response.ok) { console.error('[Email] فشل الارسال'); return false; }
+    if (!response.ok) {
+      const err = await response.json();
+      console.error('[Email] فشل الارسال:', err);
+      return false;
+    }
     console.log(`[Email] تم الارسال الى ${data.to}`);
     return true;
   } catch (error) {
