@@ -57,7 +57,7 @@ export class AuthService {
         sub: user.id,
         email: user.email,
       },
-      process.env.JWT_SECRET || 'dev_secret',
+      process.env.JWT_SECRET as string,
       {
         expiresIn: '1d',
       },
