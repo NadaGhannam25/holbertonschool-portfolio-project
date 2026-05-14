@@ -1,8 +1,19 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { startCronJobs } from './services/cron';
 
+function validateEnvironment() {
+  if (!process.env.JWT_SECRET) {
+    throw new Error(
+      'JWT_SECRET is required. Please add it to your .env file.',
+    );
+  }
+}
+
 async function bootstrap() {
+  validateEnvironment();
+
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
@@ -10,6 +21,14 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   const port = process.env.PORT ?? 4000;
 
