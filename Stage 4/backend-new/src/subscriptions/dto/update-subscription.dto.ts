@@ -26,6 +26,12 @@ export class UpdateSubscriptionDto {
   @IsInt()
   @Min(1)
   categoryId?: number;
+  
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  providerId?: number;
 
   @IsOptional()
   @IsDateString()
