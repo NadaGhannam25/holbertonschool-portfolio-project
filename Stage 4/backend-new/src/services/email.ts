@@ -12,11 +12,23 @@ interface ReminderEmailData {
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
+
   return date.toLocaleDateString('ar-SA', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
+}
+
+function formatBillingCycle(cycle: string): string {
+  const map: Record<string, string> = {
+    monthly: 'شهري',
+    yearly: 'سنوي',
+    weekly: 'أسبوعي',
+    daily: 'يومي',
+  };
+
+  return map[cycle] ?? cycle;
 }
 
 function buildEmailHtml(data: ReminderEmailData): string {
@@ -26,62 +38,152 @@ function buildEmailHtml(data: ReminderEmailData): string {
 <head>
   <meta charset="UTF-8" />
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f6fb; direction: rtl; }
-    .wrapper { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 16px; overflow: hidden; }
-    .header { background: linear-gradient(135deg, #1e3a5f, #2e5d9e); padding: 36px 40px; text-align: center; }
-    .header h1 { color: #fff; font-size: 22px; }
-    .body { padding: 36px 40px; }
-    .card { background: #f8f9ff; border: 1px solid #e2e8f8; border-radius: 12px; padding: 24px; margin-bottom: 28px; }
-    .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #edf0f8; }
-    .row:last-child { border-bottom: none; }
-    .btn-cancel { display: inline-block; background: #fff; color: #e53e3e; border: 1.5px solid #e53e3e; padding: 12px 28px; border-radius: 50px; text-decoration: none; }
-    .footer { background: #f4f6fb; padding: 24px 40px; text-align: center; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      direction: rtl;
+      margin: 0;
+      padding: 0;
+    }
+    .wrapper {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+    .header {
+      background: linear-gradient(135deg, #1e3a5f, #2e5d9e);
+      padding: 32px 40px;
+      text-align: center;
+    }
+    .header h1 {
+      color: #ffffff;
+      font-size: 22px;
+      margin: 0;
+    }
+    .body {
+      padding: 32px 40px;
+      color: #1f2937;
+    }
+    .card {
+      background: #f8f9ff;
+      border: 1px solid #e2e8f8;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #edf0f8;
+    }
+    .row:last-child {
+      border-bottom: none;
+    }
+    .btn-cancel {
+      display: inline-block;
+      background: #ffffff;
+      color: #e53e3e;
+      border: 1.5px solid #e53e3e;
+      padding: 12px 28px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .footer {
+      background: #f4f6fb;
+      padding: 20px 40px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
   <div class="wrapper">
-    <div class="header"><h1>تذكير تجديد اشتراك</h1></div>
-    <div class="body">
-      <p>مرحبا <strong>${data.userName}</strong>،</p>
-      <p>اشتراكك في <strong>${data.subscriptionName}</strong> سيتجدد خلال 3 ايام.</p>
-      <div class="card">
-        <div class="row"><span>الخدمة</span><strong>${data.subscriptionName}</strong></div>
-        <div class="row"><span>تاريخ التجديد</span><strong>${formatDate(data.renewalDate)}</strong></div>
-        <div class="row"><span>المبلغ</span><strong>${data.amount} ريال</strong></div>
-      </div>
-      ${data.cancelUrl ? `<a href="${data.cancelUrl}" class="btn-cancel">الغاء الاشتراك</a>` : ''}
+    <div class="header">
+      <h1>تذكير بتجديد اشتراك</h1>
     </div>
-    <div class="footer"><p>2026 Dierha</p></div>
+
+    <div class="body">
+      <p>مرحبًا <strong>${data.userName}</strong>،</p>
+      <p>
+        نذكّرك بأن اشتراكك في <strong>${data.subscriptionName}</strong>
+        سيتجدد قريبًا.
+      </p>
+
+      <div class="card">
+        <div class="row">
+          <span>الخدمة</span>
+          <strong>${data.subscriptionName}</strong>
+        </div>
+        <div class="row">
+          <span>تاريخ التجديد</span>
+          <strong>${formatDate(data.renewalDate)}</strong>
+        </div>
+        <div class="row">
+          <span>المبلغ</span>
+          <strong>${data.amount} ريال</strong>
+        </div>
+        <div class="row">
+          <span>دورة الفوترة</span>
+          <strong>${formatBillingCycle(data.billingCycle)}</strong>
+        </div>
+      </div>
+
+      ${
+        data.cancelUrl
+          ? `<a href="${data.cancelUrl}" class="btn-cancel">إدارة أو إلغاء الاشتراك</a>`
+          : ''
+      }
+    </div>
+
+    <div class="footer">
+      <p>ديرها | منصة إدارة الاشتراكات</p>
+    </div>
   </div>
 </body>
 </html>`;
 }
 
-export async function sendReminderEmail(data: ReminderEmailData): Promise<boolean> {
+export async function sendReminderEmail(
+  data: ReminderEmailData,
+): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) { console.warn('[Email] RESEND_API_KEY غير موجود'); return false; }
+
+  if (!apiKey) {
+    console.warn('[Email] RESEND_API_KEY is missing');
+    return false;
+  }
 
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        from: 'onboarding@resend.dev',
+        from: process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev',
         to: [data.to],
-        subject: `تذكير: ${data.subscriptionName} سيتجدد خلال 3 ايام`,
+        subject: `تذكير: ${data.subscriptionName} سيتجدد قريبًا`,
         html: buildEmailHtml(data),
       }),
     });
 
     if (!response.ok) {
-      const err = await response.json();
-      console.error('[Email] فشل الارسال:', err);
+      const errorBody = await response.json();
+      console.error('[Email] Failed to send:', errorBody);
       return false;
     }
-    console.log(`[Email] تم الارسال الى ${data.to}`);
+
+    console.log(`[Email] Sent to ${data.to}`);
     return true;
   } catch (error) {
-    console.error('[Email] خطا:', error);
+    console.error('[Email] Error:', error);
     return false;
   }
 }
