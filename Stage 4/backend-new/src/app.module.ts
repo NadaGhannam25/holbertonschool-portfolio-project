@@ -6,9 +6,16 @@ import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './common/logger.middleware';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { ProvidersModule } from './providers/providers.module';
 
 @Module({
-  imports: [CategoriesModule, AuthModule, SubscriptionsModule, AnalyticsModule],
+  imports: [
+    CategoriesModule,
+    AuthModule,
+    SubscriptionsModule,
+    AnalyticsModule,
+    ProvidersModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
