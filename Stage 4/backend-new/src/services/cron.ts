@@ -1,12 +1,12 @@
 import 'dotenv/config';
 import cron from 'node-cron';
-import { eq, and, lte } from 'drizzle-orm';
+import { and, eq, lte } from 'drizzle-orm';
 import { db } from '../db';
 import { reminders, subscriptions, users } from '../db/schema';
 import { sendReminderEmail } from './email';
 
 async function runReminderJob(): Promise<void> {
-  console.log('[Cron] بدء فحص التذكيرات...');
+  console.log('[Cron] Checking pending reminders...');
 
   const now = new Date();
 
@@ -27,19 +27,12 @@ async function runReminderJob(): Promise<void> {
     .from(reminders)
     .innerJoin(subscriptions, eq(reminders.subscriptionId, subscriptions.id))
     .innerJoin(users, eq(subscriptions.userId, users.id))
-    .where(
-      and(
-        eq(reminders.sent, false),
-        lte(reminders.remindAt, now),
-      ),
-    );
+    .where(and(eq(reminders.sent, false), lte(reminders.remindAt, now)));
 
   if (pendingReminders.length === 0) {
-    console.log('[Cron] لا توجد تذكيرات معلقة');
+    console.log('[Cron] No pending reminders');
     return;
   }
-
-  console.log(`[Cron] وجدنا ${pendingReminders.length} تذكير للارسال`);
 
   for (const reminder of pendingReminders) {
     try {
@@ -53,28 +46,31 @@ async function runReminderJob(): Promise<void> {
         cancelUrl: reminder.cancelUrl,
       });
 
-      await db
-        .update(reminders)
-        .set({ sent: true })
-        .where(eq(reminders.id, reminder.reminderId));
-
       if (sent) {
-        console.log(`[Cron] تم ارسال التذكير لـ ${reminder.userEmail}`);
+        await db
+          .update(reminders)
+          .set({ sent: true })
+          .where(eq(reminders.id, reminder.reminderId));
+
+        console.log(`[Cron] Reminder sent to ${reminder.userEmail}`);
       }
-    } catch (err) {
-      console.error(`[Cron] خطا في معالجة التذكير ${reminder.reminderId}:`, err);
+    } catch (error) {
+      console.error(
+        `[Cron] Failed to process reminder ${reminder.reminderId}:`,
+        error,
+      );
     }
   }
 
-  console.log('[Cron] انتهى فحص التذكيرات');
+  console.log('[Cron] Reminder check completed');
 }
 
 export function startCronJobs(): void {
   cron.schedule('0 9 * * *', () => {
-    runReminderJob().catch((err) => {
-      console.error('[Cron] خطا في الcron job:', err);
+    runReminderJob().catch((error) => {
+      console.error('[Cron] Reminder job failed:', error);
     });
   });
 
-  console.log('[Cron] Cron jobs مشغلة - تذكيرات يومية الساعة 9:00 صباحا');
+  console.log('[Cron] Daily reminder job scheduled at 9:00 AM');
 }
