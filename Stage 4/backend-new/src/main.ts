@@ -1,3 +1,4 @@
+import { startCronJobs } from './services/cron';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { startCronJobs } from './services/cron';
