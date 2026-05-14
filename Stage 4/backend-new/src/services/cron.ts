@@ -49,7 +49,7 @@ async function runReminderJob(): Promise<void> {
       if (sent) {
         await db
           .update(reminders)
-          .set({ sent: true })
+          .set({ sent: true, sentAt: new Date(), })
           .where(eq(reminders.id, reminder.reminderId));
 
         console.log(`[Cron] Reminder sent to ${reminder.userEmail}`);
