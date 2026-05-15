@@ -35,9 +35,8 @@ export class CreateSubscriptionDto {
   @IsDateString()
   renewalDate: string;
 
-  @IsString()
-  @IsNotEmpty()
-  billingCycle: string;
+  @IsIn(['monthly', 'quarterly', 'semi_annual', 'yearly'])
+  billingCycle:  'monthly' | 'quarterly' | 'semi_annual' | 'yearly';
 
   @IsOptional()
   @IsString()
