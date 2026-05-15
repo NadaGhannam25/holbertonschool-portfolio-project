@@ -1,7 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '../db';
-import {categories, priceHistory, reminders, subscriptionProviders, subscriptions, } from '../db/schema';
+import {
+  categories,
+  priceHistory,
+  reminders,
+  subscriptionProviders,
+  subscriptions,
+} from '../db/schema';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 
@@ -44,32 +50,46 @@ export class SubscriptionsService {
   }
 
   async create(userId: number, dto: CreateSubscriptionDto) {
-    const [subscription] = await db
-      .insert(subscriptions)
-      .values({
-        userId,
-        providerId: dto.providerId,
-        name: dto.name,
-        price: this.formatPrice(dto.price),
-        categoryId: dto.categoryId,
-        renewalDate: dto.renewalDate,
-        billingCycle: dto.billingCycle,
-        notes: dto.notes,
-        status: dto.status ?? 'active',
-        cancelUrl: dto.cancelUrl,
-      })
-      .returning();
+    return db.transaction(async (tx) => {
+      const [subscription] = await tx
+        .insert(subscriptions)
+        .values({
+          userId,
+          providerId: dto.providerId,
+          name: dto.name,
+          price: this.formatPrice(dto.price),
+          categoryId: dto.categoryId,
+          renewalDate: dto.renewalDate,
+          billingCycle: dto.billingCycle,
+          notes: dto.notes,
+          status: dto.status ?? 'active',
+          cancelUrl: dto.cancelUrl,
+        })
+        .returning();
 
-    await db.insert(priceHistory).values({
-      subscriptionId: subscription.id,
-      oldPrice: null,
-      newPrice: this.formatPrice(dto.price),
-      effectiveFrom: dto.renewalDate,
+      await tx.insert(priceHistory).values({
+        subscriptionId: subscription.id,
+        oldPrice: null,
+        newPrice: this.formatPrice(dto.price),
+        effectiveFrom: dto.renewalDate,
+      });
+
+      const renewalDate = new Date(dto.renewalDate);
+      const remindAt = new Date(renewalDate);
+
+      remindAt.setDate(remindAt.getDate() - 3);
+
+      if (remindAt > new Date()) {
+        await tx.insert(reminders).values({
+          subscriptionId: subscription.id,
+          remindAt,
+          sent: false,
+          sentAt: null,
+        });
+      }
+
+      return subscription;
     });
-
-    await this.createReminderBeforeRenewal(subscription.id, dto.renewalDate);
-
-    return subscription;
   }
 
   async findOne(userId: number, id: number) {
