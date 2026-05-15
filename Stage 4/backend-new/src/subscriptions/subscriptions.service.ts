@@ -175,21 +175,25 @@ export class SubscriptionsService {
       .orderBy(desc(priceHistory.changedAt));
   }
 
+  
   async remove(userId: number, id: number) {
-    await this.getOwnedSubscription(userId, id);
+    return db.transaction(async (tx) => {
+      await this.getOwnedSubscription(userId, id);
 
-    await db.delete(reminders).where(eq(reminders.subscriptionId, id));
-    await db.delete(priceHistory).where(eq(priceHistory.subscriptionId, id));
+      await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
 
-    const [deletedSubscription] = await db
-      .delete(subscriptions)
-      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
-      .returning();
+      await tx.delete(priceHistory).where(eq(priceHistory.subscriptionId, id));
 
-    return {
-      message: 'Subscription deleted successfully',
-      subscription: deletedSubscription,
-    };
+      const [deletedSubscription] = await tx
+        .delete(subscriptions)
+        .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+        .returning();
+
+      return {
+        message: 'Subscription deleted successfully',
+        subscription: deletedSubscription,
+      };
+    });
   }
 
   async toggle(userId: number, id: number) {
