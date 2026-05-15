@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedRequest } from '../auth/guards/jwt-auth.guard';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
+import { FilterSubscriptionsDto } from './dto/filter-subscriptions.dto';
 import { SubscriptionsService } from './subscriptions.service';
 
 @Controller('api/subscriptions')
@@ -23,8 +25,11 @@ export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
   @Get()
-  findAll(@Req() request: AuthenticatedRequest) {
-    return this.subscriptionsService.findAll(request.user!.sub);
+  findAll(
+    @Req() request: AuthenticatedRequest,
+    @Query() filters: FilterSubscriptionsDto,
+  ) {
+    return this.subscriptionsService.findAll(request.user!.sub, filters);
   }
 
   @Post()
