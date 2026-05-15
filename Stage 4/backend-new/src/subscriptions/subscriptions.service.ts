@@ -1,16 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { and, desc, eq, ilike } from 'drizzle-orm';
 import { db } from '../db';
-import { categories, priceHistory, reminders, subscriptionProviders, subscriptions,
-} from '../db/schema';
+import { categories, priceHistory, reminders, subscriptionProviders, subscriptions } from '../db/schema';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { FilterSubscriptionsDto } from './dto/filter-subscriptions.dto';
 
 @Injectable()
 export class SubscriptionsService {
-  
-  async findAll(userId: number) {
+  async findAll(userId: number, filters?: FilterSubscriptionsDto) {
+    const conditions = [eq(subscriptions.userId, userId)];
+
+    if (filters?.categoryId !== undefined) {
+      conditions.push(eq(subscriptions.categoryId, filters.categoryId));
+    }
+
+    if (filters?.search) {
+      conditions.push(ilike(subscriptions.name, `%${filters.search}%`));
+    }
+
     return db
       .select({
         id: subscriptions.id,
@@ -43,7 +51,7 @@ export class SubscriptionsService {
         subscriptionProviders,
         eq(subscriptions.providerId, subscriptionProviders.id),
       )
-      .where(eq(subscriptions.userId, userId));
+      .where(and(...conditions));
   }
 
   async create(userId: number, dto: CreateSubscriptionDto) {
@@ -172,7 +180,6 @@ export class SubscriptionsService {
       .orderBy(desc(priceHistory.changedAt));
   }
 
-  
   async remove(userId: number, id: number) {
     return db.transaction(async (tx) => {
       await this.getOwnedSubscription(userId, id);
