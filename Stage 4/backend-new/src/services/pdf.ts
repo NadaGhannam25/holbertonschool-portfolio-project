@@ -12,9 +12,9 @@ function formatDate(dateStr: string): string {
 function formatBillingCycle(cycle: string): string {
   const map: Record<string, string> = {
     monthly: 'Monthly',
+    quarterly: 'Every 3 Months',
+    semi_annual: 'Every 6 Months',
     yearly: 'Yearly',
-    weekly: 'Weekly',
-    daily: 'Daily',
   };
 
   return map[cycle] ?? cycle;
@@ -23,9 +23,9 @@ function formatBillingCycle(cycle: string): string {
 function getMonthlyEquivalent(price: string, billingCycle: string): number {
   const amount = Number(price);
 
+  if (billingCycle === 'quarterly') return amount / 3;
+  if (billingCycle === 'semi_annual') return amount / 6;
   if (billingCycle === 'yearly') return amount / 12;
-  if (billingCycle === 'weekly') return amount * 4;
-  if (billingCycle === 'daily') return amount * 30;
 
   return amount;
 }
