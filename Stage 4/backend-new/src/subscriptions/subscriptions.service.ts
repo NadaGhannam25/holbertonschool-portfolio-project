@@ -1,18 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, ilike } from 'drizzle-orm';
 import { db } from '../db';
-import {
-  categories,
-  priceHistory,
-  reminders,
-  subscriptionProviders,
-  subscriptions,
+import { categories, priceHistory, reminders, subscriptionProviders, subscriptions,
 } from '../db/schema';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
+import { FilterSubscriptionsDto } from './dto/filter-subscriptions.dto';
 
 @Injectable()
 export class SubscriptionsService {
+  
   async findAll(userId: number) {
     return db
       .select({
