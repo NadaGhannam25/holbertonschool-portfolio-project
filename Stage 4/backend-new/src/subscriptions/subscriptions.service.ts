@@ -76,7 +76,6 @@ export class SubscriptionsService {
 
       const renewalDate = new Date(dto.renewalDate);
       const remindAt = new Date(renewalDate);
-
       remindAt.setDate(remindAt.getDate() - 3);
 
       if (remindAt > new Date()) {
@@ -97,63 +96,73 @@ export class SubscriptionsService {
   }
 
   async update(userId: number, id: number, dto: UpdateSubscriptionDto) {
-    const currentSubscription = await this.getOwnedSubscription(userId, id);
-    const updateData: Partial<typeof subscriptions.$inferInsert> = {};
+    return db.transaction(async (tx) => {
+      const currentSubscription = await this.getOwnedSubscription(userId, id);
+      const updateData: Partial<typeof subscriptions.$inferInsert> = {};
 
-    if (dto.name !== undefined) updateData.name = dto.name;
-    if (dto.price !== undefined) updateData.price = this.formatPrice(dto.price);
-    if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
-    if (dto.providerId !== undefined) updateData.providerId = dto.providerId;
-    if (dto.renewalDate !== undefined) updateData.renewalDate = dto.renewalDate;
-    if (dto.billingCycle !== undefined) updateData.billingCycle = dto.billingCycle;
-    if (dto.notes !== undefined) updateData.notes = dto.notes;
-    if (dto.status !== undefined) updateData.status = dto.status;
-    if (dto.cancelUrl !== undefined) updateData.cancelUrl = dto.cancelUrl;
+      if (dto.name !== undefined) updateData.name = dto.name;
+      if (dto.price !== undefined) updateData.price = this.formatPrice(dto.price);
+      if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
+      if (dto.providerId !== undefined) updateData.providerId = dto.providerId;
+      if (dto.renewalDate !== undefined) updateData.renewalDate = dto.renewalDate;
+      if (dto.billingCycle !== undefined) updateData.billingCycle = dto.billingCycle;
+      if (dto.notes !== undefined) updateData.notes = dto.notes;
+      if (dto.status !== undefined) updateData.status = dto.status;
+      if (dto.cancelUrl !== undefined) updateData.cancelUrl = dto.cancelUrl;
 
-    if (Object.keys(updateData).length === 0) {
-      return currentSubscription;
-    }
+      if (Object.keys(updateData).length === 0) {
+        return currentSubscription;
+      }
 
-    const oldPrice = Number(currentSubscription.price);
-    const newPrice = dto.price;
+      const oldPrice = Number(currentSubscription.price);
+      const newPrice = dto.price;
 
-    if (newPrice !== undefined && oldPrice !== newPrice) {
-      await db.insert(priceHistory).values({
-        subscriptionId: currentSubscription.id,
-        oldPrice: this.formatPrice(oldPrice),
-        newPrice: this.formatPrice(newPrice),
-        effectiveFrom: new Date().toISOString().slice(0, 10),
-      });
-    }
+      if (newPrice !== undefined && oldPrice !== newPrice) {
+        await tx.insert(priceHistory).values({
+          subscriptionId: currentSubscription.id,
+          oldPrice: this.formatPrice(oldPrice),
+          newPrice: this.formatPrice(newPrice),
+          effectiveFrom: new Date().toISOString().slice(0, 10),
+        });
+      }
 
-    const [updatedSubscription] = await db
-      .update(subscriptions)
-      .set(updateData)
-      .where(
-        and(
-          eq(subscriptions.id, currentSubscription.id),
-          eq(subscriptions.userId, userId),
-        ),
-      )
-      .returning();
-
-    if (dto.renewalDate !== undefined) {
-      await db
-        .delete(reminders)
+      const [updatedSubscription] = await tx
+        .update(subscriptions)
+        .set(updateData)
         .where(
           and(
-            eq(reminders.subscriptionId, currentSubscription.id),
-            eq(reminders.sent, false),
+            eq(subscriptions.id, currentSubscription.id),
+            eq(subscriptions.userId, userId),
           ),
-        );
+        )
+        .returning();
 
-      await this.createReminderBeforeRenewal(
-        currentSubscription.id,
-        dto.renewalDate,
-      );
-    }
+      if (dto.renewalDate !== undefined) {
+        await tx
+          .delete(reminders)
+          .where(
+            and(
+              eq(reminders.subscriptionId, currentSubscription.id),
+              eq(reminders.sent, false),
+            ),
+          );
 
-    return updatedSubscription;
+        const renewalDate = new Date(dto.renewalDate);
+        const remindAt = new Date(renewalDate);
+        remindAt.setDate(remindAt.getDate() - 3);
+
+        if (remindAt > new Date()) {
+          await tx.insert(reminders).values({
+            subscriptionId: currentSubscription.id,
+            remindAt,
+            sent: false,
+            sentAt: null,
+          });
+        }
+      }
+
+      return updatedSubscription;
+    });
   }
 
   async findPriceHistory(userId: number, id: number) {
@@ -237,27 +246,6 @@ export class SubscriptionsService {
     }
 
     return subscription;
-  }
-
-  private async createReminderBeforeRenewal(
-    subscriptionId: number,
-    renewalDateValue: string,
-  ) {
-    const renewalDate = new Date(renewalDateValue);
-    const remindAt = new Date(renewalDate);
-
-    remindAt.setDate(remindAt.getDate() - 3);
-
-    if (remindAt <= new Date()) {
-      return;
-    }
-
-    await db.insert(reminders).values({
-      subscriptionId,
-      remindAt,
-      sent: false,
-      sentAt: null,
-    });
   }
 
   private formatPrice(price: number) {
