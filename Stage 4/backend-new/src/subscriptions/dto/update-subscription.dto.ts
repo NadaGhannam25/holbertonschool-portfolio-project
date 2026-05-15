@@ -38,8 +38,8 @@ export class UpdateSubscriptionDto {
   renewalDate?: string;
 
   @IsOptional()
-  @IsString()
-  billingCycle?: string;
+  @IsIn(['monthly', 'quarterly', 'semi_annual', 'yearly'])
+  billingCycle?: 'monthly' | 'quarterly' | 'semi_annual' | 'yearly';
 
   @IsOptional()
   @IsString()
