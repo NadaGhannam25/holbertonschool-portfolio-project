@@ -25,18 +25,31 @@ export class AnalyticsService {
       .select({
         totalYearlyAmount: sql<string>`coalesce(sum(
           case
-            when lower(${subscriptions.billingCycle}) in ('monthly', 'شهري') then ${subscriptions.price}::numeric * 12
-            when lower(${subscriptions.billingCycle}) in ('weekly', 'أسبوعي', 'اسبوعي') then ${subscriptions.price}::numeric * 52
-            when lower(${subscriptions.billingCycle}) in ('daily', 'يومي') then ${subscriptions.price}::numeric * 365
+            when ${subscriptions.billingCycle} = 'monthly'
+              then ${subscriptions.price}::numeric * 12
+
+            when ${subscriptions.billingCycle} = 'quarterly'
+              then ${subscriptions.price}::numeric * 4
+
+            when ${subscriptions.billingCycle} = 'semi_annual'
+              then ${subscriptions.price}::numeric * 2
+
+            when ${subscriptions.billingCycle} = 'yearly'
+              then ${subscriptions.price}::numeric
+
             else ${subscriptions.price}::numeric
           end
         ), 0)`,
+
         subscriptionsCount: sql<number>`count(${subscriptions.id})::int`,
       })
       .from(subscriptions)
       .where(eq(subscriptions.userId, userId));
 
-    return result ?? { totalYearlyAmount: '0', subscriptionsCount: 0 };
+    return result ?? {
+      totalYearlyAmount: '0',
+      subscriptionsCount: 0,
+    };
   }
 
   async getCategories(userId: number) {
