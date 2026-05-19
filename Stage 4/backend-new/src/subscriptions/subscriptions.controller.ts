@@ -51,6 +51,14 @@ export class SubscriptionsController {
     return this.subscriptionsService.findPriceHistory(request.user!.sub, id);
   }
 
+  @Get(':id/spending')
+  getSubscriptionSpending(
+    @Req() request: AuthenticatedRequest,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.subscriptionsService.getSubscriptionSpending(request.user!.sub,id);
+  }
+  
   @Get(':id')
   findOne(
     @Req() request: AuthenticatedRequest,
