@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  IsBoolean,
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -26,7 +27,7 @@ export class UpdateSubscriptionDto {
   @IsInt()
   @Min(1)
   categoryId?: number;
-  
+
   @IsOptional()
   @Type(() => Number)
   @IsInt()
@@ -38,8 +39,8 @@ export class UpdateSubscriptionDto {
   renewalDate?: string;
 
   @IsOptional()
-  @IsIn(['monthly', 'quarterly', 'semi_annual', 'yearly'])
-  billingCycle?: 'monthly' | 'quarterly' | 'semi_annual' | 'yearly';
+  @IsIn(['monthly', 'quarterly', 'semi_annual', 'yearly', 'weekly'])
+  billingCycle?: 'monthly' | 'quarterly' | 'semi_annual' | 'yearly' | 'weekly';
 
   @IsOptional()
   @IsString()
@@ -52,4 +53,14 @@ export class UpdateSubscriptionDto {
   @IsOptional()
   @IsUrl({ require_protocol: true })
   cancelUrl?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @IsIn([1, 3, 7])
+  reminderDays?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  remindersEnabled?: boolean;
 }
