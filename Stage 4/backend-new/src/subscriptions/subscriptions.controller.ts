@@ -30,6 +30,10 @@ import {
 } from '../services/email';
 
 @Controller('api/subscriptions')
+
+// علقيه مؤقتًا للتست
+// @UseGuards(JwtAuthGuard)
+
 @UseGuards(JwtAuthGuard)
 export class SubscriptionsController {
 
@@ -79,17 +83,25 @@ export class SubscriptionsController {
     return res.send(pdfBuffer);
   }
 
-  @Get('test/reset-email')
-  async testResetEmail() {
+  // =========================
+  // TEST RESET PASSWORD EMAIL
+  // =========================
 
-    const result = await sendResetPasswordEmail({
-      to: 'viuxwl7@gmail.com',
-      userName: 'Sondos',
-      token: 'test-reset-token-123',
-    });
+  @Get('test-reset')
+  async testReset(
+    @Query('email') email: string,
+  ) {
+
+    const result =
+      await sendResetPasswordEmail({
+        to: email,
+        userName: 'User',
+        token: 'test-reset-token-123',
+      });
 
     return {
       success: result,
+      sentTo: email,
     };
   }
 
