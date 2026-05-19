@@ -18,4 +18,11 @@ export class FilterSubscriptionsDto {
   @Min(1)
   @Max(12)
   paymentMonth?: number;
+
+  
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(2000)
+  paymentYear?: number;
 }
