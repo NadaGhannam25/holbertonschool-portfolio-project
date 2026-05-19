@@ -25,9 +25,14 @@ import { FilterSubscriptionsDto } from './dto/filter-subscriptions.dto';
 
 import { SubscriptionsService } from './subscriptions.service';
 
+import {
+  sendResetPasswordEmail,
+} from '../services/email';
+
 @Controller('api/subscriptions')
 @UseGuards(JwtAuthGuard)
 export class SubscriptionsController {
+
   constructor(
     private readonly subscriptionsService: SubscriptionsService,
   ) {}
@@ -59,16 +64,33 @@ export class SubscriptionsController {
     @Req() request: AuthenticatedRequest,
     @Res() res: Response,
   ) {
-    const pdfBuffer = await this.subscriptionsService.exportPdf(
-      request.user!.sub,
-    );
+
+    const pdfBuffer =
+      await this.subscriptionsService.exportPdf(
+        request.user!.sub,
+      );
 
     res.set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition': 'inline; filename=subscriptions.pdf',
+      'Content-Disposition':
+        'inline; filename=subscriptions.pdf',
     });
 
     return res.send(pdfBuffer);
+  }
+
+  @Get('test/reset-email')
+  async testResetEmail() {
+
+    const result = await sendResetPasswordEmail({
+      to: 'viuxwl7@gmail.com',
+      userName: 'Sondos',
+      token: 'test-reset-token-123',
+    });
+
+    return {
+      success: result,
+    };
   }
 
   @Get(':id/spending')
