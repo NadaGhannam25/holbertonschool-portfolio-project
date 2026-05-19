@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class FilterSubscriptionsDto {
   @IsOptional()
@@ -11,4 +11,11 @@ export class FilterSubscriptionsDto {
   @IsInt()
   @Min(1)
   categoryId?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(12)
+  paymentMonth?: number;
 }
