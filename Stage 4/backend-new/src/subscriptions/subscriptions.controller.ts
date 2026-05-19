@@ -11,7 +11,9 @@ import {
   Query,
   Req,
   UseGuards,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedRequest } from '../auth/guards/jwt-auth.guard';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -56,9 +58,29 @@ export class SubscriptionsController {
     @Req() request: AuthenticatedRequest,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.subscriptionsService.getSubscriptionSpending(request.user!.sub,id);
+    return this.subscriptionsService.getSubscriptionSpending(
+      request.user!.sub,
+      id,
+    );
   }
-  
+
+  @Get('pdf/export')
+  async exportPdf(
+    @Req() request: AuthenticatedRequest,
+    @Res() res: Response,
+  ) {
+    const pdfBuffer = await this.subscriptionsService.exportPdf(
+      request.user!.sub,
+    );
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'inline; filename=subscriptions.pdf',
+    });
+
+    res.send(pdfBuffer);
+  }
+
   @Get(':id')
   findOne(
     @Req() request: AuthenticatedRequest,
