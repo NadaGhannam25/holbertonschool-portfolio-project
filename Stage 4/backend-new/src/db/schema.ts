@@ -52,17 +52,6 @@ export const subscriptions = pgTable('subscriptions', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-export const subscriptionPayments = pgTable('subscription_payments', {
-  id: serial('id').primaryKey(),
-  subscriptionId: integer('subscription_id').references(() => subscriptions.id),
-  userId: integer('user_id').references(() => users.id),
-  amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
-  paymentDate: date('payment_date').notNull(),
-  status: text('status').notNull().default('upcoming'),
-  notes: text('notes'),
-  createdAt: timestamp('created_at').defaultNow(),
-});
-
 export const priceHistory = pgTable('price_history', {
   id: serial('id').primaryKey(),
   subscriptionId: integer('subscription_id').references(() => subscriptions.id),
