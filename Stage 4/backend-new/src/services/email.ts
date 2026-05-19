@@ -187,3 +187,90 @@ export async function sendReminderEmail(
     return false;
   }
 }
+
+//reset password email
+
+interface ResetPasswordEmailData {
+  to: string;
+  userName: string;
+  token: string;
+}
+
+export async function sendResetPasswordEmail(
+  data: ResetPasswordEmailData,
+): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+
+  if (!apiKey) {
+    console.warn('[Email] RESEND_API_KEY is missing');
+    return false;
+  }
+
+  const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173';
+
+  const resetUrl = `${frontendUrl}/reset-password?token=${data.token}`;
+
+  const html = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+</head>
+<body style="font-family: Arial, sans-serif; background:#f4f6fb; padding:32px;">
+  <div style="max-width:600px; margin:auto; background:#fff; border-radius:16px; padding:32px;">
+    <h2 style="color:#1e3a5f;">إعادة تعيين كلمة المرور</h2>
+
+    <p>مرحبًا <strong>${data.userName}</strong>،</p>
+
+    <p>
+      وصلنا طلب لإعادة تعيين كلمة المرور الخاصة بحسابك في منصة ديرها.
+    </p>
+
+    <p>
+      اضغط على الزر التالي لتعيين كلمة مرور جديدة:
+    </p>
+
+    <p style="text-align:center; margin:32px 0;">
+      <a href="${resetUrl}" style="background:#1e3a5f; color:#fff; padding:14px 28px; border-radius:999px; text-decoration:none; font-weight:bold;">
+        إعادة تعيين كلمة المرور
+      </a>
+    </p>
+
+    <p style="color:#6b7280;">
+      الرابط صالح لمدة 15 دقيقة فقط.
+    </p>
+
+    <p style="color:#6b7280;">
+      إذا لم تطلب إعادة تعيين كلمة المرور، تجاهلي هذه الرسالة.
+    </p>
+  </div>
+</body>
+</html>`;
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev',
+        to: [data.to],
+        subject: 'إعادة تعيين كلمة المرور - ديرها',
+        html,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json();
+      console.error('[Email] Failed to send reset password email:', errorBody);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('[Email] Reset password email error:', error);
+    return false;
+  }
+}
