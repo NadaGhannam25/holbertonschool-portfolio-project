@@ -9,7 +9,6 @@ import {
   boolean,
 } from 'drizzle-orm/pg-core';
 
-// USERS
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
@@ -18,13 +17,11 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-// CATEGORIES
 export const categories = pgTable('categories', {
   id: serial('id').primaryKey(),
   name: text('name').notNull().unique(),
 });
 
-// SUBSCRIPTION PROVIDERS
 export const subscriptionProviders = pgTable('subscription_providers', {
   id: serial('id').primaryKey(),
   name: text('name').notNull().unique(),
@@ -36,7 +33,6 @@ export const subscriptionProviders = pgTable('subscription_providers', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-// SUBSCRIPTIONS
 export const subscriptions = pgTable('subscriptions', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').references(() => users.id),
@@ -49,10 +45,11 @@ export const subscriptions = pgTable('subscriptions', {
   notes: text('notes'),
   status: text('status').default('active'),
   cancelUrl: text('cancel_url'),
+  reminderDays: integer('reminder_days').default(3),
+  remindersEnabled: boolean('reminders_enabled').default(true),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-// PRICE HISTORY
 export const priceHistory = pgTable('price_history', {
   id: serial('id').primaryKey(),
   subscriptionId: integer('subscription_id').references(() => subscriptions.id),
@@ -62,7 +59,6 @@ export const priceHistory = pgTable('price_history', {
   changedAt: timestamp('changed_at').defaultNow(),
 });
 
-// REMINDERS
 export const reminders = pgTable('reminders', {
   id: serial('id').primaryKey(),
   subscriptionId: integer('subscription_id').references(() => subscriptions.id),
