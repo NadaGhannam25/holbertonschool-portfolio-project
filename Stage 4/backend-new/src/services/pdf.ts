@@ -1,11 +1,14 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { eq } from 'drizzle-orm';
+
 import { db } from '../db';
 import { categories, subscriptions, users } from '../db/schema';
+import { cairoRegularBase64 } from '../assets/fonts/cairo';
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
+
   return date.toLocaleDateString('ar-SA', {
     year: 'numeric',
     month: 'long',
@@ -15,12 +18,12 @@ function formatDate(dateStr: string): string {
 
 function formatBillingCycle(cycle: string): string {
   const map: Record<string, string> = {
-    weekly: 'اسبوعي',
     monthly: 'شهري',
-    quarterly: 'كل 3 اشهر',
-    semi_annual: 'كل 6 اشهر',
+    quarterly: 'كل 3 أشهر',
+    semi_annual: 'كل 6 أشهر',
     yearly: 'سنوي',
   };
+
   return map[cycle] ?? cycle;
 }
 
@@ -30,25 +33,37 @@ function formatStatus(status: string): string {
     inactive: 'متوقف',
     cancelled: 'ملغي',
   };
+
   return map[status] ?? status;
 }
 
-function getMonthlyEquivalent(price: string, billingCycle: string): number {
+function getMonthlyEquivalent(
+  price: string,
+  billingCycle: string,
+): number {
   const amount = Number(price);
-  if (billingCycle === 'weekly') return amount * 4;
+
   if (billingCycle === 'quarterly') return amount / 3;
   if (billingCycle === 'semi_annual') return amount / 6;
   if (billingCycle === 'yearly') return amount / 12;
+
   return amount;
 }
 
-export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> {
+export async function generateSubscriptionsPdf(
+  userId: number,
+): Promise<Buffer> {
   const [user] = await db
-    .select({ name: users.name, email: users.email })
+    .select({
+      name: users.name,
+      email: users.email,
+    })
     .from(users)
     .where(eq(users.id, userId));
 
-  if (!user) throw new Error('User not found');
+  if (!user) {
+    throw new Error('User not found');
+  }
 
   const rows = await db
     .select({
@@ -60,85 +75,164 @@ export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> 
       categoryName: categories.name,
     })
     .from(subscriptions)
-    .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
+    .leftJoin(
+      categories,
+      eq(subscriptions.categoryId, categories.id),
+    )
     .where(eq(subscriptions.userId, userId));
 
-  const activeSubscriptions = rows.filter((row) => row.status === 'active');
+  const activeSubscriptions = rows.filter(
+    (row) => row.status === 'active',
+  );
+
   const monthlyTotal = activeSubscriptions.reduce((sum, row) => {
     return sum + getMonthlyEquivalent(row.price, row.billingCycle);
   }, 0);
+
   const yearlyTotal = monthlyTotal * 12;
 
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+  });
+
+  doc.addFileToVFS('Cairo-Regular.ttf', cairoRegularBase64);
+  doc.addFont('Cairo-Regular.ttf', 'Cairo', 'normal');
+  doc.setFont('Cairo');
+  doc.setR2L(true);
+
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 16;
 
   doc.setFillColor(30, 58, 95);
   doc.rect(0, 0, pageWidth, 36, 'F');
+
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Dierha', margin, 16);
+  doc.text('ديرها', pageWidth - margin, 16, {
+    align: 'right',
+  });
+
   doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Subscription Management Report', margin, 25);
+  doc.text('تقرير إدارة الاشتراكات', pageWidth - margin, 25, {
+    align: 'right',
+  });
 
   let y = 48;
+
   doc.setTextColor(60, 60, 80);
   doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Account:', margin, y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${user.name} (${user.email})`, margin + 22, y);
+
+  doc.text(`الحساب: ${user.name} (${user.email})`, pageWidth - margin, y, {
+    align: 'right',
+  });
+
   y += 7;
-  doc.setFont('helvetica', 'bold');
-  doc.text('Generated:', margin, y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(new Date().toLocaleDateString('ar-SA'), margin + 26, y);
+
+  doc.text(
+    `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA')}`,
+    pageWidth - margin,
+    y,
+    {
+      align: 'right',
+    },
+  );
 
   y += 14;
+
   const cardWidth = (pageWidth - margin * 2 - 8) / 3;
+
   const cards = [
-    { label: 'عدد الاشتراكات', value: String(rows.length) },
-    { label: 'الاجمالي الشهري', value: `${Math.round(monthlyTotal * 100) / 100} ريال` },
-    { label: 'الاجمالي السنوي', value: `${Math.round(yearlyTotal * 100) / 100} ريال` },
+    {
+      label: 'عدد الاشتراكات',
+      value: String(rows.length),
+    },
+    {
+      label: 'الإجمالي الشهري',
+      value: `${monthlyTotal.toFixed(2)} ريال`,
+    },
+    {
+      label: 'الإجمالي السنوي',
+      value: `${yearlyTotal.toFixed(2)} ريال`,
+    },
   ];
 
   cards.forEach((card, index) => {
     const x = margin + index * (cardWidth + 4);
+
     doc.setFillColor(245, 247, 255);
     doc.setDrawColor(210, 218, 240);
     doc.roundedRect(x, y, cardWidth, 22, 3, 3, 'FD');
+
     doc.setTextColor(100, 116, 160);
     doc.setFontSize(8);
-    doc.text(card.label, x + 6, y + 8);
+    doc.text(card.label, x + cardWidth - 6, y + 8, {
+      align: 'right',
+    });
+
     doc.setTextColor(30, 58, 95);
-    doc.setFontSize(13);
-    doc.setFont('helvetica', 'bold');
-    doc.text(card.value, x + 6, y + 18);
+    doc.setFontSize(12);
+    doc.text(card.value, x + cardWidth - 6, y + 18, {
+      align: 'right',
+    });
   });
 
   y += 32;
+
   doc.setTextColor(30, 58, 95);
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'bold');
-  doc.text('جدول الاشتراكات', margin, y);
+  doc.setFontSize(12);
+  doc.text('جدول الاشتراكات', pageWidth - margin, y, {
+    align: 'right',
+  });
 
   autoTable(doc, {
     startY: y + 4,
-    head: [['الخدمة', 'التصنيف', 'السعر', 'دورة الدفع', 'تاريخ التجديد', 'الحالة']],
+
+    head: [
+      [
+        'الحالة',
+        'تاريخ التجديد',
+        'دورة الدفع',
+        'السعر',
+        'التصنيف',
+        'الخدمة',
+      ],
+    ],
+
     body: rows.map((subscription) => [
-      subscription.name,
-      subscription.categoryName ?? 'اخرى',
-      `${subscription.price} ريال`,
-      formatBillingCycle(subscription.billingCycle),
-      formatDate(subscription.renewalDate),
       formatStatus(subscription.status ?? 'active'),
+      formatDate(subscription.renewalDate),
+      formatBillingCycle(subscription.billingCycle),
+      `${subscription.price} ريال`,
+      subscription.categoryName ?? 'أخرى',
+      subscription.name,
     ]),
-    margin: { left: margin, right: margin },
-    styles: { fontSize: 9, cellPadding: 4, textColor: [50, 50, 70] },
-    headStyles: { fillColor: [30, 58, 95], textColor: [255, 255, 255], fontStyle: 'bold' },
-    alternateRowStyles: { fillColor: [248, 249, 255] },
+
+    margin: {
+      left: margin,
+      right: margin,
+    },
+
+    styles: {
+      font: 'Cairo',
+      fontSize: 8,
+      cellPadding: 4,
+      halign: 'right',
+      textColor: [50, 50, 70],
+    },
+
+    headStyles: {
+      font: 'Cairo',
+      fillColor: [30, 58, 95],
+      textColor: [255, 255, 255],
+      halign: 'right',
+    },
+
+    alternateRowStyles: {
+      fillColor: [248, 249, 255],
+    },
   });
 
-return Buffer.from(doc.output('arraybuffer') as ArrayBuffer);}
+  return Buffer.from(doc.output('arraybuffer') as ArrayBuffer);
+}
