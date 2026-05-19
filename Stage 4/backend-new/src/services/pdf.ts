@@ -141,5 +141,4 @@ export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> 
     alternateRowStyles: { fillColor: [248, 249, 255] },
   });
 
-  return Buffer.from(doc.output('arraybuffer'));
-}
+return Buffer.from(doc.output('arraybuffer') as ArrayBuffer);}
