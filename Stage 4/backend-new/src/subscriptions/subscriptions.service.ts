@@ -164,6 +164,35 @@ export class SubscriptionsService {
     });
   }
 
+  async getSubscriptionSpending(userId: number, id: number) {
+    const subscription = await this.getOwnedSubscription(userId, id);
+
+    const today = new Date();
+
+    const startDate = new Date(today);
+    startDate.setMonth(startDate.getMonth() - 6);
+
+    const endDate = new Date(today);
+    endDate.setMonth(endDate.getMonth() + 2);
+
+    const payments = this.generatePaymentTimeline({
+      service: subscription.name,
+      amount: Number(subscription.price),
+      renewalDate: subscription.renewalDate,
+      billingCycle: subscription.billingCycle ?? 'monthly',
+      startDate,
+      endDate,
+    });
+
+    return {
+      subscription: {
+        id: subscription.id,
+        name: subscription.name,
+      },
+      payments,
+    };
+  }
+
   async findPriceHistory(userId: number, id: number) {
     const currentSubscription = await this.getOwnedSubscription(userId, id);
     return db
