@@ -10,11 +10,11 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 
-import { Response } from 'express';
+import type { Response } from 'express';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedRequest } from '../auth/guards/jwt-auth.guard';
@@ -54,35 +54,21 @@ export class SubscriptionsController {
     );
   }
 
-  // PDF EXPORT
   @Get('pdf/export')
   async exportPdf(
     @Req() request: AuthenticatedRequest,
     @Res() res: Response,
   ) {
-    const pdfBuffer =
-      await this.subscriptionsService.exportPdf(
-        request.user!.sub,
-      );
+    const pdfBuffer = await this.subscriptionsService.exportPdf(
+      request.user!.sub,
+    );
 
     res.set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition':
-        'inline; filename=subscriptions.pdf',
+      'Content-Disposition': 'inline; filename=subscriptions.pdf',
     });
 
-    res.send(pdfBuffer);
-  }
-
-  @Get(':id/history')
-  findPriceHistory(
-    @Req() request: AuthenticatedRequest,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.subscriptionsService.findPriceHistory(
-      request.user!.sub,
-      id,
-    );
+    return res.send(pdfBuffer);
   }
 
   @Get(':id/spending')
@@ -91,6 +77,17 @@ export class SubscriptionsController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.subscriptionsService.getSubscriptionSpending(
+      request.user!.sub,
+      id,
+    );
+  }
+
+  @Get(':id/history')
+  findPriceHistory(
+    @Req() request: AuthenticatedRequest,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.subscriptionsService.findPriceHistory(
       request.user!.sub,
       id,
     );
@@ -120,23 +117,23 @@ export class SubscriptionsController {
     );
   }
 
-  @Delete(':id')
-  remove(
-    @Req() request: AuthenticatedRequest,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.subscriptionsService.remove(
-      request.user!.sub,
-      id,
-    );
-  }
-
   @Patch(':id/toggle')
   toggle(
     @Req() request: AuthenticatedRequest,
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.subscriptionsService.toggle(
+      request.user!.sub,
+      id,
+    );
+  }
+
+  @Delete(':id')
+  remove(
+    @Req() request: AuthenticatedRequest,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.subscriptionsService.remove(
       request.user!.sub,
       id,
     );
