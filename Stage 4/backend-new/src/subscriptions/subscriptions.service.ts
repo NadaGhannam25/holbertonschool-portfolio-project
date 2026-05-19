@@ -1,20 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { and, desc, eq, ilike, sql } from 'drizzle-orm';
-
 import { db } from '../db';
-
-import {
-  categories,
-  priceHistory,
-  reminders,
-  subscriptionProviders,
-  subscriptions,
-} from '../db/schema';
-
+import { categories, priceHistory, reminders, subscriptionProviders, subscriptions } from '../db/schema';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { FilterSubscriptionsDto } from './dto/filter-subscriptions.dto';
-
 import { generateSubscriptionsPdf } from '../services/pdf';
 
 type BillingCycle = 'weekly' | 'monthly' | 'quarterly' | 'semi_annual' | 'yearly';
@@ -180,16 +170,46 @@ export class SubscriptionsService {
     return db.transaction(async (tx) => {
       const updateData: Partial<typeof subscriptions.$inferInsert> = {};
 
-      if (dto.providerId !== undefined) updateData.providerId = dto.providerId;
-      if (dto.name !== undefined) updateData.name = dto.name;
-      if (dto.price !== undefined) updateData.price = this.formatPrice(dto.price);
-      if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
-      if (dto.renewalDate !== undefined) updateData.renewalDate = dto.renewalDate;
-      if (dto.billingCycle !== undefined) updateData.billingCycle = dto.billingCycle;
-      if (dto.notes !== undefined) updateData.notes = dto.notes;
-      if (dto.status !== undefined) updateData.status = dto.status;
-      if (dto.cancelUrl !== undefined) updateData.cancelUrl = dto.cancelUrl;
-      if (dto.reminderDays !== undefined) updateData.reminderDays = dto.reminderDays;
+      if (dto.providerId !== undefined) {
+        updateData.providerId = dto.providerId;
+      }
+
+      if (dto.name !== undefined) {
+        updateData.name = dto.name;
+      }
+
+      if (dto.price !== undefined) {
+        updateData.price = this.formatPrice(dto.price);
+      }
+
+      if (dto.categoryId !== undefined) {
+        updateData.categoryId = dto.categoryId;
+      }
+
+      if (dto.renewalDate !== undefined) {
+        updateData.renewalDate = dto.renewalDate;
+      }
+
+      if (dto.billingCycle !== undefined) {
+        updateData.billingCycle = dto.billingCycle;
+      }
+
+      if (dto.notes !== undefined) {
+        updateData.notes = dto.notes;
+      }
+
+      if (dto.status !== undefined) {
+        updateData.status = dto.status;
+      }
+
+      if (dto.cancelUrl !== undefined) {
+        updateData.cancelUrl = dto.cancelUrl;
+      }
+
+      if (dto.reminderDays !== undefined) {
+        updateData.reminderDays = dto.reminderDays;
+      }
+
       if (dto.remindersEnabled !== undefined) {
         updateData.remindersEnabled = dto.remindersEnabled;
       }
@@ -216,38 +236,46 @@ export class SubscriptionsService {
           effectiveFrom: dto.renewalDate ?? currentSubscription.renewalDate,
         });
       }
+
       const reminderSettingsChanged =
         dto.reminderDays !== undefined ||
         dto.remindersEnabled !== undefined ||
         dto.renewalDate !== undefined;
 
-        if (reminderSettingsChanged) {
-          await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
+      if (reminderSettingsChanged) {
+        await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
 
-          const finalRemindersEnabled =
+        const finalRemindersEnabled =
           dto.remindersEnabled ??
           currentSubscription.remindersEnabled ??
           true;
 
-          const finalReminderDays =
+        const finalReminderDays =
           dto.reminderDays ??
           currentSubscription.reminderDays ??
           3;
 
-          const finalRenewalDate =
+        const finalRenewalDate =
           dto.renewalDate ??
           currentSubscription.renewalDate;
 
-          if (finalRemindersEnabled) {
-            const renewalDate = this.parseDate(finalRenewalDate);
-            const remindAt = new Date(renewalDate);
+        if (finalRemindersEnabled) {
+          const renewalDate = this.parseDate(finalRenewalDate);
+          const remindAt = new Date(renewalDate);
 
-            remindAt.setDate(remindAt.getDate() - finalReminderDays);
+          remindAt.setDate(remindAt.getDate() - finalReminderDays);
 
-            if (remindAt > new Date()) {
-              await tx.insert(reminders).values({ subscriptionId: id, remindAt, sent: false, sentAt: null }); }
-          } 
+          if (remindAt > new Date()) {
+            await tx.insert(reminders).values({
+              subscriptionId: id,
+              remindAt,
+              sent: false,
+              sentAt: null,
+            });
+          }
         }
+      }
+
       return updatedSubscription;
     });
   }
