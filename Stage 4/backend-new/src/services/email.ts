@@ -32,6 +32,7 @@ function formatDate(dateStr: string): string {
 
 function formatBillingCycle(cycle: string): string {
   const map: Record<string, string> = {
+    weekly: 'اسبوعي',
     monthly: 'شهري',
     quarterly: 'كل ٣ شهور',
     semi_annual: 'كل ٦ شهور',
