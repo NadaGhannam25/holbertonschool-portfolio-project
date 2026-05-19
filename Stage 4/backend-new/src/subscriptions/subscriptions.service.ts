@@ -261,6 +261,111 @@ export class SubscriptionsService {
     return subscription;
   }
 
+  private generatePaymentTimeline(params: {
+  service: string;
+  amount: number;
+  renewalDate: string;
+  billingCycle: string;
+  startDate: Date;
+  endDate: Date;
+}) {
+  const payments: {
+    service: string;
+    amount: number;
+    date: string;
+    month: string;
+    status: 'paid' | 'upcoming';
+  }[] = [];
+
+  const today = new Date();
+  const currentDate = new Date(params.renewalDate);
+
+  while (currentDate > params.startDate) {
+    this.moveDateBackward(currentDate, params.billingCycle);
+  }
+
+  while (currentDate <= params.endDate) {
+    if (currentDate >= params.startDate) {
+      const paymentDate = new Date(currentDate);
+
+      payments.push({
+        service: params.service,
+        amount: params.amount,
+        date: paymentDate.toISOString().split('T')[0],
+        month: this.getArabicMonthName(paymentDate),
+        status: paymentDate < today ? 'paid' : 'upcoming',
+      });
+    }
+
+    this.moveDateForward(currentDate, params.billingCycle);
+  }
+
+  return payments;
+}
+
+private moveDateForward(date: Date, billingCycle: string) {
+  switch (billingCycle) {
+    case 'weekly':
+      date.setDate(date.getDate() + 7);
+      break;
+    case 'monthly':
+      date.setMonth(date.getMonth() + 1);
+      break;
+    case 'quarterly':
+      date.setMonth(date.getMonth() + 3);
+      break;
+    case 'semi_annual':
+      date.setMonth(date.getMonth() + 6);
+      break;
+    case 'yearly':
+      date.setFullYear(date.getFullYear() + 1);
+      break;
+    default:
+      date.setMonth(date.getMonth() + 1);
+  }
+}
+
+private moveDateBackward(date: Date, billingCycle: string) {
+  switch (billingCycle) {
+    case 'weekly':
+      date.setDate(date.getDate() - 7);
+      break;
+    case 'monthly':
+      date.setMonth(date.getMonth() - 1);
+      break;
+    case 'quarterly':
+      date.setMonth(date.getMonth() - 3);
+      break;
+    case 'semi_annual':
+      date.setMonth(date.getMonth() - 6);
+      break;
+    case 'yearly':
+      date.setFullYear(date.getFullYear() - 1);
+      break;
+    default:
+      date.setMonth(date.getMonth() - 1);
+  }
+}
+
+private getArabicMonthName(date: Date) {
+  const months = [
+    'يناير',
+    'فبراير',
+    'مارس',
+    'أبريل',
+    'مايو',
+    'يونيو',
+    'يوليو',
+    'أغسطس',
+    'سبتمبر',
+    'أكتوبر',
+    'نوفمبر',
+    'ديسمبر',
+  ];
+
+  return months[date.getMonth()];
+}
+
   private formatPrice(price: number) {
     return price.toFixed(2);
   }
