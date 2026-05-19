@@ -17,6 +17,8 @@ import { FilterSubscriptionsDto } from './dto/filter-subscriptions.dto';
 
 import { generateSubscriptionsPdf } from '../services/pdf';
 
+type BillingCycle = 'weekly' | 'monthly' | 'quarterly' | 'semi_annual' | 'yearly';
+
 @Injectable()
 export class SubscriptionsService {
   async findAll(userId: number, filters?: FilterSubscriptionsDto) {
@@ -108,7 +110,7 @@ export class SubscriptionsService {
       });
 
       if (remindersEnabled) {
-        const renewalDate = new Date(dto.renewalDate);
+        const renewalDate = this.parseDate(subscription.renewalDate);
         const remindAt = new Date(renewalDate);
 
         remindAt.setDate(remindAt.getDate() - reminderDays);
@@ -131,6 +133,37 @@ export class SubscriptionsService {
     return this.getOwnedSubscription(userId, id);
   }
 
+  async getSubscriptionSpending(userId: number, id: number) {
+    const subscription = await this.getOwnedSubscription(userId, id);
+
+    const today = new Date();
+
+    const startDate = new Date(today);
+    startDate.setMonth(startDate.getMonth() - 6);
+    startDate.setHours(0, 0, 0, 0);
+
+    const endDate = new Date(today);
+    endDate.setMonth(endDate.getMonth() + 2);
+    endDate.setHours(23, 59, 59, 999);
+
+    const payments = this.generatePaymentTimeline({
+      service: subscription.name,
+      amount: Number(subscription.price),
+      renewalDate: subscription.renewalDate,
+      billingCycle: subscription.billingCycle as BillingCycle,
+      startDate,
+      endDate,
+    });
+
+    return {
+      subscription: {
+        id: subscription.id,
+        name: subscription.name,
+      },
+      payments,
+    };
+  }
+
   async findPriceHistory(userId: number, id: number) {
     const currentSubscription = await this.getOwnedSubscription(userId, id);
 
@@ -141,17 +174,60 @@ export class SubscriptionsService {
       .orderBy(desc(priceHistory.changedAt));
   }
 
+  async update(userId: number, id: number, dto: UpdateSubscriptionDto) {
+    const currentSubscription = await this.getOwnedSubscription(userId, id);
+
+    return db.transaction(async (tx) => {
+      const updateData: Partial<typeof subscriptions.$inferInsert> = {};
+
+      if (dto.providerId !== undefined) updateData.providerId = dto.providerId;
+      if (dto.name !== undefined) updateData.name = dto.name;
+      if (dto.price !== undefined) updateData.price = this.formatPrice(dto.price);
+      if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
+      if (dto.renewalDate !== undefined) updateData.renewalDate = dto.renewalDate;
+      if (dto.billingCycle !== undefined) updateData.billingCycle = dto.billingCycle;
+      if (dto.notes !== undefined) updateData.notes = dto.notes;
+      if (dto.status !== undefined) updateData.status = dto.status;
+      if (dto.cancelUrl !== undefined) updateData.cancelUrl = dto.cancelUrl;
+      if (dto.reminderDays !== undefined) updateData.reminderDays = dto.reminderDays;
+      if (dto.remindersEnabled !== undefined) {
+        updateData.remindersEnabled = dto.remindersEnabled;
+      }
+
+      const [updatedSubscription] = await tx
+        .update(subscriptions)
+        .set(updateData)
+        .where(
+          and(
+            eq(subscriptions.id, id),
+            eq(subscriptions.userId, userId),
+          ),
+        )
+        .returning();
+
+      if (
+        dto.price !== undefined &&
+        Number(currentSubscription.price) !== Number(dto.price)
+      ) {
+        await tx.insert(priceHistory).values({
+          subscriptionId: id,
+          oldPrice: currentSubscription.price,
+          newPrice: this.formatPrice(dto.price),
+          effectiveFrom: dto.renewalDate ?? currentSubscription.renewalDate,
+        });
+      }
+
+      return updatedSubscription;
+    });
+  }
+
   async remove(userId: number, id: number) {
     return db.transaction(async (tx) => {
       await this.getOwnedSubscription(userId, id);
 
-      await tx
-        .delete(reminders)
-        .where(eq(reminders.subscriptionId, id));
+      await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
 
-      await tx
-        .delete(priceHistory)
-        .where(eq(priceHistory.subscriptionId, id));
+      await tx.delete(priceHistory).where(eq(priceHistory.subscriptionId, id));
 
       const [deletedSubscription] = await tx
         .delete(subscriptions)
@@ -171,15 +247,10 @@ export class SubscriptionsService {
   }
 
   async toggle(userId: number, id: number) {
-    const currentSubscription = await this.getOwnedSubscription(
-      userId,
-      id,
-    );
+    const currentSubscription = await this.getOwnedSubscription(userId, id);
 
     const nextStatus =
-      currentSubscription.status === 'active'
-        ? 'inactive'
-        : 'active';
+      currentSubscription.status === 'active' ? 'inactive' : 'active';
 
     const [updatedSubscription] = await db
       .update(subscriptions)
@@ -195,10 +266,7 @@ export class SubscriptionsService {
     return updatedSubscription;
   }
 
-  private async getOwnedSubscription(
-    userId: number,
-    id: number,
-  ) {
+  private async getOwnedSubscription(userId: number, id: number) {
     const [subscription] = await db
       .select({
         id: subscriptions.id,
@@ -231,10 +299,128 @@ export class SubscriptionsService {
     return subscription;
   }
 
-  private formatPrice(price: number) {
-    return price.toFixed(2);
+  private generatePaymentTimeline(params: {
+    service: string;
+    amount: number;
+    renewalDate: string;
+    billingCycle: BillingCycle;
+    startDate: Date;
+    endDate: Date;
+  }) {
+    const payments: {
+      service: string;
+      amount: number;
+      date: string;
+      month: string;
+      status: 'paid' | 'upcoming';
+    }[] = [];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const currentDate = this.parseDate(params.renewalDate);
+
+    while (currentDate > params.startDate) {
+      this.moveDateBackward(currentDate, params.billingCycle);
+    }
+
+    while (currentDate <= params.endDate) {
+      if (currentDate >= params.startDate) {
+        const paymentDate = new Date(currentDate);
+
+        payments.push({
+          service: params.service,
+          amount: params.amount,
+          date: this.formatDate(paymentDate),
+          month: this.getArabicMonthName(paymentDate),
+          status: paymentDate < today ? 'paid' : 'upcoming',
+        });
+      }
+
+      this.moveDateForward(currentDate, params.billingCycle);
+    }
+
+    return payments;
   }
-}    return generateSubscriptionsPdf(userId);
+
+  private moveDateForward(date: Date, billingCycle: BillingCycle) {
+    switch (billingCycle) {
+      case 'weekly':
+        date.setDate(date.getDate() + 7);
+        break;
+      case 'monthly':
+        date.setMonth(date.getMonth() + 1);
+        break;
+      case 'quarterly':
+        date.setMonth(date.getMonth() + 3);
+        break;
+      case 'semi_annual':
+        date.setMonth(date.getMonth() + 6);
+        break;
+      case 'yearly':
+        date.setFullYear(date.getFullYear() + 1);
+        break;
+      default:
+        date.setMonth(date.getMonth() + 1);
+    }
+  }
+
+  private moveDateBackward(date: Date, billingCycle: BillingCycle) {
+    switch (billingCycle) {
+      case 'weekly':
+        date.setDate(date.getDate() - 7);
+        break;
+      case 'monthly':
+        date.setMonth(date.getMonth() - 1);
+        break;
+      case 'quarterly':
+        date.setMonth(date.getMonth() - 3);
+        break;
+      case 'semi_annual':
+        date.setMonth(date.getMonth() - 6);
+        break;
+      case 'yearly':
+        date.setFullYear(date.getFullYear() - 1);
+        break;
+      default:
+        date.setMonth(date.getMonth() - 1);
+    }
+  }
+
+  private getArabicMonthName(date: Date) {
+    const months = [
+      'يناير',
+      'فبراير',
+      'مارس',
+      'أبريل',
+      'مايو',
+      'يونيو',
+      'يوليو',
+      'أغسطس',
+      'سبتمبر',
+      'أكتوبر',
+      'نوفمبر',
+      'ديسمبر',
+    ];
+
+    return months[date.getMonth()];
+  }
+
+  private parseDate(dateValue: string | Date) {
+    if (dateValue instanceof Date) {
+      return new Date(dateValue);
+    }
+
+    const [year, month, day] = dateValue.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  private formatDate(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 
   private formatPrice(price: number) {
