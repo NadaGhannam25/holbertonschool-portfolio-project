@@ -418,7 +418,7 @@ export async function sendReminderEmail(
   return sendEmail({
     from:
       process.env.RESEND_REMINDER_EMAIL ??
-      'Dierha <reminder@dierha.com>',
+      'Dierha <reminders@dierha.com>',
 
     to: data.to,
 
