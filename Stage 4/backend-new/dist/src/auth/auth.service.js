@@ -83,7 +83,7 @@ let AuthService = class AuthService {
         const token = jwt.sign({
             sub: user.id,
             email: user.email,
-        }, process.env.JWT_SECRET || 'dev_secret', {
+        }, process.env.JWT_SECRET, {
             expiresIn: '1d',
         });
         return {
