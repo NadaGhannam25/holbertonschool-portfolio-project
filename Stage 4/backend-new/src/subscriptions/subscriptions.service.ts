@@ -23,9 +23,11 @@ export class SubscriptionsService {
     }
 
     if (filters?.paymentMonth !== undefined) {
-      conditions.push(
-        sql`extract(month from ${subscriptions.renewalDate}::date) = ${filters.paymentMonth}`,
-      );
+      conditions.push( sql`extract(month from ${subscriptions.renewalDate}::date) = ${filters.paymentMonth}`);
+    }
+
+    if (filters?.paymentYear !== undefined) {
+      conditions.push( sql`extract(year from ${subscriptions.renewalDate}::date) = ${filters.paymentYear}`);
     }
 
     return db
