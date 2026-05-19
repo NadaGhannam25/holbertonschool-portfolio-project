@@ -25,6 +25,9 @@ export class AnalyticsService {
       .select({
         totalYearlyAmount: sql<string>`coalesce(sum(
           case
+            when ${subscriptions.billingCycle} = 'weekly'
+              then ${subscriptions.price}::numeric * 52
+              
             when ${subscriptions.billingCycle} = 'monthly'
               then ${subscriptions.price}::numeric * 12
 
