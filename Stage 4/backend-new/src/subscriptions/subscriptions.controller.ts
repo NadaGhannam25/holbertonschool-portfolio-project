@@ -25,17 +25,9 @@ import { FilterSubscriptionsDto } from './dto/filter-subscriptions.dto';
 
 import { SubscriptionsService } from './subscriptions.service';
 
-import {
-  sendResetPasswordEmail,
-} from '../services/email';
-
-@Controller('subscriptions')
-
-// علقيه مؤقتًا للتست
-// @UseGuards(JwtAuthGuard)
-
+@Controller('api/subscriptions')
+@UseGuards(JwtAuthGuard)
 export class SubscriptionsController {
-
   constructor(
     private readonly subscriptionsService: SubscriptionsService,
   ) {}
@@ -67,7 +59,6 @@ export class SubscriptionsController {
     @Req() request: AuthenticatedRequest,
     @Res() res: Response,
   ) {
-
     const pdfBuffer =
       await this.subscriptionsService.exportPdf(
         request.user!.sub,
@@ -80,133 +71,6 @@ export class SubscriptionsController {
     });
 
     return res.send(pdfBuffer);
-  }
-
-  // =========================
-  // TEST RESET PASSWORD EMAIL
-  // =========================
-
-  @Get('test-reset')
-  async testReset(
-    @Query('email') email: string,
-  ) {
-
-    const result =
-      await sendResetPasswordEmail({
-        to: email,
-        userName: 'User',
-        token: 'test-reset-token-123',
-      });
-
-    return {
-      success: result,
-      sentTo: email,
-    };
-  }
-
-  @Get(':id/spending')
-  getSubscriptionSpending(
-    @Req() request: AuthenticatedRequest,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.subscriptionsService.getSubscriptionSpending(
-      request.user!.sub,
-      id,
-    );
-  }
-
-  @Get(':id/history')
-  findPriceHistory(
-    @Req() request: AuthenticatedRequest,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.subscriptionsService.findPriceHistory(
-      request.user!.sub,
-      id,
-    );
-  }
-
-  @Get(':id')
-  findOne(
-    @Req() request: AuthenticatedRequest,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.subscriptionsService.findOne(
-      request.user!.sub,
-      id,
-    );
-  }
-
-  @Put(':id')
-  update(
-    @Req() request: AuthenticatedRequest,
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateSubscriptionDto: UpdateSubscriptionDto,
-  ) {
-    return this.subscriptionsService.update(
-      request.user!.sub,
-      id,
-      updateSubscriptionDto,
-    );
-  }
-
-  @Patch(':id/toggle')
-  toggle(
-    @Req() request: AuthenticatedRequest,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.subscriptionsService.toggle(
-      request.user!.sub,
-      id,
-    );
-  }
-
-  @Delete(':id')
-  remove(
-    @Req() request: AuthenticatedRequest,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.subscriptionsService.remove(
-      request.user!.sub,
-      id,
-    );
-  }
-}  ) {
-
-    const pdfBuffer =
-      await this.subscriptionsService.exportPdf(
-        request.user!.sub,
-      );
-
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition':
-        'inline; filename=subscriptions.pdf',
-    });
-
-    return res.send(pdfBuffer);
-  }
-
-  // =========================
-  // TEST RESET PASSWORD EMAIL
-  // =========================
-
-  @Get('test-reset')
-  async testReset(
-    @Query('email') email: string,
-  ) {
-
-    const result =
-      await sendResetPasswordEmail({
-        to: email,
-        userName: 'User',
-        token: 'test-reset-token-123',
-      });
-
-    return {
-      success: result,
-      sentTo: email,
-    };
   }
 
   @Get(':id/spending')
