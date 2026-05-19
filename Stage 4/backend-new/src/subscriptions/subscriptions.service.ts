@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { and, desc, eq, ilike } from 'drizzle-orm';
+import { and, desc, eq, ilike, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { categories, priceHistory, reminders, subscriptionProviders, subscriptions } from '../db/schema';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -15,6 +15,9 @@ export class SubscriptionsService {
     }
     if (filters?.search) {
       conditions.push(ilike(subscriptions.name, `%${filters.search}%`));
+    }
+    if (filters?.paymentMonth !== undefined) {
+      conditions.push( sql`extract(month from ${subscriptions.renewalDate}::date) = ${filters.paymentMonth}`);
     }
     return db
       .select({
