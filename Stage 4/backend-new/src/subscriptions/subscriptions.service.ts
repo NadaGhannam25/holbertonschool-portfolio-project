@@ -32,6 +32,8 @@ export class SubscriptionsService {
         notes: subscriptions.notes,
         status: subscriptions.status,
         cancelUrl: subscriptions.cancelUrl,
+        reminderDays: subscriptions.reminderDays,
+        remindersEnabled: subscriptions.remindersEnabled,
         createdAt: subscriptions.createdAt,
         category: {
           id: categories.id,
@@ -56,6 +58,9 @@ export class SubscriptionsService {
 
   async create(userId: number, dto: CreateSubscriptionDto) {
     return db.transaction(async (tx) => {
+      const reminderDays = dto.reminderDays ?? 3;
+      const remindersEnabled = dto.remindersEnabled ?? true;
+
       const [subscription] = await tx
         .insert(subscriptions)
         .values({
@@ -66,6 +71,214 @@ export class SubscriptionsService {
           categoryId: dto.categoryId,
           renewalDate: dto.renewalDate,
           billingCycle: dto.billingCycle,
+          notes: dto.notes,
+          status: dto.status ?? 'active',
+          cancelUrl: dto.cancelUrl,
+          reminderDays,
+          remindersEnabled,
+        })
+        .returning();
+
+      await tx.insert(priceHistory).values({
+        subscriptionId: subscription.id,
+        oldPrice: null,
+        newPrice: this.formatPrice(dto.price),
+        effectiveFrom: dto.renewalDate,
+      });
+
+      if (remindersEnabled) {
+        const renewalDate = new Date(dto.renewalDate);
+        const remindAt = new Date(renewalDate);
+        remindAt.setDate(remindAt.getDate() - reminderDays);
+
+        if (remindAt > new Date()) {
+          await tx.insert(reminders).values({
+            subscriptionId: subscription.id,
+            remindAt,
+            sent: false,
+            sentAt: null,
+          });
+        }
+      }
+
+      return subscription;
+    });
+  }
+
+  async findOne(userId: number, id: number) {
+    return this.getOwnedSubscription(userId, id);
+  }
+
+  async update(userId: number, id: number, dto: UpdateSubscriptionDto) {
+    return db.transaction(async (tx) => {
+      const currentSubscription = await this.getOwnedSubscription(userId, id);
+      const updateData: Partial<typeof subscriptions.$inferInsert> = {};
+
+      if (dto.name !== undefined) updateData.name = dto.name;
+      if (dto.price !== undefined) updateData.price = this.formatPrice(dto.price);
+      if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
+      if (dto.providerId !== undefined) updateData.providerId = dto.providerId;
+      if (dto.renewalDate !== undefined) updateData.renewalDate = dto.renewalDate;
+      if (dto.billingCycle !== undefined) updateData.billingCycle = dto.billingCycle;
+      if (dto.notes !== undefined) updateData.notes = dto.notes;
+      if (dto.status !== undefined) updateData.status = dto.status;
+      if (dto.cancelUrl !== undefined) updateData.cancelUrl = dto.cancelUrl;
+      if (dto.reminderDays !== undefined) updateData.reminderDays = dto.reminderDays;
+      if (dto.remindersEnabled !== undefined) updateData.remindersEnabled = dto.remindersEnabled;
+
+      if (Object.keys(updateData).length === 0) {
+        return currentSubscription;
+      }
+
+      const oldPrice = Number(currentSubscription.price);
+      const newPrice = dto.price;
+
+      if (newPrice !== undefined && oldPrice !== newPrice) {
+        await tx.insert(priceHistory).values({
+          subscriptionId: currentSubscription.id,
+          oldPrice: this.formatPrice(oldPrice),
+          newPrice: this.formatPrice(newPrice),
+          effectiveFrom: new Date().toISOString().slice(0, 10),
+        });
+      }
+
+      const [updatedSubscription] = await tx
+        .update(subscriptions)
+        .set(updateData)
+        .where(
+          and(
+            eq(subscriptions.id, currentSubscription.id),
+            eq(subscriptions.userId, userId),
+          ),
+        )
+        .returning();
+
+      if (dto.renewalDate !== undefined || dto.reminderDays !== undefined || dto.remindersEnabled !== undefined) {
+        await tx
+          .delete(reminders)
+          .where(
+            and(
+              eq(reminders.subscriptionId, currentSubscription.id),
+              eq(reminders.sent, false),
+            ),
+          );
+
+        const remindersEnabled = dto.remindersEnabled ?? currentSubscription.remindersEnabled ?? true;
+        const reminderDays = dto.reminderDays ?? currentSubscription.reminderDays ?? 3;
+        const renewalDateStr = dto.renewalDate ?? currentSubscription.renewalDate;
+
+        if (remindersEnabled) {
+          const renewalDate = new Date(renewalDateStr);
+          const remindAt = new Date(renewalDate);
+          remindAt.setDate(remindAt.getDate() - reminderDays);
+
+          if (remindAt > new Date()) {
+            await tx.insert(reminders).values({
+              subscriptionId: currentSubscription.id,
+              remindAt,
+              sent: false,
+              sentAt: null,
+            });
+          }
+        }
+      }
+
+      return updatedSubscription;
+    });
+  }
+
+  async findPriceHistory(userId: number, id: number) {
+    const currentSubscription = await this.getOwnedSubscription(userId, id);
+
+    return db
+      .select()
+      .from(priceHistory)
+      .where(eq(priceHistory.subscriptionId, currentSubscription.id))
+      .orderBy(desc(priceHistory.changedAt));
+  }
+
+  async remove(userId: number, id: number) {
+    return db.transaction(async (tx) => {
+      await this.getOwnedSubscription(userId, id);
+
+      await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
+
+      await tx.delete(priceHistory).where(eq(priceHistory.subscriptionId, id));
+
+      const [deletedSubscription] = await tx
+        .delete(subscriptions)
+        .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+        .returning();
+
+      return {
+        message: 'Subscription deleted successfully',
+        subscription: deletedSubscription,
+      };
+    });
+  }
+
+  async toggle(userId: number, id: number) {
+    const currentSubscription = await this.getOwnedSubscription(userId, id);
+    const nextStatus =
+      currentSubscription.status === 'active' ? 'inactive' : 'active';
+
+    const [updatedSubscription] = await db
+      .update(subscriptions)
+      .set({ status: nextStatus })
+      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+      .returning();
+
+    return updatedSubscription;
+  }
+
+  private async getOwnedSubscription(userId: number, id: number) {
+    const [subscription] = await db
+      .select({
+        id: subscriptions.id,
+        userId: subscriptions.userId,
+        providerId: subscriptions.providerId,
+        name: subscriptions.name,
+        price: subscriptions.price,
+        categoryId: subscriptions.categoryId,
+        renewalDate: subscriptions.renewalDate,
+        billingCycle: subscriptions.billingCycle,
+        notes: subscriptions.notes,
+        status: subscriptions.status,
+        cancelUrl: subscriptions.cancelUrl,
+        reminderDays: subscriptions.reminderDays,
+        remindersEnabled: subscriptions.remindersEnabled,
+        createdAt: subscriptions.createdAt,
+        category: {
+          id: categories.id,
+          name: categories.name,
+        },
+        provider: {
+          id: subscriptionProviders.id,
+          name: subscriptionProviders.name,
+          logoUrl: subscriptionProviders.logoUrl,
+          websiteUrl: subscriptionProviders.websiteUrl,
+          cancelUrl: subscriptionProviders.cancelUrl,
+        },
+      })
+      .from(subscriptions)
+      .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
+      .leftJoin(
+        subscriptionProviders,
+        eq(subscriptions.providerId, subscriptionProviders.id),
+      )
+      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)));
+
+    if (!subscription) {
+      throw new NotFoundException('Subscription not found');
+    }
+
+    return subscription;
+  }
+
+  private formatPrice(price: number) {
+    return price.toFixed(2);
+  }
+}          billingCycle: dto.billingCycle,
           notes: dto.notes,
           status: dto.status ?? 'active',
           cancelUrl: dto.cancelUrl,
