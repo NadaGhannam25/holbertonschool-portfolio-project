@@ -216,7 +216,38 @@ export class SubscriptionsService {
           effectiveFrom: dto.renewalDate ?? currentSubscription.renewalDate,
         });
       }
+      const reminderSettingsChanged =
+        dto.reminderDays !== undefined ||
+        dto.remindersEnabled !== undefined ||
+        dto.renewalDate !== undefined;
 
+        if (reminderSettingsChanged) {
+          await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
+
+          const finalRemindersEnabled =
+          dto.remindersEnabled ??
+          currentSubscription.remindersEnabled ??
+          true;
+
+          const finalReminderDays =
+          dto.reminderDays ??
+          currentSubscription.reminderDays ??
+          3;
+
+          const finalRenewalDate =
+          dto.renewalDate ??
+          currentSubscription.renewalDate;
+
+          if (finalRemindersEnabled) {
+            const renewalDate = this.parseDate(finalRenewalDate);
+            const remindAt = new Date(renewalDate);
+
+            remindAt.setDate(remindAt.getDate() - finalReminderDays);
+
+            if (remindAt > new Date()) {
+              await tx.insert(reminders).values({ subscriptionId: id, remindAt, sent: false, sentAt: null }); }
+          } 
+        }
       return updatedSubscription;
     });
   }
