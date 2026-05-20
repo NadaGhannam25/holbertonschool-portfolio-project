@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 
 import type { Response } from 'express';
-
+import { sendReminderEmail } from '../services/email';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedRequest } from '../auth/guards/jwt-auth.guard';
 
