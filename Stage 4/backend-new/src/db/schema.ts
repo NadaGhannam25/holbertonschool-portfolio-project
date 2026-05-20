@@ -43,6 +43,7 @@ export const subscriptions = pgTable('subscriptions', {
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
   categoryId: integer('category_id').references(() => categories.id),
   renewalDate: date('renewal_date').notNull(),
+  startDate: date('start_date').notNull(),
   billingCycle: text('billing_cycle').notNull(),
   notes: text('notes'),
   status: text('status').default('active'),
@@ -64,7 +65,7 @@ export const priceHistory = pgTable('price_history', {
 export const reminders = pgTable('reminders', {
   id: serial('id').primaryKey(),
   subscriptionId: integer('subscription_id').references(() => subscriptions.id),
-  remindAt: timestamp('remind_at').notNull(),
+  remindAt: date('remind_at').notNull(),
   sent: boolean('sent').default(false),
   sentAt: timestamp('sent_at'),
 });
