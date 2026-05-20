@@ -184,7 +184,7 @@ function buildReminderEmailHtml(
           ? `
             <p style="text-align:center; margin-top:28px;">
               <a href="${data.cancelUrl}" class="btn-cancel">
-                إدارة أو إلغاء الاشتراك
+                إلغاء الاشتراك
               </a>
             </p>
           `
