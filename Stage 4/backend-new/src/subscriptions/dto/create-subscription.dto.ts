@@ -52,9 +52,7 @@ export class CreateSubscriptionDto {
   cancelUrl?: string;
 
   @IsOptional()
-  @Type(() => Number)
   @IsInt()
-  @IsIn([1, 3, 7])
   reminderDays?: number;
 
   @IsOptional()
