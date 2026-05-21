@@ -44,12 +44,14 @@ export const subscriptions = pgTable('subscriptions', {
   categoryId: integer('category_id').references(() => categories.id),
   renewalDate: date('renewal_date').notNull(),
   startDate: date('start_date').notNull(),
+  endDate: date('end_date'),
   billingCycle: text('billing_cycle').notNull(),
   notes: text('notes'),
   status: text('status').default('active'),
   cancelUrl: text('cancel_url'),
   reminderDays: integer('reminder_days').default(3),
   remindersEnabled: boolean('reminders_enabled').default(true),
+  deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
