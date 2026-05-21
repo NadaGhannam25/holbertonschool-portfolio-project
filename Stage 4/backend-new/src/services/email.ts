@@ -1,4 +1,3 @@
-```ts
 import 'dotenv/config';
 
 interface ReminderEmailData {
