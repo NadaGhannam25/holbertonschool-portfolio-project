@@ -51,12 +51,15 @@ export class SubscriptionsService {
         price: subscriptions.price,
         categoryId: subscriptions.categoryId,
         renewalDate: subscriptions.renewalDate,
+        startDate: subscriptions.startDate,
+        endDate: subscriptions.endDate,
         billingCycle: subscriptions.billingCycle,
         notes: subscriptions.notes,
         status: subscriptions.status,
         cancelUrl: subscriptions.cancelUrl,
         reminderDays: subscriptions.reminderDays,
         remindersEnabled: subscriptions.remindersEnabled,
+        deletedAt: subscriptions.deletedAt,
         createdAt: subscriptions.createdAt,
 
         category: {
@@ -90,7 +93,10 @@ export class SubscriptionsService {
       const reminderDays = dto.reminderDays ?? 3;
       const remindersEnabled = dto.remindersEnabled ?? true;
       const startDate = dto.renewalDate;
-      const nextRenewalDate = this.getNextRenewalDate( startDate, dto.billingCycle as BillingCycle );
+      const nextRenewalDate = this.getNextRenewalDate( 
+        startDate, 
+        dto.billingCycle as BillingCycle,
+      );
       const [subscription] = await tx
         .insert(subscriptions)
         .values({
@@ -293,12 +299,15 @@ export class SubscriptionsService {
         price: subscriptions.price,
         categoryId: subscriptions.categoryId,
         renewalDate: subscriptions.renewalDate,
+        startDate: subscriptions.startDate,
+        endDate: subscriptions.endDate,
         billingCycle: subscriptions.billingCycle,
         notes: subscriptions.notes,
         status: subscriptions.status,
         cancelUrl: subscriptions.cancelUrl,
         reminderDays: subscriptions.reminderDays,
         remindersEnabled: subscriptions.remindersEnabled,
+        deletedAt: subscriptions.deletedAt,
         createdAt: subscriptions.createdAt,
       })
       .from(subscriptions)
