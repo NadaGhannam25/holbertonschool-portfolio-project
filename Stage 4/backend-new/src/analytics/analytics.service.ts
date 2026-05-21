@@ -17,7 +17,7 @@ type AnalyticsSubscription = {
   billingCycle: string;
   startDate: string;
   endDate: string | null;
-  categoryId: number;
+  categoryId: number | null;
   categoryName: string | null;
 };
 
@@ -114,7 +114,7 @@ export class AnalyticsService {
 
       if (payments.length === 0) continue;
 
-      const categoryId = subscription.categoryId;
+      const categoryId = subscription.categoryId ?? 5;
       const categoryName = subscription.categoryName ?? 'أخرى';
 
       if (!categoryMap.has(categoryId)) {
