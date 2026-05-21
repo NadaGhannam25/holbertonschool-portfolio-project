@@ -4,7 +4,7 @@ interface ReminderEmailData {
   to: string;
   userName: string;
   subscriptionName: string;
- renewalDate: string;
+  renewalDate: string;
   amount: string;
   billingCycle: string;
   cancelUrl?: string | null;
@@ -20,6 +20,7 @@ const EMAIL_LOGO_URL =
   'https://zpijpebyajnkxsrnrfre.supabase.co/storage/v1/object/public/assets/dierha-logo.png.jpeg';
 
 const EMAIL_STYLES = `
+
   body,
   table,
   td,
@@ -32,73 +33,134 @@ const EMAIL_STYLES = `
   }
 
   body {
-    font-family: Tahoma, Arial, sans-serif;
+
+    font-family:
+      Tahoma,
+      Arial,
+      sans-serif;
+
     background: #FAFBFC;
+
     margin: 0;
-    padding: 0;
+
+    padding: 40px 0;
   }
 
   .wrapper {
-    max-width: 620px;
-    margin: 40px auto;
-    background: #ffffff;
-    border-radius: 24px;
+
+    max-width: 650px;
+
+    margin: auto;
+
+    background: #FFFFFF;
+
+    border-radius: 30px;
+
     overflow: hidden;
-    border: 1px solid #E5E9F1;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+
+    border: 1px solid #D6DAE1;
+
+    box-shadow:
+      0 10px 35px rgba(102,108,192,0.10);
   }
 
   .header {
-    background: linear-gradient(
-      135deg,
-      #666CC0,
-      #6E87C0
-    );
 
-    padding: 40px 40px 30px;
+    background:
+      linear-gradient(
+        135deg,
+        #666CC0 0%,
+        #6E87C0 55%,
+        #F9E1B3 100%
+      );
+
+    padding:
+      55px
+      40px
+      42px;
+
     text-align: center !important;
   }
 
   .header img {
+
     display: block;
-    margin: 0 auto 18px auto;
+
+    margin:
+      0 auto 24px auto;
+
+    width: 180px;
+
+    filter:
+      drop-shadow(
+        0 8px 16px rgba(0,0,0,0.15)
+      );
   }
 
   .header h1 {
-    color: #ffffff;
-    font-size: 28px;
+
+    color: #FFFFFF;
+
+    font-size: 32px;
+
+    font-weight: 800;
+
     margin: 0;
-    font-weight: 700;
+
+    letter-spacing: -.5px;
+
     text-align: center !important;
   }
 
   .body {
-    padding: 40px;
+
+    padding: 46px;
+
     color: #292B2E;
-    line-height: 2;
+
+    line-height: 2.1;
+
     font-size: 16px;
   }
 
   .body p {
+
     margin-top: 0;
+
     color: #46494E;
+
+    font-size: 16px;
   }
 
   .card {
-    background: #FAFBFC;
-    border: 1px solid #E5E9F1;
-    border-radius: 20px;
-    padding: 24px;
-    margin: 30px 0;
-    line-height: 2;
+
+    background:
+      linear-gradient(
+        180deg,
+        #FFFFFF,
+        #FAFBFC
+      );
+
+    border:
+      1px solid #E5E9F1;
+
+    border-radius: 24px;
+
+    padding: 30px;
+
+    margin: 34px 0;
+
+    box-shadow:
+      0 4px 14px rgba(0,0,0,0.03);
   }
 
   .row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 0;
-    border-bottom: 1px solid #E5E9F1;
+
+    padding:
+      16px 0;
+
+    border-bottom:
+      1px solid #E5E9F1;
   }
 
   .row:last-child {
@@ -106,61 +168,105 @@ const EMAIL_STYLES = `
   }
 
   .row span {
+
+    display: block;
+
     color: #63676E;
+
+    font-size: 14px;
+
+    margin-bottom: 4px;
   }
 
   .row strong {
+
     color: #292B2E;
+
+    font-size: 16px;
+
     font-weight: 700;
   }
 
   .btn-primary {
-    display: inline-block;
-    background: linear-gradient(
-      135deg,
-      #666CC0,
-      #6E87C0
-    );
 
-    color: #ffffff !important;
-    padding: 14px 34px;
+    display: inline-block;
+
+    background:
+      linear-gradient(
+        135deg,
+        #666CC0,
+        #6E87C0
+      );
+
+    color: #FFFFFF !important;
+
+    padding:
+      16px 44px;
+
     border-radius: 999px;
+
     text-decoration: none;
-    font-weight: bold;
+
     font-size: 15px;
+
+    font-weight: 700;
+
+    box-shadow:
+      0 10px 20px rgba(102,108,192,0.25);
   }
 
   .btn-secondary {
+
     display: inline-block;
-    background: linear-gradient(
-      135deg,
-      #F38DB9,
-      #F9E1B3
-    );
+
+    background:
+      linear-gradient(
+        135deg,
+        #F9E1B3,
+        #F3B0B9
+      );
 
     color: #292B2E !important;
-    padding: 14px 34px;
+
+    padding:
+      16px 44px;
+
     border-radius: 999px;
+
     text-decoration: none;
-    font-weight: bold;
+
     font-size: 15px;
+
+    font-weight: 700;
   }
 
   .footer {
+
     background: #FAFBFC;
-    padding: 24px;
+
+    padding: 28px;
+
     text-align: center !important;
+
     color: #63676E;
+
     font-size: 13px;
-    border-top: 1px solid #E5E9F1;
+
+    border-top:
+      1px solid #E5E9F1;
   }
 
   .manual-note {
+
     color: #63676E;
+
     font-size: 14px;
+
     line-height: 2;
-    margin-top: 28px;
+
+    margin-top: 30px;
   }
+
 `;
 
 function getFrontendUrl(): string {
@@ -204,100 +310,99 @@ function buildReminderEmailHtml(
 
 <head>
 
-  <meta charset="UTF-8" />
+<meta charset="UTF-8" />
 
-  <style>
-    ${EMAIL_STYLES}
-  </style>
+<style>
+${EMAIL_STYLES}
+</style>
 
 </head>
 
 <body>
 
-  <div class="wrapper">
+<div class="wrapper">
 
-    <div class="header">
+<div class="header">
 
-      <img
-        src="${EMAIL_LOGO_URL}"
-        alt="Dierha"
-        width="150"
-      />
+<img
+src="${EMAIL_LOGO_URL}"
+alt="Dierha"
+/>
 
-      <h1>
-        تذكير بتجديد اشتراك
-      </h1>
+<h1>
+تذكير بتجديد اشتراك
+</h1>
 
-    </div>
+</div>
 
-    <div class="body">
+<div class="body">
 
-      <p>
-        مرحبًا
-        <strong>${data.userName}</strong>
+<p>
+مرحبًا
+<strong>${data.userName}</strong>
+</p>
+
+<p>
+نذكّرك بأن اشتراكك في
+<strong>${data.subscriptionName}</strong>
+سيتجدد قريبًا.
+</p>
+
+<div class="card">
+
+<div class="row">
+<span>الخدمة</span>
+<strong>${data.subscriptionName}</strong>
+</div>
+
+<div class="row">
+<span>تاريخ التجديد</span>
+<strong>${formatDate(data.renewalDate)}</strong>
+</div>
+
+<div class="row">
+<span>المبلغ</span>
+<strong>${data.amount} ريال</strong>
+</div>
+
+<div class="row">
+<span>دورة الدفع</span>
+<strong>${formatBillingCycle(data.billingCycle)}</strong>
+</div>
+
+</div>
+
+${
+  data.cancelUrl
+    ? `
+      <p style="text-align:center !important; margin-top:28px;">
+
+        <a
+          href="${data.cancelUrl}"
+          class="btn-secondary"
+        >
+          إلغاء الاشتراك
+        </a>
+
       </p>
+    `
+    : `
+      <p class="manual-note">
 
-      <p>
-        نذكّرك بأن اشتراكك في
-        <strong>${data.subscriptionName}</strong>
-        سيتجدد قريبًا.
+        هذا الاشتراك تمت إضافته يدويًا،
+        لذلك لا يتوفر رابط إلغاء مباشر.
+
       </p>
+    `
+}
 
-      <div class="card">
+</div>
 
-        <div class="row">
-          <span>الخدمة</span>
-          <strong>${data.subscriptionName}</strong>
-        </div>
+<div class="footer">
+ديرها | منصة إدارة الاشتراكات
+</div>
 
-        <div class="row">
-          <span>تاريخ التجديد</span>
-          <strong>${formatDate(data.renewalDate)}</strong>
-        </div>
-
-        <div class="row">
-          <span>المبلغ</span>
-          <strong>${data.amount} ريال</strong>
-        </div>
-
-        <div class="row">
-          <span>دورة الدفع</span>
-          <strong>${formatBillingCycle(data.billingCycle)}</strong>
-        </div>
-
-      </div>
-
-      ${
-        data.cancelUrl
-          ? `
-            <p style="text-align:center !important; margin-top:28px;">
-
-              <a
-                href="${data.cancelUrl}"
-                class="btn-secondary"
-              >
-                إلغاء الاشتراك
-              </a>
-
-            </p>
-          `
-          : `
-            <p class="manual-note">
-
-              هذا الاشتراك تمت إضافته يدويًا،
-              لذلك لا يتوفر رابط إلغاء مباشر.
-
-            </p>
-          `
-      }
-
-    </div>
-
-    <div class="footer">
-      ديرها | منصة إدارة الاشتراكات
-    </div>
-
-  </div>
+</div>
 
 </body>
 </html>
@@ -309,7 +414,7 @@ function buildResetPasswordHtml(
 ): string {
 
   const resetUrl =
-    \`${getFrontendUrl()}/reset-password?token=\${data.token}\`;
+    `${getFrontendUrl()}/reset-password?token=${data.token}`;
 
   return `
 <!DOCTYPE html>
@@ -317,89 +422,88 @@ function buildResetPasswordHtml(
 
 <head>
 
-  <meta charset="UTF-8" />
+<meta charset="UTF-8" />
 
-  <style>
-    ${EMAIL_STYLES}
-  </style>
+<style>
+${EMAIL_STYLES}
+</style>
 
 </head>
 
 <body>
 
-  <div class="wrapper">
+<div class="wrapper">
 
-    <div class="header">
+<div class="header">
 
-      <img
-        src="${EMAIL_LOGO_URL}"
-        alt="Dierha"
-        width="150"
-      />
+<img
+src="${EMAIL_LOGO_URL}"
+alt="Dierha"
+/>
 
-      <h1>
-        إعادة تعيين كلمة المرور
-      </h1>
+<h1>
+إعادة تعيين كلمة المرور
+</h1>
 
-    </div>
+</div>
 
-    <div class="body">
+<div class="body">
 
-      <p>
-        مرحبًا
-        <strong>${data.userName}</strong>
-      </p>
+<p>
+مرحبًا
+<strong>${data.userName}</strong>
+</p>
 
-      <p>
-        وصلنا طلب لإعادة تعيين كلمة المرور الخاصة بحسابك في
-        <strong>ديرها</strong>.
-      </p>
+<p>
+وصلنا طلب لإعادة تعيين كلمة المرور الخاصة بحسابك في
+<strong>ديرها</strong>.
+</p>
 
-      <div class="card">
+<div class="card">
 
-        <p>
-          لإكمال العملية،
-          اضغطي على الزر التالي
-          لاختيار كلمة مرور جديدة.
-        </p>
+<p>
+لإكمال العملية،
+اضغطي على الزر التالي
+لاختيار كلمة مرور جديدة.
+</p>
 
-        <p>
-          هذا الرابط صالح لمدة
-          <strong>15 دقيقة فقط</strong>.
-        </p>
+<p>
+هذا الرابط صالح لمدة
+<strong>15 دقيقة فقط</strong>.
+</p>
 
-      </div>
+</div>
 
-      <p
-        style="
-          text-align:center !important;
-          margin-top:28px;
-        "
-      >
+<p
+style="
+text-align:center !important;
+margin-top:28px;
+"
+>
 
-        <a
-          href="${resetUrl}"
-          class="btn-primary"
-        >
-          إعادة تعيين كلمة المرور
-        </a>
+<a
+href="${resetUrl}"
+class="btn-primary"
+>
+إعادة تعيين كلمة المرور
+</a>
 
-      </p>
+</p>
 
-      <p class="manual-note">
+<p class="manual-note">
 
-        إذا لم تطلبي إعادة تعيين كلمة المرور،
-        يمكنك تجاهل هذه الرسالة بأمان.
+إذا لم تطلبي إعادة تعيين كلمة المرور،
+يمكنك تجاهل هذه الرسالة بأمان.
 
-      </p>
+</p>
 
-    </div>
+</div>
 
-    <div class="footer">
-      ديرها | منصة إدارة الاشتراكات
-    </div>
+<div class="footer">
+ديرها | منصة إدارة الاشتراكات
+</div>
 
-  </div>
+</div>
 
 </body>
 </html>
@@ -434,7 +538,7 @@ async function sendEmail(params: {
         method: 'POST',
 
         headers: {
-          Authorization: \`Bearer \${apiKey}\`,
+          Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
 
@@ -461,7 +565,7 @@ async function sendEmail(params: {
     }
 
     console.log(
-      \`[Email] Sent to \${params.to}\`,
+      `[Email] Sent to ${params.to}`,
     );
 
     return true;
@@ -490,7 +594,7 @@ export async function sendReminderEmail(
     to: data.to,
 
     subject:
-      \`تذكير: \${data.subscriptionName} سيتجدد قريبًا\`,
+      `تذكير: ${data.subscriptionName} سيتجدد قريبًا`,
 
     html:
       buildReminderEmailHtml(data),
