@@ -16,8 +16,7 @@ interface ResetPasswordEmailData {
   token: string;
 }
 
-const EMAIL_LOGO_URL =
-  'https://zpijpebyajnkxsrnrfre.supabase.co/storage/v1/object/public/assets/dierha-logo.png.jpeg';
+const EMAIL_LOGO_URL ='https://zpijpebyajnkxsrnrfre.supabase.co/storage/v1/object/public/assets/dierha-logo.png.jpeg';
 
 const EMAIL_STYLES = `
 
