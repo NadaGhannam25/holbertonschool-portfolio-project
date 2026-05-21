@@ -1,19 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { and, desc, eq, ilike, sql, type SQL } from 'drizzle-orm';
-
 import { db } from '../db';
-import {
-  categories,
-  priceHistory,
-  reminders,
-  subscriptionProviders,
-  subscriptions,
-} from '../db/schema';
-
+import { categories, priceHistory, reminders, subscriptionProviders, subscriptions } from '../db/schema';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { FilterSubscriptionsDto } from './dto/filter-subscriptions.dto';
-
 import { generateSubscriptionsPdf } from '../services/pdf';
 
 type BillingCycle =
@@ -26,7 +17,10 @@ type BillingCycle =
 @Injectable()
 export class SubscriptionsService {
   async findAll(userId: number, filters?: FilterSubscriptionsDto) {
-    const conditions: SQL[] = [eq(subscriptions.userId, userId)];
+    const conditions: SQL[] = [
+      eq(subscriptions.userId, userId),
+      sql`${subscriptions.deletedAt} is null`,
+    ];
 
     if (filters?.categoryId !== undefined) {
       conditions.push(eq(subscriptions.categoryId, Number(filters.categoryId)));
@@ -95,7 +89,8 @@ export class SubscriptionsService {
     return db.transaction(async (tx) => {
       const reminderDays = dto.reminderDays ?? 3;
       const remindersEnabled = dto.remindersEnabled ?? true;
-
+      const startDate = dto.renewalDate;
+      const nextRenewalDate = this.getNextRenewalDate( startDate, dto.billingCycle as BillingCycle );
       const [subscription] = await tx
         .insert(subscriptions)
         .values({
@@ -104,8 +99,9 @@ export class SubscriptionsService {
           name: dto.name,
           price: this.formatPrice(dto.price),
           categoryId: dto.categoryId,
-          renewalDate: dto.renewalDate,
-          startDate: dto.renewalDate,
+          renewalDate: nextRenewalDate,
+          startDate,
+          endDate: null,
           billingCycle: dto.billingCycle,
           notes: dto.notes,
           status: dto.status ?? 'active',
@@ -114,36 +110,6 @@ export class SubscriptionsService {
           remindersEnabled,
         })
         .returning();
-
-      await tx.insert(priceHistory).values({
-        subscriptionId: subscription.id,
-        oldPrice: null,
-        newPrice: this.formatPrice(dto.price),
-        effectiveFrom: dto.renewalDate,
-      });
-
-      if (remindersEnabled) {
-        const renewalDate = this.parseDate(subscription.renewalDate);
-        renewalDate.setHours(23, 59, 59, 999);
-
-        const remindAt = this.parseDate(subscription.renewalDate);
-        remindAt.setDate(remindAt.getDate() - reminderDays);
-
-        const now = new Date();
-
-        if (renewalDate >= now) {
-          await tx.insert(reminders).values({
-            subscriptionId: subscription.id,
-            remindAt: this.formatDate(remindAt <= now ? now : remindAt),
-            sent: false,
-            sentAt: null,
-          });
-        }
-      }
-
-      return subscription;
-    });
-  }
 
   async findOne(userId: number, id: number) {
     return this.getOwnedSubscription(userId, id);
@@ -260,12 +226,15 @@ export class SubscriptionsService {
   async remove(userId: number, id: number) {
     return db.transaction(async (tx) => {
       await this.getOwnedSubscription(userId, id);
-
+      const today = this.formatDate(new Date());
       await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
-      await tx.delete(priceHistory).where(eq(priceHistory.subscriptionId, id));
-
       const [deletedSubscription] = await tx
-        .delete(subscriptions)
+        .update(subscriptions)
+        .set({
+          status: 'inactive',
+          endDate: today,
+          deletedAt: new Date(),
+        })
         .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
         .returning();
 
@@ -278,16 +247,18 @@ export class SubscriptionsService {
 
   async toggle(userId: number, id: number) {
     const currentSubscription = await this.getOwnedSubscription(userId, id);
-
-    const nextStatus =
-      currentSubscription.status === 'active' ? 'inactive' : 'active';
-
+    const nextStatus = currentSubscription.status === 'active' ? 'inactive' : 'active';
     const [updatedSubscription] = await db
       .update(subscriptions)
-      .set({ status: nextStatus })
+      .set({
+        status: nextStatus,
+        endDate:
+          nextStatus === 'inactive'
+            ? this.formatDate(new Date())
+            : null,
+      })
       .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
       .returning();
-
     return updatedSubscription;
   }
 
@@ -421,7 +392,20 @@ export class SubscriptionsService {
 
     return `${year}-${month}-${day}`;
   }
+  private getNextRenewalDate(
+    startDateValue: string,
+    billingCycle: BillingCycle,
+  ) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const renewalDate = this.parseDate(startDateValue);
+    renewalDate.setHours(0, 0, 0, 0);
+    while (renewalDate < today) {
+    this.moveDateForward(renewalDate, billingCycle);
+  }
 
+    return this.formatDate(renewalDate);
+  }
   private formatPrice(price: number | string) {
     return Number(price).toFixed(2);
   }
