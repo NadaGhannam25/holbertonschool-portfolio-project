@@ -1,3 +1,4 @@
+```ts
 import {
   Body,
   Controller,
@@ -22,7 +23,6 @@ import {
 
 @Controller('auth')
 export class AuthController {
-
   constructor(
     private readonly authService: AuthService,
   ) {}
@@ -54,17 +54,27 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Patch('profile')
   updateProfile(
-
     @Req()
     req: AuthenticatedRequest,
 
     @Body()
     body: UpdateProfileDto,
-
   ) {
-
     return this.authService.updateProfile(
       req.user!.sub,
+      body,
+    );
+  }
+
+  @Post('logout')
+  logout() {
+    return {
+      message:
+        'Logout successful. Please remove the token from client storage.',
+    };
+  }
+}
+```
       body,
     );
   }
