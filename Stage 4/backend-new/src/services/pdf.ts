@@ -5,32 +5,44 @@ import puppeteer from 'puppeteer';
 import { eq } from 'drizzle-orm';
 
 import { db } from '../db';
+
 import {
   categories,
   subscriptions,
   users,
 } from '../db/schema';
 
-function formatDate(dateStr: string): string {
+function formatDate(
+  dateStr: string,
+): string {
 
   const date = new Date(dateStr);
 
-  return date.toLocaleDateString('ar-SA', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  return date.toLocaleDateString(
+    'ar-SA',
+    {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    },
+  );
 }
 
 function formatBillingCycle(
   cycle: string,
 ): string {
 
-  const map: Record<string, string> = {
+  const map:
+  Record<string, string> = {
+
     weekly: 'أسبوعي',
+
     monthly: 'شهري',
+
     quarterly: 'كل 3 أشهر',
+
     semi_annual: 'كل 6 أشهر',
+
     yearly: 'سنوي',
   };
 
@@ -41,9 +53,13 @@ function formatStatus(
   status: string,
 ): string {
 
-  const map: Record<string, string> = {
+  const map:
+  Record<string, string> = {
+
     active: 'نشط',
+
     inactive: 'متوقف',
+
     cancelled: 'ملغي',
   };
 
@@ -55,83 +71,133 @@ function getMonthlyEquivalent(
   billingCycle: string,
 ): number {
 
-  const amount = Number(price);
+  const amount =
+    Number(price);
 
-  if (billingCycle === 'weekly') {
+  if (
+    billingCycle === 'weekly'
+  ) {
+
     return amount * 4;
   }
 
-  if (billingCycle === 'quarterly') {
+  if (
+    billingCycle === 'quarterly'
+  ) {
+
     return amount / 3;
   }
 
-  if (billingCycle === 'semi_annual') {
+  if (
+    billingCycle === 'semi_annual'
+  ) {
+
     return amount / 6;
   }
 
-  if (billingCycle === 'yearly') {
+  if (
+    billingCycle === 'yearly'
+  ) {
+
     return amount / 12;
   }
 
   return amount;
 }
 
-export async function generateSubscriptionsPdf(
+export async function
+generateSubscriptionsPdf(
   userId: number,
 ): Promise<Buffer> {
 
   const [user] = await db
+
     .select({
+
       name: users.name,
+
       email: users.email,
     })
+
     .from(users)
-    .where(eq(users.id, userId));
+
+    .where(
+      eq(users.id, userId),
+    );
 
   if (!user) {
-    throw new Error('User not found');
+
+    throw new Error(
+      'User not found',
+    );
   }
 
   const rows = await db
+
     .select({
-      name: subscriptions.name,
-      price: subscriptions.price,
+
+      name:
+        subscriptions.name,
+
+      price:
+        subscriptions.price,
+
       billingCycle:
         subscriptions.billingCycle,
+
       renewalDate:
         subscriptions.renewalDate,
-      status: subscriptions.status,
-      categoryName: categories.name,
+
+      status:
+        subscriptions.status,
+
+      categoryName:
+        categories.name,
     })
+
     .from(subscriptions)
+
     .leftJoin(
+
       categories,
+
       eq(
         subscriptions.categoryId,
         categories.id,
       ),
     )
+
     .where(
-      eq(subscriptions.userId, userId),
+      eq(
+        subscriptions.userId,
+        userId,
+      ),
     );
 
   const activeSubscriptions =
+
     rows.filter(
-      (row) => row.status === 'active',
+      (row) =>
+        row.status ===
+        'active',
     );
 
   const monthlyTotal =
+
     activeSubscriptions.reduce(
+
       (sum, row) => {
 
         return (
           sum +
+
           getMonthlyEquivalent(
             row.price,
             row.billingCycle,
           )
         );
       },
+
       0,
     );
 
@@ -139,8 +205,10 @@ export async function generateSubscriptionsPdf(
     monthlyTotal * 12;
 
   const tableRows = rows
+
     .map(
       (subscription) => `
+
         <tr>
 
           <td>
@@ -148,44 +216,58 @@ export async function generateSubscriptionsPdf(
           </td>
 
           <td>
+
             ${
               subscription.categoryName ??
               'أخرى'
             }
+
           </td>
 
           <td>
-            ${subscription.price} ريال
+            ${subscription.price}
+            ريال
           </td>
 
           <td>
+
             ${formatBillingCycle(
               subscription.billingCycle,
             )}
+
           </td>
 
           <td>
+
             ${formatDate(
               subscription.renewalDate,
             )}
+
           </td>
 
           <td>
+
             ${formatStatus(
               subscription.status ??
-                'active',
+              'active',
             )}
+
           </td>
 
         </tr>
       `,
     )
+
     .join('');
 
   const html = `
+
 <!DOCTYPE html>
 
-<html lang="ar" dir="rtl">
+<html
+  lang="ar"
+  dir="rtl"
+>
 
 <head>
 
@@ -193,225 +275,253 @@ export async function generateSubscriptionsPdf(
 
 <style>
 
-  body {
+body {
 
-    font-family:
-      Tahoma,
-      Arial,
-      sans-serif;
+  font-family:
+    Tahoma,
+    Arial,
+    sans-serif;
 
-    direction: rtl;
+  direction: rtl;
 
-    margin: 0;
+  margin: 0;
 
-    padding: 0;
+  padding: 0;
 
-    color: #292B2E;
+  background: #FAFBFC;
 
-    background: #FAFBFC;
-  }
+  color: #292B2E;
+}
 
-  .header {
+.wrapper {
 
-    background:
-      linear-gradient(
-        135deg,
-        #666CC0 0%,
-        #6E87C0 45%,
-        #F3B0B9 100%
-      );
+  width: 100%;
 
-    padding:
-      55px
-      48px
-      42px;
+  min-height: 100vh;
 
-    text-align: center;
+  background: #FAFBFC;
+}
 
-    color: white;
-  }
+.header {
 
-  .header img {
+  background:
+    linear-gradient(
+      135deg,
+      #666CC0 0%,
+      #6E87C0 45%,
+      #F3B0B9 100%
+    );
 
-    width: 180px;
+  padding:
+    55px
+    40px
+    45px;
 
-    margin-bottom: 22px;
+  text-align: center;
 
-    background: white;
+  color: white;
+}
 
-    border-radius: 18px;
+.header img {
 
-    padding: 10px;
+  width: 220px;
 
-    box-shadow:
-      0 10px 24px rgba(0,0,0,0.12);
-  }
+  margin-bottom: 22px;
 
-  .header h1 {
+  background: white;
 
-    margin: 0;
+  border-radius: 24px;
 
-    font-size: 34px;
+  padding: 12px;
 
-    font-weight: 800;
-  }
+  box-shadow:
+    0 12px 28px
+    rgba(0,0,0,0.12);
+}
 
-  .header p {
+.header h1 {
 
-    margin-top: 10px;
+  margin: 0;
 
-    font-size: 15px;
+  font-size: 38px;
 
-    opacity: 0.95;
-  }
+  font-weight: 800;
+}
 
-  .content {
+.header p {
 
-    padding: 42px 50px;
-  }
+  margin-top: 12px;
 
-  .info {
+  font-size: 16px;
 
-    background: white;
+  opacity: .95;
+}
 
-    border: 1px solid #E5E9F1;
+.content {
 
-    border-radius: 24px;
+  padding:
+    45px
+    55px;
+}
 
-    padding: 24px;
+.info {
 
-    margin-bottom: 32px;
+  background: white;
 
-    line-height: 2.1;
+  border:
+    1px solid #D6DAE1;
 
-    box-shadow:
-      0 4px 14px rgba(102,108,192,0.05);
-  }
+  border-radius: 24px;
 
-  .info div {
+  padding: 24px;
 
-    margin-bottom: 6px;
-  }
+  margin-bottom: 34px;
 
-  .cards {
+  line-height: 2.1;
 
-    display: grid;
+  box-shadow:
+    0 6px 18px
+    rgba(102,108,192,0.05);
+}
 
-    grid-template-columns:
-      repeat(3, 1fr);
+.info div {
 
-    gap: 18px;
+  margin-bottom: 8px;
 
-    margin:
-      30px 0 40px;
-  }
+  font-size: 15px;
+}
 
-  .card {
+.cards {
 
-    background:
-      linear-gradient(
-        180deg,
-        #FFFFFF,
-        #FAFBFC
-      );
+  display: grid;
 
-    border:
-      1px solid #E5E9F1;
+  grid-template-columns:
+    repeat(3, 1fr);
 
-    border-radius: 24px;
+  gap: 18px;
 
-    padding: 22px;
+  margin-bottom: 40px;
+}
 
-    text-align: center;
+.card {
 
-    box-shadow:
-      0 6px 16px rgba(102,108,192,0.06);
-  }
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF,
+      #FAFBFC
+    );
 
-  .card .label {
+  border:
+    1px solid #D6DAE1;
 
-    color: #6E87C0;
+  border-radius: 24px;
 
-    font-size: 14px;
+  padding: 26px;
 
-    margin-bottom: 10px;
+  text-align: center;
 
-    font-weight: 700;
-  }
+  box-shadow:
+    0 6px 16px
+    rgba(102,108,192,0.06);
+}
 
-  .card .value {
+.card .label {
 
-    color: #292B2E;
+  color: #6E87C0;
 
-    font-size: 24px;
+  font-size: 14px;
 
-    font-weight: 800;
-  }
+  margin-bottom: 10px;
 
-  h2 {
+  font-weight: 700;
+}
 
-    color: #666CC0;
+.card .value {
 
-    font-size: 24px;
+  color: #292B2E;
 
-    margin:
-      0 0 20px;
+  font-size: 28px;
 
-    font-weight: 800;
-  }
+  font-weight: 800;
+}
 
-  table {
+.section-title {
 
-    width: 100%;
+  color: #666CC0;
 
-    border-collapse: collapse;
+  font-size: 28px;
 
-    background: white;
+  font-weight: 800;
 
-    overflow: hidden;
+  margin:
+    0 0 20px;
+}
 
-    border-radius: 24px;
+table {
 
-    box-shadow:
-      0 8px 24px rgba(0,0,0,0.04);
+  width: 100%;
 
-    font-size: 13px;
-  }
+  border-collapse: collapse;
 
-  th {
+  background: white;
 
-    background:
-      linear-gradient(
-        135deg,
-        #666CC0,
-        #6E87C0
-      );
+  border-radius: 24px;
 
-    color: white;
+  overflow: hidden;
 
-    padding: 16px;
+  box-shadow:
+    0 8px 24px
+    rgba(0,0,0,0.04);
+}
 
-    text-align: right;
+th {
 
-    font-size: 13px;
-  }
+  background:
+    linear-gradient(
+      135deg,
+      #666CC0,
+      #6E87C0
+    );
 
-  td {
+  color: white;
 
-    padding: 16px;
+  padding: 18px;
 
-    border-bottom:
-      1px solid #E5E9F1;
+  text-align: right;
 
-    text-align: right;
+  font-size: 14px;
+}
 
-    color: #292B2E;
-  }
+td {
 
-  tr:nth-child(even) td {
+  padding: 18px;
 
-    background: #FAFBFC;
-  }
+  border-bottom:
+    1px solid #E5E9F1;
+
+  color: #292B2E;
+
+  font-size: 14px;
+}
+
+tr:nth-child(even) td {
+
+  background: #FAFBFC;
+}
+
+.footer {
+
+  margin-top: 40px;
+
+  text-align: center;
+
+  color: #63676E;
+
+  font-size: 14px;
+
+  padding-bottom: 30px;
+}
 
 </style>
 
@@ -419,146 +529,187 @@ export async function generateSubscriptionsPdf(
 
 <body>
 
-<div class="header">
+<div class="wrapper">
 
-  <img
-    src="https://zpijpebyajnkxsrnrfre.supabase.co/storage/v1/object/public/assets/dierha-logo.png"
-  />
+  <div class="header">
 
-  <h1>
-    ديرها
-  </h1>
+    <img
+      src="https://zpijpebyajnkxsrnrfre.supabase.co/storage/v1/object/public/assets/dierha-logo.png"
+    />
 
-  <p>
-    تقرير إدارة الاشتراكات
-  </p>
+    <h1>
+      ديرها
+    </h1>
 
-</div>
-
-<div class="content">
-
-  <div class="info">
-
-    <div>
-      الحساب:
-      ${user.name}
-    </div>
-
-    <div>
-      البريد الإلكتروني:
-      ${user.email}
-    </div>
-
-    <div>
-      تاريخ الإصدار:
-      ${new Date().toLocaleDateString(
-        'ar-SA',
-      )}
-    </div>
+    <p>
+      تقرير إدارة الاشتراكات
+    </p>
 
   </div>
 
-  <div class="cards">
+  <div class="content">
 
-    <div class="card">
+    <div class="info">
 
-      <div class="label">
-        عدد الاشتراكات
+      <div>
+
+        الحساب:
+        ${user.name}
+
       </div>
 
-      <div class="value">
-        ${rows.length}
+      <div>
+
+        البريد الإلكتروني:
+        ${user.email}
+
+      </div>
+
+      <div>
+
+        تاريخ الإصدار:
+        ${new Date()
+          .toLocaleDateString(
+            'ar-SA',
+          )}
+
       </div>
 
     </div>
 
-    <div class="card">
+    <div class="cards">
 
-      <div class="label">
-        الإجمالي الشهري
+      <div class="card">
+
+        <div class="label">
+          عدد الاشتراكات
+        </div>
+
+        <div class="value">
+          ${rows.length}
+        </div>
+
       </div>
 
-      <div class="value">
-        ${monthlyTotal.toFixed(2)} ريال
+      <div class="card">
+
+        <div class="label">
+          الإجمالي الشهري
+        </div>
+
+        <div class="value">
+
+          ${monthlyTotal.toFixed(
+            2,
+          )}
+
+          ريال
+
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="label">
+          الإجمالي السنوي
+        </div>
+
+        <div class="value">
+
+          ${yearlyTotal.toFixed(
+            2,
+          )}
+
+          ريال
+
+        </div>
+
       </div>
 
     </div>
 
-    <div class="card">
+    <h2 class="section-title">
 
-      <div class="label">
-        الإجمالي السنوي
-      </div>
+      جدول الاشتراكات
 
-      <div class="value">
-        ${yearlyTotal.toFixed(2)} ريال
-      </div>
+    </h2>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>الخدمة</th>
+
+          <th>التصنيف</th>
+
+          <th>السعر</th>
+
+          <th>دورة الدفع</th>
+
+          <th>تاريخ التجديد</th>
+
+          <th>الحالة</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${tableRows}
+
+      </tbody>
+
+    </table>
+
+    <div class="footer">
+
+      ديرها | منصة إدارة الاشتراكات
 
     </div>
 
   </div>
-
-  <h2>
-    جدول الاشتراكات
-  </h2>
-
-  <table>
-
-    <thead>
-
-      <tr>
-
-        <th>الخدمة</th>
-
-        <th>التصنيف</th>
-
-        <th>السعر</th>
-
-        <th>دورة الدفع</th>
-
-        <th>تاريخ التجديد</th>
-
-        <th>الحالة</th>
-
-      </tr>
-
-    </thead>
-
-    <tbody>
-
-      ${tableRows}
-
-    </tbody>
-
-  </table>
 
 </div>
 
 </body>
+
 </html>
 `;
 
   const browser =
     await puppeteer.launch({
+
       headless: true,
     });
 
   const page =
     await browser.newPage();
 
-  await page.setContent(html, {
-    waitUntil: 'load',
-  });
+  await page.setContent(
+    html,
+    {
+      waitUntil: 'load',
+    },
+  );
 
   const pdf = await page.pdf({
+
     format: 'A4',
 
     printBackground: true,
 
     margin: {
+
       top: '0mm',
+
       right: '0mm',
+
       bottom: '0mm',
+
       left: '0mm',
     },
   });
