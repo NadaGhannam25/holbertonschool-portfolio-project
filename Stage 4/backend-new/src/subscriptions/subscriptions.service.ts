@@ -110,6 +110,27 @@ export class SubscriptionsService {
           remindersEnabled,
         })
         .returning();
+        if (remindersEnabled) {
+          const renewalDate = this.parseDate(nextRenewalDate);
+          renewalDate.setHours(23, 59, 59, 999);
+          const remindAt = this.parseDate(nextRenewalDate);
+          remindAt.setDate(remindAt.getDate() - reminderDays);
+          const now = new Date();
+          if (renewalDate >= now) {
+            await tx.insert(reminders).values({
+              subscriptionId: subscription.id,
+              remindAt: this.formatDate(
+                remindAt <= now ? now : remindAt,
+              ),
+              sent: false,
+              sentAt: null,
+            });
+          }
+        }
+
+        return subscription;
+      });
+    }
 
   async findOne(userId: number, id: number) {
     return this.getOwnedSubscription(userId, id);
