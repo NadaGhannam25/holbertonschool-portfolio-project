@@ -15,6 +15,7 @@ import { RegisterDto } from './dto/register.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { sendResetPasswordEmail } from '../services/email';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -122,6 +123,7 @@ export class AuthService {
         'If this email exists, a reset password link has been sent.',
     };
   }
+  
 
   async resetPassword(body: ResetPasswordDto) {
     const result = await db
@@ -157,4 +159,33 @@ export class AuthService {
       message: 'Password reset successfully',
     };
   }
+  async updateProfile(
+  userId: number,
+  body: UpdateProfileDto,
+) {
+
+  await db
+    .update(users)
+    .set({
+      name: body.name,
+    })
+    .where(eq(users.id, userId));
+
+  const result = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+    })
+    .from(users)
+    .where(eq(users.id, userId));
+
+  return {
+
+    message:
+      'Profile updated successfully',
+
+    user: result[0],
+  };
+}
 }
