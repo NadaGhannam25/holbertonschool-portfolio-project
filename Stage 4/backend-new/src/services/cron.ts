@@ -178,7 +178,7 @@ async function updateExpiredSubscriptions() {
 
   const allSubscriptions = await db
     .select()
-    .from(subscriptions);
+    .from(subscriptions)
     .where(eq(subscriptions.status, 'active'));
 
   const today = new Date();
