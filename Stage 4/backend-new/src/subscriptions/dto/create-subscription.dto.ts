@@ -34,7 +34,11 @@ export class CreateSubscriptionDto {
   providerId?: number;
 
   @IsDateString()
-  renewalDate: string;
+  startDate: string;
+
+  @IsOptional()
+  @IsDateString()
+  renewalDate?: string;
 
   @IsIn(['monthly', 'quarterly', 'semi_annual', 'yearly', 'weekly'])
   billingCycle: 'monthly' | 'quarterly' | 'semi_annual' | 'yearly' | 'weekly';
@@ -60,4 +64,5 @@ export class CreateSubscriptionDto {
   @IsOptional()
   @IsBoolean()
   remindersEnabled?: boolean;
+
 }
