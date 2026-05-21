@@ -92,7 +92,7 @@ export class SubscriptionsService {
     return db.transaction(async (tx) => {
       const reminderDays = dto.reminderDays ?? 3;
       const remindersEnabled = dto.remindersEnabled ?? true;
-      const startDate = dto.renewalDate;
+      const startDate = dto.startDate;
       const nextRenewalDate = this.getNextRenewalDate( 
         startDate, 
         dto.billingCycle as BillingCycle,
