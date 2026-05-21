@@ -5,6 +5,19 @@ import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
+import {
+  Patch,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+
+import {
+  JwtAuthGuard,
+  AuthenticatedRequest,
+} from './guards/jwt-auth.guard';
+
+import { UpdateProfileDto } from './dto/update-profile.dto';
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -28,6 +41,25 @@ export class AuthController {
   resetPassword(@Body() body: ResetPasswordDto) {
     return this.authService.resetPassword(body);
   }
+  @UseGuards(JwtAuthGuard)
+
+@Patch('profile')
+
+updateProfile(
+
+  @Req()
+  req: AuthenticatedRequest,
+
+  @Body()
+  body: UpdateProfileDto,
+
+) {
+
+  return this.authService.updateProfile(
+    req.user!.sub,
+    body,
+  );
+}
 
   @Post('logout')
   logout() {
