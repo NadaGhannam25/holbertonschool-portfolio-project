@@ -218,7 +218,12 @@ export class AnalyticsService {
       })
       .from(subscriptions)
       .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
-      .where(eq(subscriptions.userId, userId));
+      .where(
+            and(
+                eq(subscriptions.userId, userId),
+                sql`${subscriptions.startDate} is not null`,
+            ),
+      );
   }
 
   private generatePaymentsForRange(params: {
