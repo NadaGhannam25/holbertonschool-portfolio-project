@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Post,
-  Patch,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -22,6 +21,7 @@ import {
 
 @Controller('auth')
 export class AuthController {
+
   constructor(
     private readonly authService: AuthService,
   ) {}
@@ -51,14 +51,17 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('profile')
+  @Post('profile')
   updateProfile(
+
     @Req()
     req: AuthenticatedRequest,
 
     @Body()
     body: UpdateProfileDto,
+
   ) {
+
     return this.authService.updateProfile(
       req.user!.sub,
       body,
@@ -74,15 +77,3 @@ export class AuthController {
   }
 }
 ```
-      body,
-    );
-  }
-
-  @Post('logout')
-  logout() {
-    return {
-      message:
-        'Logout successful. Please remove the token from client storage.',
-    };
-  }
-}
