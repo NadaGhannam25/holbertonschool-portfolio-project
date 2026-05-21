@@ -192,7 +192,7 @@ async function updateExpiredSubscriptions() {
 
     let updated = false;
 
-    while (renewalDate <= today) {
+    while (renewalDate < today) {
       moveDateForward(
         renewalDate,
         subscription.billingCycle as BillingCycle,
