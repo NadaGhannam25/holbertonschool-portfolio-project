@@ -1,16 +1,8 @@
 import 'dotenv/config';
 import cron from 'node-cron';
 import { and, eq, lte } from 'drizzle-orm';
-
 import { db } from '../db';
-
-import {
-  reminders,
-  subscriptionProviders,
-  subscriptions,
-  users,
-} from '../db/schema';
-
+import { reminders, subscriptionProviders, subscriptions, users } from '../db/schema';
 import { sendReminderEmail } from './email';
 
 type BillingCycle =
@@ -187,6 +179,7 @@ async function updateExpiredSubscriptions() {
   const allSubscriptions = await db
     .select()
     .from(subscriptions);
+    .where(eq(subscriptions.status, 'active'));
 
   const today = new Date();
 
