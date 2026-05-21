@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Post,
+  Patch,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -16,6 +17,9 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 
 import {
   JwtAuthGuard,
+} from './guards/jwt-auth.guard';
+
+import type {
   AuthenticatedRequest,
 } from './guards/jwt-auth.guard';
 
@@ -51,7 +55,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('profile')
+  @Patch('profile')
   updateProfile(
 
     @Req()
@@ -76,4 +80,3 @@ export class AuthController {
     };
   }
 }
-```
