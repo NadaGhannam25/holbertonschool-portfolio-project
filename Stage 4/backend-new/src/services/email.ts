@@ -71,6 +71,199 @@ const EMAIL_STYLES = `
 
   .header {
 
+    background: linear-gradient(
+      135deg,
+      #666CC0 0%,
+      #7A86D6 45%,
+      #F38BB2 100%
+    ) !important;
+
+    padding:
+      55px
+      40px
+      45px;
+
+    text-align: center !important;
+
+    color: #FFFFFF !important;
+  }
+
+  .header img {
+
+    width: 220px;
+
+    margin:
+      0 auto 22px auto;
+
+    display: block;
+
+    background: #FFFFFF;
+
+    border-radius: 24px;
+
+    padding: 12px;
+
+    box-shadow:
+      0 12px 28px
+      rgba(0,0,0,0.12);
+  }
+
+  .header h1 {
+
+    margin: 0;
+
+    font-size: 38px;
+
+    font-weight: 800;
+
+    color: #FFFFFF;
+
+    text-align: center !important;
+  }
+
+  .body {
+
+    padding:
+      45px
+      55px;
+
+    line-height: 2.1;
+
+    color: #292B2E;
+  }
+
+  .body p {
+
+    font-size: 16px;
+
+    color: #46494E;
+  }
+
+  .card {
+
+    background:
+      linear-gradient(
+        180deg,
+        #FFFFFF 0%,
+        #FAFBFC 100%
+      );
+
+    border:
+      1px solid #D6DAE1;
+
+    border-radius: 24px;
+
+    padding: 26px;
+
+    margin: 35px 0;
+
+    box-shadow:
+      0 6px 16px
+      rgba(102,108,192,0.06);
+  }
+
+  .row {
+
+    padding: 20px 0;
+
+    border-bottom:
+      1px solid #E5E9F1;
+  }
+
+  .row:last-child {
+
+    border-bottom: none;
+  }
+
+  .row span {
+
+    display: block;
+
+    color: #6E87C0;
+
+    font-size: 14px;
+
+    margin-bottom: 8px;
+
+    font-weight: 700;
+  }
+
+  .row strong {
+
+    color: #292B2E;
+
+    font-size: 22px;
+
+    font-weight: 800;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+
+    display: inline-block;
+
+    background: linear-gradient(
+      135deg,
+      #666CC0 0%,
+      #7A86D6 45%,
+      #F38BB2 100%
+    ) !important;
+
+    color: #FFFFFF !important;
+
+    padding:
+      18px
+      52px;
+
+    border-radius: 999px;
+
+    text-decoration: none;
+
+    font-size: 16px;
+
+    font-weight: 800;
+
+    border: none;
+
+    box-shadow:
+      0 12px 24px
+      rgba(243,139,178,0.28);
+  }
+
+  .footer {
+
+    margin-top: 40px;
+
+    text-align: center !important;
+
+    color: #63676E;
+
+    font-size: 14px;
+
+    padding: 30px;
+
+    background: #E5E9F1;
+
+    border-top:
+      1px solid #D6DAE1;
+  }
+
+  .manual-note {
+
+    color: #63676E;
+
+    font-size: 15px;
+
+    line-height: 2.2;
+
+    margin-top: 35px;
+  }
+`;      0 8px 24px
+      rgba(0,0,0,0.04);
+  }
+
+  .header {
+
 background: #7B7FD1 !important;
 
     padding:
