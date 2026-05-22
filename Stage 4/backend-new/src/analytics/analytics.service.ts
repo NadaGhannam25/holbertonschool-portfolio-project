@@ -1,5 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { and, asc, eq, gte, isNull, lte, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  eq,
+  gte,
+  isNull,
+  lte,
+  or,
+  isNotNull,
+  sql,
+} from 'drizzle-orm';
 
 import { db } from '../db';
 import { categories, subscriptions } from '../db/schema';
@@ -23,9 +33,22 @@ type AnalyticsSubscription = {
 
 @Injectable()
 export class AnalyticsService {
+  // ─── Timezone helpers ─────────────────────────────────────────────────────
+
+  private getRiyadhToday(): string {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Riyadh',
+    }).format(new Date());
+  }
+
+  private getRiyadhNow(): Date {
+    return this.parseDate(this.getRiyadhToday());
+  }
+
+  // ─── Public endpoints ─────────────────────────────────────────────────────
+
   async getMonthly(userId: number) {
     const monthRanges = this.getLastSixMonthRanges();
-
     const userSubscriptions = await this.getAnalyticsSubscriptions(userId);
 
     return monthRanges.map((monthRange) => {
@@ -58,8 +81,9 @@ export class AnalyticsService {
   }
 
   async getYearly(userId: number) {
-    const now = new Date();
+    const now = this.getRiyadhNow();
     const yearStart = new Date(now.getFullYear(), 0, 1);
+    yearStart.setHours(0, 0, 0, 0);
 
     const userSubscriptions = await this.getAnalyticsSubscriptions(userId);
 
@@ -90,7 +114,7 @@ export class AnalyticsService {
   }
 
   async getCategories(userId: number) {
-    const now = new Date();
+    const now = this.getRiyadhNow();
     const yearStart = new Date(now.getFullYear(), 0, 1);
 
     const userSubscriptions = await this.getAnalyticsSubscriptions(userId);
@@ -175,10 +199,11 @@ export class AnalyticsService {
   }
 
   async getUpcoming(userId: number) {
-    const today = this.formatDate(new Date());
+    const today = this.getRiyadhToday();
 
-    const sevenDaysFromNow = new Date();
+    const sevenDaysFromNow = this.getRiyadhNow();
     sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+    const sevenDaysStr = this.formatDate(sevenDaysFromNow);
 
     return db
       .select({
@@ -199,12 +224,20 @@ export class AnalyticsService {
           eq(subscriptions.status, 'active'),
           isNull(subscriptions.deletedAt),
           gte(subscriptions.renewalDate, today),
-          lte(subscriptions.renewalDate, this.formatDate(sevenDaysFromNow)),
+          lte(subscriptions.renewalDate, sevenDaysStr),
         ),
       )
       .orderBy(asc(subscriptions.renewalDate));
   }
 
+  // ─── Private helpers ──────────────────────────────────────────────────────
+
+  /**
+   * للحسابات المالية:
+   * ✅ الاشتراكات النشطة الحالية
+   * ✅ الاشتراكات المحذوفة التي عندها endDate (محذوفة بشكل صحيح)
+   * ❌ اشتراكات قديمة/تجريبية بدون endDate → مستبعدة
+   */
   private async getAnalyticsSubscriptions(userId: number) {
     return db
       .select({
@@ -219,10 +252,22 @@ export class AnalyticsService {
       .from(subscriptions)
       .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
       .where(
+        and(
+          eq(subscriptions.userId, userId),
+          sql`${subscriptions.startDate} is not null`,
+          or(
+            // نشطة حالياً
             and(
-                eq(subscriptions.userId, userId),
-                sql`${subscriptions.startDate} is not null`,
+              eq(subscriptions.status, 'active'),
+              isNull(subscriptions.deletedAt),
             ),
+            // محذوفة لكن بشكل صحيح (لها endDate)
+            and(
+              isNotNull(subscriptions.deletedAt),
+              isNotNull(subscriptions.endDate),
+            ),
+          ),
+        ),
       );
   }
 
@@ -238,7 +283,7 @@ export class AnalyticsService {
 
     const subscriptionEnd = params.subscription.endDate
       ? this.parseDate(params.subscription.endDate)
-      : params.rangeEnd;
+      : new Date(params.rangeEnd);
 
     subscriptionEnd.setHours(23, 59, 59, 999);
 
@@ -275,14 +320,10 @@ export class AnalyticsService {
   }
 
   private getLastSixMonthRanges() {
-    return Array.from({ length: 6 }, (_, index) => {
-      const now = new Date();
+    const now = this.getRiyadhNow();
 
-      const date = new Date(
-        now.getFullYear(),
-        now.getMonth() - (5 - index),
-        1,
-      );
+    return Array.from({ length: 6 }, (_, index) => {
+      const date = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1);
 
       const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
       const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
@@ -296,7 +337,7 @@ export class AnalyticsService {
   }
 
   private getCurrentMonthRange() {
-    const now = new Date();
+    const now = this.getRiyadhNow();
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
     const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
@@ -311,23 +352,18 @@ export class AnalyticsService {
       case 'weekly':
         date.setDate(date.getDate() + 7);
         break;
-
       case 'monthly':
         date.setMonth(date.getMonth() + 1);
         break;
-
       case 'quarterly':
         date.setMonth(date.getMonth() + 3);
         break;
-
       case 'semi_annual':
         date.setMonth(date.getMonth() + 6);
         break;
-
       case 'yearly':
         date.setFullYear(date.getFullYear() + 1);
         break;
-
       default:
         date.setMonth(date.getMonth() + 1);
     }
@@ -339,7 +375,6 @@ export class AnalyticsService {
     }
 
     const [year, month, day] = dateValue.split('-').map(Number);
-
     return new Date(year, month - 1, day);
   }
 
@@ -347,14 +382,12 @@ export class AnalyticsService {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-
     return `${year}-${month}-${day}`;
   }
 
   private formatMonth(date: Date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
-
     return `${year}-${month}`;
   }
 }
