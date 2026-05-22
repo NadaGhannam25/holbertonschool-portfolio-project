@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "setup": "npm install && npm audit fix --force && pnpm add -D drizzle-kit@latest && pnpm add class-validator class-transformer && pnpm add node-cron jspdf jspdf-autotable && pnpm add -D @types/node-cron && pnpm add puppeteer && pnpm exec drizzle-kit push"
     "seed:providers": "pnpm ts-node src/db/seed-providers.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
