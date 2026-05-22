@@ -144,12 +144,13 @@ const EMAIL_STYLES = `
 
   .card {
 
-    background:
-      linear-gradient(
-        180deg,
-        #FFFFFF,
-        #FAFBFC
-      );
+    bbackground:
+  linear-gradient(
+    135deg,
+    #666CC0 0%,
+    #6E87C0 50%,
+    #F38FB1 100%
+  );
 
     border:
       1px solid #D6DAE1;
