@@ -1,8 +1,13 @@
 import 'dotenv/config';
 import cron from 'node-cron';
-import { and, eq, lte } from 'drizzle-orm';
+import { and, eq, isNull, lte } from 'drizzle-orm';
 import { db } from '../db';
-import { reminders, subscriptionProviders, subscriptions, users } from '../db/schema';
+import {
+  reminders,
+  subscriptionProviders,
+  subscriptions,
+  users,
+} from '../db/schema';
 import { sendReminderEmail } from './email';
 
 type BillingCycle =
@@ -11,6 +16,12 @@ type BillingCycle =
   | 'quarterly'
   | 'semi_annual'
   | 'yearly';
+
+function getRiyadhToday(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Riyadh',
+  }).format(new Date());
+}
 
 function parseDate(dateValue: string | Date) {
   if (dateValue instanceof Date) return new Date(dateValue);
@@ -28,10 +39,7 @@ function formatDate(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-function moveDateForward(
-  date: Date,
-  billingCycle: BillingCycle,
-) {
+function moveDateForward(date: Date, billingCycle: BillingCycle) {
   switch (billingCycle) {
     case 'weekly':
       date.setDate(date.getDate() + 7);
@@ -67,10 +75,7 @@ async function createNextReminder(
   renewalDate.setHours(23, 59, 59, 999);
 
   const remindAt = parseDate(subscription.renewalDate);
-
-  remindAt.setDate(
-    remindAt.getDate() - (subscription.reminderDays ?? 3),
-  );
+  remindAt.setDate(remindAt.getDate() - (subscription.reminderDays ?? 3));
 
   const now = new Date();
 
@@ -78,9 +83,7 @@ async function createNextReminder(
 
   await db.insert(reminders).values({
     subscriptionId: subscription.id,
-    remindAt: formatDate(
-      remindAt <= now ? now : remindAt,
-    ),
+    remindAt: formatDate(remindAt <= now ? now : remindAt),
     sent: false,
     sentAt: null,
   });
@@ -89,9 +92,9 @@ async function createNextReminder(
 async function runReminderJob(): Promise<void> {
   console.log('[Cron] Checking pending reminders...');
 
-  const today = new Date()
-    .toISOString()
-    .split('T')[0];
+  const today = getRiyadhToday(); // ✅ تاريخ الرياض
+
+  console.log(`[Cron] Today (Riyadh): ${today}`);
 
   const pendingReminders = await db
     .select({
@@ -112,10 +115,7 @@ async function runReminderJob(): Promise<void> {
       userEmail: users.email,
     })
     .from(reminders)
-    .innerJoin(
-      subscriptions,
-      eq(reminders.subscriptionId, subscriptions.id),
-    )
+    .innerJoin(subscriptions, eq(reminders.subscriptionId, subscriptions.id))
     .innerJoin(users, eq(subscriptions.userId, users.id))
     .leftJoin(
       subscriptionProviders,
@@ -124,13 +124,12 @@ async function runReminderJob(): Promise<void> {
     .where(
       and(
         eq(reminders.sent, false),
+        isNull(reminders.sentAt),
         lte(reminders.remindAt, today),
       ),
     );
 
-  console.log(
-    `[Cron] Pending reminders count: ${pendingReminders.length}`,
-  );
+  console.log(`[Cron] Pending reminders count: ${pendingReminders.length}`);
 
   for (const reminder of pendingReminders) {
     try {
@@ -142,9 +141,7 @@ async function runReminderJob(): Promise<void> {
         amount: reminder.price,
         billingCycle: reminder.billingCycle,
         cancelUrl:
-          reminder.subscriptionCancelUrl ??
-          reminder.providerCancelUrl ??
-          null,
+          reminder.subscriptionCancelUrl ?? reminder.providerCancelUrl ?? null,
       });
 
       if (sent) {
@@ -156,13 +153,9 @@ async function runReminderJob(): Promise<void> {
           })
           .where(eq(reminders.id, reminder.reminderId));
 
-        console.log(
-          `[Cron] Reminder sent to ${reminder.userEmail}`,
-        );
+        console.log(`[Cron] Reminder sent to ${reminder.userEmail}`);
       } else {
-        console.warn(
-          `[Cron] Email failed for ${reminder.userEmail}`,
-        );
+        console.warn(`[Cron] Email failed for ${reminder.userEmail}`);
       }
     } catch (error) {
       console.error(
@@ -181,23 +174,19 @@ async function updateExpiredSubscriptions() {
     .from(subscriptions)
     .where(eq(subscriptions.status, 'active'));
 
-  const today = new Date();
-
+  // ✅ تاريخ الرياض
+  const todayStr = getRiyadhToday();
+  const today = new Date(todayStr);
   today.setHours(0, 0, 0, 0);
 
   for (const subscription of allSubscriptions) {
     const renewalDate = parseDate(subscription.renewalDate);
-
     renewalDate.setHours(0, 0, 0, 0);
 
     let updated = false;
 
     while (renewalDate < today) {
-      moveDateForward(
-        renewalDate,
-        subscription.billingCycle as BillingCycle,
-      );
-
+      moveDateForward(renewalDate, subscription.billingCycle as BillingCycle);
       updated = true;
     }
 
@@ -207,9 +196,7 @@ async function updateExpiredSubscriptions() {
 
     const [updatedSubscription] = await db
       .update(subscriptions)
-      .set({
-        renewalDate: nextRenewalDate,
-      })
+      .set({ renewalDate: nextRenewalDate })
       .where(eq(subscriptions.id, subscription.id))
       .returning();
 
@@ -237,23 +224,13 @@ export function startCronJobs(): void {
   cron.schedule('5 9 * * *', async () => {
     try {
       console.log('[Cron] Running daily renewal update...');
-
       await updateExpiredSubscriptions();
-
       console.log('[Cron] Daily renewal update completed');
     } catch (error) {
-      console.error(
-        '[Cron] Daily renewal update failed:',
-        error,
-      );
+      console.error('[Cron] Daily renewal update failed:', error);
     }
   });
 
-  console.log(
-    '[Cron] Reminder sender scheduled every minute',
-  );
-
-  console.log(
-    '[Cron] Renewal updater scheduled daily at 9:05 AM',
-  );
+  console.log('[Cron] Reminder sender scheduled every minute');
+  console.log('[Cron] Renewal updater scheduled daily at 9:05 AM');
 }
