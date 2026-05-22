@@ -20,7 +20,6 @@ const EMAIL_LOGO_URL =
   'https://zpijpebyajnkxsrnrfre.supabase.co/storage/v1/object/public/assets/dierha-logo.png';
 
 const EMAIL_STYLES = `
-
   body,
   table,
   td,
@@ -28,133 +27,74 @@ const EMAIL_STYLES = `
   div,
   span,
   a {
-
     direction: rtl !important;
     text-align: right !important;
   }
 
   body {
-
-    font-family:
-      Tahoma,
-      Arial,
-      sans-serif;
-
+    font-family: Tahoma, Arial, sans-serif;
     background: #FAFBFC;
-
     margin: 0;
-
     padding: 45px 0;
-
     color: #292B2E;
   }
 
   .wrapper {
-
     max-width: 660px;
-
     margin: auto;
-
     background: #FFFFFF;
-
     border-radius: 24px;
-
     overflow: hidden;
-
-    border:
-      1px solid #D6DAE1;
-
-    box-shadow:
-      0 8px 24px
-      rgba(0,0,0,0.04);
+    border: 1px solid #D6DAE1;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.04);
   }
 
   .header {
-
-    background: linear-gradient(
-      135deg,
-      #666CC0 0%,
-      #7A86D6 45%,
-      #F38BB2 100%
-    ) !important;
-
-    padding:
-      55px
-      40px
-      45px;
-
+    background: #7B7FD1 !important;
+    padding: 55px 40px 45px;
     text-align: center !important;
-
     color: #FFFFFF !important;
   }
 
   .header img {
-
     width: 220px;
-
-    margin:
-      0 auto 22px auto;
-
+    margin: 0 auto 22px auto;
     display: block;
-
     background: #FFFFFF;
-
     border-radius: 24px;
-
     padding: 12px;
-
-    box-shadow:
-      0 12px 28px
-      rgba(0,0,0,0.12);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
   }
 
   .header h1 {
-
     margin: 0;
-
     font-size: 38px;
-
     font-weight: 800;
-
     color: #FFFFFF;
-
     text-align: center !important;
   }
 
   .body {
-
-    padding:
-      45px
-      55px;
-
+    padding: 45px 55px;
     line-height: 2.1;
-
     color: #292B2E;
   }
 
   .body p {
-
     font-size: 16px;
-
     color: #46494E;
   }
 
   .card {
+    background: linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FAFBFC 100%
+    );
 
-    background:
-      linear-gradient(
-        180deg,
-        #FFFFFF 0%,
-        #FAFBFC 100%
-      );
-
-    border:
-      1px solid #D6DAE1;
-
+    border: 1px solid #D6DAE1;
     border-radius: 24px;
-
     padding: 26px;
-
     margin: 35px 0;
 
     box-shadow:
@@ -163,231 +103,30 @@ const EMAIL_STYLES = `
   }
 
   .row {
-
     padding: 20px 0;
-
-    border-bottom:
-      1px solid #E5E9F1;
+    border-bottom: 1px solid #E5E9F1;
   }
 
   .row:last-child {
-
     border-bottom: none;
   }
 
   .row span {
-
     display: block;
-
     color: #6E87C0;
-
     font-size: 14px;
-
     margin-bottom: 8px;
-
     font-weight: 700;
   }
 
   .row strong {
-
     color: #292B2E;
-
     font-size: 22px;
-
     font-weight: 800;
   }
 
   .btn-primary,
   .btn-secondary {
-
-    display: inline-block;
-
-    background: linear-gradient(
-      135deg,
-      #666CC0 0%,
-      #7A86D6 45%,
-      #F38BB2 100%
-    ) !important;
-
-    color: #FFFFFF !important;
-
-    padding:
-      18px
-      52px;
-
-    border-radius: 999px;
-
-    text-decoration: none;
-
-    font-size: 16px;
-
-    font-weight: 800;
-
-    border: none;
-
-    box-shadow:
-      0 12px 24px
-      rgba(243,139,178,0.28);
-  }
-
-  .footer {
-
-    margin-top: 40px;
-
-    text-align: center !important;
-
-    color: #63676E;
-
-    font-size: 14px;
-
-    padding: 30px;
-
-    background: #E5E9F1;
-
-    border-top:
-      1px solid #D6DAE1;
-  }
-
-  .manual-note {
-
-    color: #63676E;
-
-    font-size: 15px;
-
-    line-height: 2.2;
-
-    margin-top: 35px;
-  }
-`;      0 8px 24px
-      rgba(0,0,0,0.04);
-  }
-
-  .header {
-
-background: #7B7FD1 !important;
-
-    padding:
-      55px
-      40px
-      45px;
-
-    text-align: center !important;
-
-    color: #FFFFFF !important;
-  }
-
-  .header img {
-
-    width: 220px;
-
-    margin:
-      0 auto 22px auto;
-
-    display: block;
-
-    background: #FFFFFF;
-
-    border-radius: 24px;
-
-    padding: 12px;
-
-    box-shadow:
-      0 12px 28px
-      rgba(0,0,0,0.12);
-  }
-
-  .header h1 {
-
-    margin: 0;
-
-    font-size: 38px;
-
-    font-weight: 800;
-
-    color: #FFFFFF;
-
-    text-align: center !important;
-  }
-
-  .body {
-
-    padding:
-      45px
-      55px;
-
-    line-height: 2.1;
-
-    color: #292B2E;
-  }
-
-  .body p {
-
-    font-size: 16px;
-
-    color: #46494E;
-  }
-
-  .card {
-
-    background:
-      linear-gradient(
-        180deg,
-        #FFFFFF 0%,
-        #FAFBFC 100%
-      );
-
-    border:
-      1px solid #D6DAE1;
-
-    border-radius: 24px;
-
-    padding: 26px;
-
-    margin: 35px 0;
-
-    box-shadow:
-      0 6px 16px
-      rgba(102,108,192,0.06);
-  }
-
-  .row {
-
-    padding: 20px 0;
-
-    border-bottom:
-      1px solid #E5E9F1;
-  }
-
-  .row:last-child {
-
-    border-bottom: none;
-  }
-
-  .row span {
-
-    display: block;
-
-    color: #6E87C0;
-
-    font-size: 14px;
-
-    margin-bottom: 8px;
-
-    font-weight: 700;
-  }
-
-  .row strong {
-
-    color: #292B2E;
-
-    font-size: 22px;
-
-    font-weight: 800;
-  }
-
-  .btn-primary,
-  .btn-secondary {
-
     display: inline-block;
 
     background:
@@ -399,9 +138,7 @@ background: #7B7FD1 !important;
 
     color: #FFFFFF !important;
 
-    padding:
-      18px
-      52px;
+    padding: 18px 52px;
 
     border-radius: 999px;
 
@@ -419,7 +156,6 @@ background: #7B7FD1 !important;
   }
 
   .footer {
-
     margin-top: 40px;
 
     text-align: center !important;
@@ -432,54 +168,33 @@ background: #7B7FD1 !important;
 
     background: #E5E9F1;
 
-    border-top:
-      1px solid #D6DAE1;
+    border-top: 1px solid #D6DAE1;
   }
 
   .manual-note {
-
     color: #63676E;
-
     font-size: 15px;
-
     line-height: 2.2;
-
     margin-top: 35px;
   }
 `;
 
 function getFrontendUrl(): string {
-
-  return (
-    process.env.FRONTEND_URL ??
-    'http://localhost:5173'
-  );
+  return process.env.FRONTEND_URL ?? 'http://localhost:5173';
 }
 
-function formatDate(
-  dateStr: string,
-): string {
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
 
-  const date =
-    new Date(dateStr);
-
-  return date.toLocaleDateString(
-    'ar-SA',
-    {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    },
-  );
+  return date.toLocaleDateString('ar-SA', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 }
 
-function formatBillingCycle(
-  cycle: string,
-): string {
-
-  const map:
-  Record<string, string> = {
-
+function formatBillingCycle(cycle: string): string {
+  const map: Record<string, string> = {
     weekly: 'أسبوعي',
 
     monthly: 'شهري',
@@ -494,10 +209,7 @@ function formatBillingCycle(
   return map[cycle] ?? cycle;
 }
 
-function buildReminderEmailHtml(
-  data: ReminderEmailData,
-): string {
-
+function sendReminderEmail(data: ReminderEmailData): string {
   return `
 
 <!DOCTYPE html>
@@ -576,9 +288,7 @@ ${EMAIL_STYLES}
 
         <strong>
 
-          ${formatDate(
-            data.renewalDate,
-          )}
+          ${formatDate(data.renewalDate)}
 
         </strong>
 
@@ -604,9 +314,7 @@ ${EMAIL_STYLES}
 
         <strong>
 
-          ${formatBillingCycle(
-            data.billingCycle,
-          )}
+          ${formatBillingCycle(data.billingCycle)}
 
         </strong>
 
@@ -616,7 +324,6 @@ ${EMAIL_STYLES}
 
     ${
       data.cancelUrl
-
         ? `
 
           <p
@@ -637,7 +344,6 @@ ${EMAIL_STYLES}
 
           </p>
         `
-
         : `
 
           <p class="manual-note">
@@ -667,13 +373,8 @@ ${EMAIL_STYLES}
 `;
 }
 
-function buildResetPasswordHtml(
-  data: ResetPasswordEmailData,
-): string {
-
-  const resetUrl =
-
-    `${getFrontendUrl()}/reset-password?token=${data.token}`;
+function sendResetPasswordEmail(data: ResetPasswordEmailData): string {
+  const resetUrl = `${getFrontendUrl()}/reset-password?token=${data.token}`;
 
   return `
 
@@ -790,3 +491,5 @@ ${EMAIL_STYLES}
 </html>
 `;
 }
+
+export { sendReminderEmail, sendResetPasswordEmail };
