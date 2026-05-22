@@ -5,7 +5,7 @@ interface ReminderEmailData {
   userName: string;
   subscriptionName: string;
   renewalDate: string;
-  amount: string;
+ amount: string;
   billingCycle: string;
   cancelUrl?: string | null;
 }
@@ -76,7 +76,7 @@ const EMAIL_STYLES = `
       linear-gradient(
         135deg,
         #666CC0 0%,
-        #6E87C0 45%,
+        #6E87C0 55%,
         #F3B0B9 100%
       );
 
@@ -224,6 +224,8 @@ const EMAIL_STYLES = `
 
     font-weight: 800;
 
+    border: none;
+
     box-shadow:
       0 12px 24px
       rgba(102,108,192,0.28);
@@ -236,11 +238,11 @@ const EMAIL_STYLES = `
     background:
       linear-gradient(
         135deg,
-        #F3B0B9,
-        #F9E1B3
+        #666CC0,
+        #6E87C0
       );
 
-    color: #292B2E !important;
+    color: #FFFFFF !important;
 
     padding:
       18px
@@ -253,6 +255,12 @@ const EMAIL_STYLES = `
     font-size: 16px;
 
     font-weight: 800;
+
+    border: none;
+
+    box-shadow:
+      0 12px 24px
+      rgba(102,108,192,0.28);
   }
 
   .footer {
@@ -267,10 +275,10 @@ const EMAIL_STYLES = `
 
     padding: 30px;
 
-    background: #FAFBFC;
+    background: #E5E9F1;
 
     border-top:
-      1px solid #E5E9F1;
+      1px solid #D6DAE1;
   }
 
   .manual-note {
@@ -479,8 +487,8 @@ ${EMAIL_STYLES}
 
           <p class="manual-note">
 
-            هذا الاشتراك تمت إضافته يدويًا،
-            لذلك لا يتوفر رابط إلغاء مباشر.
+            هذا الاشتراك تمت إضافته يدويًا، لذلك لا يتوفر رابط إلغاء مباشر.
+  لتحسين تجربتك وتسهيل إدارة اشتراكك لاحقًا، يمكنك إضافة رابط إلغاء الاشتراك من صفحة تفاصيل الاشتراك .
 
           </p>
         `
@@ -567,7 +575,7 @@ ${EMAIL_STYLES}
       <p>
 
         لإكمال العملية،
-        اضغطي على الزر التالي
+        اضغط على الزر التالي
         لاختيار كلمة مرور جديدة.
 
       </p>
@@ -604,9 +612,9 @@ ${EMAIL_STYLES}
 
     <p class="manual-note">
 
-      إذا لم تطلبي إعادة
+      إذا لم تطلب إعادة
       تعيين كلمة المرور،
-      يمكنك تجاهل الرسالة بأمان.
+      يمكنك تجاهل هذه الرسالة بأمان.
 
     </p>
 
@@ -624,136 +632,4 @@ ${EMAIL_STYLES}
 
 </html>
 `;
-}
-
-async function sendEmail(
-  params: {
-    from: string;
-    to: string;
-    subject: string;
-    html: string;
-  },
-): Promise<boolean> {
-
-  const apiKey =
-    process.env.RESEND_API_KEY;
-
-  if (!apiKey) {
-
-    console.warn(
-      '[Email] RESEND_API_KEY is missing',
-    );
-
-    return false;
-  }
-
-  try {
-
-    const response =
-      await fetch(
-        'https://api.resend.com/emails',
-        {
-
-          method: 'POST',
-
-          headers: {
-
-            Authorization:
-              `Bearer ${apiKey}`,
-
-            'Content-Type':
-              'application/json',
-          },
-
-          body: JSON.stringify({
-
-            from: params.from,
-
-            to: [params.to],
-
-            subject: params.subject,
-
-            html: params.html,
-          }),
-        },
-      );
-
-    if (!response.ok) {
-
-      const errorBody =
-        await response.json();
-
-      console.error(
-        '[Email] Failed to send:',
-        errorBody,
-      );
-
-      return false;
-    }
-
-    console.log(
-      `[Email] Sent to ${params.to}`,
-    );
-
-    return true;
-
-  } catch (error) {
-
-    console.error(
-      '[Email] Error:',
-      error,
-    );
-
-    return false;
-  }
-}
-
-export async function
-sendReminderEmail(
-  data: ReminderEmailData,
-): Promise<boolean> {
-
-  return sendEmail({
-
-    from:
-      process.env
-        .RESEND_REMINDER_EMAIL ??
-
-      'Dierha <reminders@dierha.com>',
-
-    to: data.to,
-
-    subject:
-      `تذكير: ${data.subscriptionName} سيتجدد قريبًا`,
-
-    html:
-      buildReminderEmailHtml(
-        data,
-      ),
-  });
-}
-
-export async function
-sendResetPasswordEmail(
-  data: ResetPasswordEmailData,
-): Promise<boolean> {
-
-  return sendEmail({
-
-    from:
-      process.env
-        .RESEND_SUPPORT_EMAIL ??
-
-      'Dierha <support@dierha.com>',
-
-    to: data.to,
-
-    subject:
-      'إعادة تعيين كلمة المرور',
-
-    html:
-      buildResetPasswordHtml(
-        data,
-      ),
-  });
 }
