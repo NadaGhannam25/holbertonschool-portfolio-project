@@ -5,7 +5,7 @@ interface ReminderEmailData {
   userName: string;
   subscriptionName: string;
   renewalDate: string;
- amount: string;
+  amount: string;
   billingCycle: string;
   cancelUrl?: string | null;
 }
@@ -30,7 +30,6 @@ const EMAIL_STYLES = `
   a {
 
     direction: rtl !important;
-
     text-align: right !important;
   }
 
@@ -73,13 +72,12 @@ const EMAIL_STYLES = `
   .header {
 
     background:
-  linear-gradient(
-    135deg,
-    #666CC0 0%,
-    #6E87C0 40%,
-    #F26D9A 100%
-    
-      );
+      linear-gradient(
+        135deg,
+        #666CC0 0%,
+        #6E87C0 40%,
+        #FF5C93 100%
+      ) !important;
 
     padding:
       55px
@@ -88,7 +86,7 @@ const EMAIL_STYLES = `
 
     text-align: center !important;
 
-    color: white;
+    color: #FFFFFF !important;
   }
 
   .header img {
@@ -100,7 +98,7 @@ const EMAIL_STYLES = `
 
     display: block;
 
-    background: white;
+    background: #FFFFFF;
 
     border-radius: 24px;
 
@@ -119,7 +117,7 @@ const EMAIL_STYLES = `
 
     font-weight: 800;
 
-    color: white;
+    color: #FFFFFF;
 
     text-align: center !important;
   }
@@ -144,13 +142,12 @@ const EMAIL_STYLES = `
 
   .card {
 
-    bbackground:
-  linear-gradient(
-    135deg,
-    #666CC0 0%,
-    #6E87C0 50%,
-    #F38FB1 100%
-  );
+    background:
+      linear-gradient(
+        180deg,
+        #FFFFFF 0%,
+        #FAFBFC 100%
+      );
 
     border:
       1px solid #D6DAE1;
@@ -201,38 +198,7 @@ const EMAIL_STYLES = `
     font-weight: 800;
   }
 
-  .btn-primary {
-
-    display: inline-block;
-
-    background:
-      linear-gradient(
-        135deg,
-        #666CC0,
-        #6E87C0
-      );
-
-    color: #FFFFFF !important;
-
-    padding:
-      18px
-      52px;
-
-    border-radius: 999px;
-
-    text-decoration: none;
-
-    font-size: 16px;
-
-    font-weight: 800;
-
-    border: none;
-
-    box-shadow:
-      0 12px 24px
-      rgba(102,108,192,0.28);
-  }
-
+  .btn-primary,
   .btn-secondary {
 
     display: inline-block;
@@ -241,8 +207,8 @@ const EMAIL_STYLES = `
       linear-gradient(
         135deg,
         #666CC0,
-        #6E87C0
-      );
+        #FF5C93
+      ) !important;
 
     color: #FFFFFF !important;
 
@@ -262,7 +228,7 @@ const EMAIL_STYLES = `
 
     box-shadow:
       0 12px 24px
-      rgba(102,108,192,0.28);
+      rgba(255,92,147,0.28);
   }
 
   .footer {
@@ -489,8 +455,10 @@ ${EMAIL_STYLES}
 
           <p class="manual-note">
 
-            هذا الاشتراك تمت إضافته يدويًا، لذلك لا يتوفر رابط إلغاء مباشر.
-  لتحسين تجربتك وتسهيل إدارة اشتراكك لاحقًا، يمكنك إضافة رابط إلغاء الاشتراك من صفحة تفاصيل الاشتراك .
+            هذا الاشتراك تمت إضافته يدويًا،
+            لذلك لا يتوفر رابط إلغاء مباشر.
+            لتحسين تجربتك وتسهيل إدارة اشتراكك لاحقًا،
+            يمكنك إضافة رابط إلغاء الاشتراك من صفحة تفاصيل الاشتراك.
 
           </p>
         `
