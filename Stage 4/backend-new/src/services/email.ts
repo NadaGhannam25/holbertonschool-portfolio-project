@@ -5,7 +5,7 @@ interface ReminderEmailData {
   userName: string;
   subscriptionName: string;
   renewalDate: string;
- amount: string;
+  amount: string;
   billingCycle: string;
   cancelUrl?: string | null;
 }
@@ -46,6 +46,8 @@ const EMAIL_STYLES = `
     margin: 0;
 
     padding: 45px 0;
+
+    color: #292B2E;
   }
 
   .wrapper {
@@ -56,16 +58,16 @@ const EMAIL_STYLES = `
 
     background: #FFFFFF;
 
-    border-radius: 34px;
+    border-radius: 24px;
 
     overflow: hidden;
 
     border:
-      2px solid #D6DAE1;
+      1px solid #D6DAE1;
 
     box-shadow:
-      0 18px 45px
-      rgba(102,108,192,0.12);
+      0 8px 24px
+      rgba(0,0,0,0.04);
   }
 
   .header {
@@ -74,92 +76,97 @@ const EMAIL_STYLES = `
       linear-gradient(
         135deg,
         #666CC0 0%,
-        #6E87C0 50%,
+        #6E87C0 45%,
         #F3B0B9 100%
       );
 
     padding:
-      70px
+      55px
       40px
-      55px;
+      45px;
 
     text-align: center !important;
+
+    color: white;
   }
 
   .header img {
 
-    display: block;
+    width: 220px;
 
     margin:
-      0 auto 28px auto;
+      0 auto 22px auto;
 
-    width: 230px;
+    display: block;
 
-    background: #FFFFFF;
+    background: white;
 
     border-radius: 24px;
 
-    padding: 14px;
+    padding: 12px;
 
     box-shadow:
-      0 12px 30px
-      rgba(41,43,46,0.15);
+      0 12px 28px
+      rgba(0,0,0,0.12);
   }
 
   .header h1 {
 
-    color: #FFFFFF;
+    margin: 0;
 
-    font-size: 40px;
+    font-size: 38px;
 
     font-weight: 800;
 
-    margin: 0;
+    color: white;
 
     text-align: center !important;
   }
 
   .body {
 
-    padding: 55px;
+    padding:
+      45px
+      55px;
+
+    line-height: 2.1;
 
     color: #292B2E;
-
-    line-height: 2.2;
-
-    font-size: 16px;
   }
 
   .body p {
 
+    font-size: 16px;
+
     color: #46494E;
-
-    font-size: 17px;
-
-    font-weight: 500;
   }
 
   .card {
 
-    background: #FFFFFF;
+    background:
+      linear-gradient(
+        180deg,
+        #FFFFFF,
+        #FAFBFC
+      );
 
     border:
-      2px solid #D6DAE1;
+      1px solid #D6DAE1;
 
-    border-radius: 28px;
+    border-radius: 24px;
 
-    padding: 35px;
+    padding: 26px;
 
-    margin: 38px 0;
+    margin: 35px 0;
 
     box-shadow:
-      0 8px 20px
+      0 6px 16px
       rgba(102,108,192,0.06);
   }
 
   .row {
 
-    padding: 22px 0;
+    padding: 20px 0;
 
     border-bottom:
       1px solid #E5E9F1;
@@ -246,17 +253,11 @@ const EMAIL_STYLES = `
     font-size: 16px;
 
     font-weight: 800;
-
-    box-shadow:
-      0 10px 20px
-      rgba(243,176,185,0.25);
   }
 
   .footer {
 
-    background: #E5E9F1;
-
-    padding: 34px;
+    margin-top: 40px;
 
     text-align: center !important;
 
@@ -264,8 +265,12 @@ const EMAIL_STYLES = `
 
     font-size: 14px;
 
+    padding: 30px;
+
+    background: #FAFBFC;
+
     border-top:
-      1px solid #D6DAE1;
+      1px solid #E5E9F1;
   }
 
   .manual-note {
@@ -654,7 +659,7 @@ async function sendEmail(
           headers: {
 
             Authorization:
-              \`Bearer \${apiKey}\`,
+              `Bearer ${apiKey}`,
 
             'Content-Type':
               'application/json',
@@ -687,7 +692,7 @@ async function sendEmail(
     }
 
     console.log(
-      \`[Email] Sent to \${params.to}\`,
+      `[Email] Sent to ${params.to}`,
     );
 
     return true;
@@ -719,7 +724,7 @@ sendReminderEmail(
     to: data.to,
 
     subject:
-      \`تذكير: \${data.subscriptionName} سيتجدد قريبًا\`,
+      `تذكير: ${data.subscriptionName} سيتجدد قريبًا`,
 
     html:
       buildReminderEmailHtml(
