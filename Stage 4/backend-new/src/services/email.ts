@@ -73,11 +73,11 @@ const EMAIL_STYLES = `
   .header {
 
     background:
-      linear-gradient(
-        135deg,
-        #666CC0 0%,
-        #6E87C0 55%,
-        #F3B0B9 100%
+  linear-gradient(
+    135deg,
+    #666CC0 0%,
+    #6E87C0 50%,
+    #F38FB1 100%
       );
 
     padding:
