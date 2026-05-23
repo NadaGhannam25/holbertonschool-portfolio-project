@@ -1,7 +1,23 @@
 import { pool } from './index';
 
 export async function syncDatabaseSchema() {
-  // MVP safety sync: keeps exis
+  // MVP safety sync: keeps existing Supabase/Postgres tables compatible with the latest code.
+  // It is idempotent, so running it more than once is safe.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id serial PRIMARY KEY,
+      name text NOT NULL,
+      email text NOT NULL UNIQUE,
+      password_hash text NOT NULL,
+      reset_password_token text,
+      reset_password_expires timestamp,
+      created_at timestamp DEFAULT now()
+    );
+
+    CREATE TABLE IF NOT EXISTS categories (
+      id serial PRIMARY KEY,
+      name text NOT NULL UNIQUE
+    );
 
     CREATE TABLE IF NOT EXISTS subscription_providers (
       id serial PRIMARY KEY,
@@ -18,7 +34,18 @@ export async function syncDatabaseSchema() {
       id serial PRIMARY KEY,
       user_id integer REFERENCES users(id),
       provider_id integer REFERENCES subscription_providers(id),
-      name texs_enabled boolean DEFAULT true,
+      name text NOT NULL,
+      price numeric(10, 2) NOT NULL,
+      category_id integer REFERENCES categories(id),
+      renewal_date date NOT NULL,
+      start_date date,
+      end_date date,
+      billing_cycle text NOT NULL,
+      notes text,
+      status text DEFAULT 'active',
+      cancel_url text,
+      reminder_days integer DEFAULT 3,
+      reminders_enabled boolean DEFAULT true,
       deleted_at timestamp,
       created_at timestamp DEFAULT now()
     );
@@ -44,7 +71,13 @@ export async function syncDatabaseSchema() {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_password_expires timestamp;
 
     ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS provider_id integer;
-    ALTER TABLE subscriptions AD
+    ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS start_date date;
+    ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS end_date date;
+    ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS reminder_days integer DEFAULT 3;
+    ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS reminders_enabled boolean DEFAULT true;
+    ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS deleted_at timestamp;
+
+    UPDATE subscriptions
     SET start_date = renewal_date
     WHERE start_date IS NULL AND renewal_date IS NOT NULL;
 
