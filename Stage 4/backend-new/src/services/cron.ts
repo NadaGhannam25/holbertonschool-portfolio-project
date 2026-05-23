@@ -92,7 +92,7 @@ async function createNextReminder(
 async function runReminderJob(): Promise<void> {
   console.log('[Cron] Checking pending reminders...');
 
-  const today = getRiyadhToday(); // ✅ تاريخ الرياض
+  const today = getRiyadhToday(); 
 
   console.log(`[Cron] Today (Riyadh): ${today}`);
 
@@ -174,7 +174,6 @@ async function updateExpiredSubscriptions() {
     .from(subscriptions)
     .where(eq(subscriptions.status, 'active'));
 
-  // ✅ تاريخ الرياض
   const todayStr = getRiyadhToday();
   const today = new Date(todayStr);
   today.setHours(0, 0, 0, 0);
