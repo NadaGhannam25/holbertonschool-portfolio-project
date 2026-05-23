@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import logo from "../assets/dierha-logo.png";       
 import Footer from "../components/Footer";  
 import SettingsDropdown from "../components/SettingsDropdown";   
-import {    
+import {     
     type BackendSubscription,   
     getCategoryAnalytics,    
     getMonthlyAnalytics, 
