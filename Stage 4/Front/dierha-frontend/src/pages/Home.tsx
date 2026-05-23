@@ -5,7 +5,7 @@ import SettingsDropdown from "../components/SettingsDropdown";
 import {    
     type BackendSubscription,   
     getCategoryAnalytics,    
-    getMonthlyAnalytics,
+    getMonthlyAnalytics, 
     getSubscriptions, 
     getUpcomingRenewals,
     exportSubscriptionsPdf,
