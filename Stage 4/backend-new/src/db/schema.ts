@@ -53,13 +53,3 @@ export const subscriptions = pgTable('subscriptions', {
   remindersEnabled: boolean('reminders_enabled').default(true),
   deletedAt: timestamp('deleted_at'),
   createdAt: timestamp('created_at').defaultNow(),
-});
-
-export const priceHistory = pgTable('price_history', {
-  id: serial('id').primaryKey(),
-  subscriptionId: integer('subscription_id').references(() => subscriptions.id),
-  oldPrice: decimal('old_price', { precision: 10, scale: 2 }),
-  newPrice: decimal('new_price', { precision: 10, scale: 2 }).notNull(),
-  effectiveFrom: date('effective_from').notNull(),
-  changedAt: timestamp('changed_at').defaultNow(),
-});
