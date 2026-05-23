@@ -5,38 +5,7 @@ import {
     }).format(new Date());
   }
 
-  private getRiyadhNow(): Date {
-    return this.parseDate(this.getRiyadhToday());
-  }
-
-  // ─── Public endpoints ─────────────────────────────────────────────────────
-
-  async getMonthly(userId: number) {
-    const now = this.getRiyadhNow();
-    const userSubscriptions = await this.getSpendingSubscriptions(userId);
-
-    if (userSubscriptions.length === 0) return [];
-
-    // ✅ أقدم تاريخ اشتراك = بداية الرسم البياني
-    const earliestDate = userSubscriptions.reduce((earliest, sub) => {
-      const subDate = this.parseDate(sub.startDate);
-      return subDate < earliest ? subDate : earliest;
-    }, this.parseDate(userSubscriptions[0].startDate));
-
-    const monthRanges = this.getAllMonthRanges(earliestDate, now);
-
-    return monthRanges.map((monthRange) => {
-      let totalAmount = 0;
-      const countedSubscriptions = new Set<number>();
-
-      for (const subscription of userSubscriptions) {
-        const payments = this.generatePaymentsForRange({
-          subscription,
-          rangeStart: monthRange.startDate,
-          rangeEnd: monthRange.endDate,
-        });
-
-        if (payments.length > 0) {
+  private getRiyadhNow(): Dat 0) {
           countedSubscriptions.add(subscription.id);
         }
 
