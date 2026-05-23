@@ -2,49 +2,6 @@
  this.getOwnedSubscription(userId, id);
 
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const currentDate = this.parseDate(params.startDate);
-    currentDate.setHours(0, 0, 0, 0);
-
-    while (currentDate <= today) {
-      payments.push({
-        service: params.service,
-        amount: params.amount,
-        date: this.formatDate(currentDate),
-        month: this.getArabicMonthName(currentDate),
-        status: 'paid',
-      });
-
-      this.moveDateForward(currentDate, params.billingCycle);
-    }
-
-    let upcomingDate = this.parseDate(params.renewalDate);
-    upcomingDate.setHours(0, 0, 0, 0);
-
-    if (upcomingDate <= today) {
-      upcomingDate = new Date(currentDate);
-    }
-
-    let upcomingCount = 0;
-
-    while (upcomingCount < 2) {
-      payments.push({
-        service: params.service,
-        amount: params.amount,
-        date: this.formatDate(upcomingDate),
-        month: this.getArabicMonthName(upcomingDate),
-        status: 'upcoming',
-      });
-
-      upcomingCount += 1;
-      this.moveDateForward(upcomingDate, params.billingCycle);
-    }
-
-    return payments;
-  }
-
   private moveDateForward(date: Date, billingCycle: BillingCycle) {
     switch (billingCycle) {
       case 'weekly':
