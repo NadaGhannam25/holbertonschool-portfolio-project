@@ -24,9 +24,7 @@
 ## Overview
 
 This README focuses on **Stage 4: Implementation** of the Dierha project.
-
-
-
+Dierha is an Arabic-first subscription management web application that helps users organize their digital subscriptions, track renewal dates, and understand their spending without connecting a bank 
 ---
 
 ## Stage 4 Objective
