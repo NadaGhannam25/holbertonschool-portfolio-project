@@ -27,6 +27,10 @@ export class CreateSubscriptionDto {
   @Min(1)
   categoryId: number;
 
+  @IsOptional()
+  @IsString()
+  categoryName?: string;
+
   @Type(() => Number)
   @IsOptional()
   @IsInt()
@@ -52,7 +56,7 @@ export class CreateSubscriptionDto {
   status?: 'active' | 'inactive';
 
   @IsOptional()
-  @IsUrl({ require_protocol: true })
+  @IsUrl({ require_protocol: false })
   cancelUrl?: string;
 
   @IsOptional()
