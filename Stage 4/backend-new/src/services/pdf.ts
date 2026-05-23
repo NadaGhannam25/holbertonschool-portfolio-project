@@ -8,25 +8,6 @@ import { db } from '../db';
 
 import {
   categories,
-  subscriptions,
-  users,
-} from '../db/schema';
-
-function formatDate(
-  dateStr: string,
-): string {
-
-  const date = new Date(dateStr);
-
-  return date.toLocaleDateString(
-    'ar-SA',
-    {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    },
-  );
-}
 
 function formatBillingCycle(
   cycle: string,
