@@ -8,7 +8,7 @@ type LoginProps = {
     isLoading?: boolean;
     externalMessage?: string;
     externalMessageType?: "success" | "error" | "info";
-};
+}; 
 
 function Login({
     onLogin,
