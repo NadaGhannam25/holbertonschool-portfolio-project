@@ -308,7 +308,6 @@ export class AnalyticsService {
 
   // ─── Private helpers ──────────────────────────────────────────────────────
 
-  
   private getAllMonthRanges(earliestDate: Date, now: Date): MonthRange[] {
     const ranges: MonthRange[] = [];
 
