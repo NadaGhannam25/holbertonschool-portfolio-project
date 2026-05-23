@@ -79,6 +79,9 @@ const billingCycleMap: Record<
 > = {
     "أسبوعي": "weekly",
     "شهري": "monthly",
+    "3 أشهر": "quarterly",
+    "6 أشهر": "semi_annual",
+    "سنة": "yearly",
     "كل 3 شهور": "quarterly",
     "كل 6 شهور": "semi_annual",
     "سنوي": "yearly",
@@ -87,13 +90,13 @@ const billingCycleMap: Record<
 const formatBillingCycle = (cycle: BackendSubscription["billingCycle"]) => {
     if (cycle === "weekly") return "أسبوعي";
     if (cycle === "monthly") return "شهري";
-    if (cycle === "quarterly") return "كل 3 شهور";
-    if (cycle === "semi_annual") return "كل 6 شهور";
-    return "سنوي";
+    if (cycle === "quarterly") return "3 أشهر";
+    if (cycle === "semi_annual") return "6 أشهر";
+    return "سنة";
 };
 
 const formatStatus = (status: BackendSubscription["status"]) => {
-    return status === "active" ? "نشط" : "متوقف";
+    return status === "active" ? "نشط" : "غير نشط";
 };
 
 const formatDate = (date: string) => {
@@ -142,6 +145,18 @@ const resolveRenewalDate = (subscription: BackendSubscription) => {
     }
 
     return addBillingCycleToDate(startDate, subscription.billingCycle);
+};
+
+const normalizeOptionalCancelUrl = (value?: string) => {
+    const trimmedValue = value?.trim();
+
+    if (!trimmedValue) return undefined;
+
+    if (/^https?:\/\//i.test(trimmedValue)) {
+        return trimmedValue;
+    }
+
+    return `https://${trimmedValue}`;
 };
 
 const formatReminderPreference = (
@@ -233,7 +248,7 @@ function SubscriptionDetails({
     });
 
     const localLogoFileName = logoFileNameMap[subscription.provider?.name || subscription.name];
-    const logoPath = getLogoPath(localLogoFileName);
+    const logoPath = getLogoPath(localLogoFileName) || getLogoPath(subscription.provider?.logoUrl || undefined);
     const categoryName = subscription.category?.name ?? "أخرى";
     const price = Number(subscription.price).toFixed(2);
     const statusLabel = formatStatus(subscription.status);
@@ -360,7 +375,7 @@ function SubscriptionDetails({
             flex: 1, 
             backgroundColor: '#ffffff', 
             color: '#4b5563', 
-            border: '1px solid #ffffff', // إطار أبيض لإخفاء الأسود
+            border: '1px solid #ffffff',
             padding: '12px', 
             borderRadius: '16px', 
             fontWeight: 'bold',
@@ -487,7 +502,10 @@ function SubscriptionDetails({
                     status: statusLabel,
                     notes: subscription.notes || "",
                     reminderPreference: reminderPreferenceLabel,
+                    name: subscription.name,
+                    cancelUrl: subscription.cancelUrl || "",
                 }}
+                isCustomSubscription={!subscription.provider?.id}
                 onClose={() => setIsEditModalOpen(false)}
                 onSave={async (updatedValues) => {
                     try {
@@ -504,6 +522,12 @@ function SubscriptionDetails({
                         };
 
                         await updateSubscription(subscription.id, {
+                            name: !subscription.provider?.id
+                                ? updatedValues.name?.trim() || subscription.name
+                                : subscription.name,
+                            cancelUrl: !subscription.provider?.id
+                                ? normalizeOptionalCancelUrl(updatedValues.cancelUrl)
+                                : subscription.cancelUrl || undefined,
                             categoryId: subscription.provider?.id
                                 ? subscription.categoryId
                                 : categoryIdMap[updatedValues.category] ?? subscription.categoryId,
@@ -531,8 +555,8 @@ function SubscriptionDetails({
     isOpen={isCancelModalOpen}
     onClose={() => setIsCancelModalOpen(false)}
     subscriptionName={subscription.name}
-    // هذا السطر سيفحص وجود الرابط في المزود أولاً، ثم في الاشتراك، وإذا لم يجدهما يرسل undefined
-    cancelUrl={subscription.provider?.cancelUrl ?? subscription.cancelUrl ?? undefined} 
+
+                cancelUrl={subscription.provider?.cancelUrl ?? subscription.cancelUrl ?? undefined} 
 />
         </div>
     );
