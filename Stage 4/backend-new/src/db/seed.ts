@@ -8,7 +8,7 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-const db = zle(pool);
+const db = drizzle(pool);
 
 const defaultCategories = [
   "ترفيه",
