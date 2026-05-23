@@ -4,7 +4,7 @@ import { useState } from "react";
 import ToastMessage from "../components/ToastMessage";   
 import { resetPassword } from "../services/authService";  
         
-type ResetPasswordProps = {       
+type ResetPasswordProps = {        
     token: string;
 };    
   
@@ -16,7 +16,7 @@ function PasswordEyeIcon({ hidden }: { hidden: boolean }) {
                 <path d="M10.58 10.58A2 2 0 0 0 13.42 13.42" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" />
                 <path d="M8.35 5.6C9.48 5.22 10.7 5 12 5C16.55 5 20.1 7.64 22 12C21.43 13.31 20.67 14.45 19.76 15.38" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M15.65 18.4C14.52 18.78 13.3 19 12 19C7.45 19 3.9 16.36 2 12C2.82 10.12 4.02 8.58 5.5 7.43" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            </svg> 
         );
     }
 
