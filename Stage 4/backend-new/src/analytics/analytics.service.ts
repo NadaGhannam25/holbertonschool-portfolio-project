@@ -57,7 +57,6 @@ export class AnalyticsService {
 
     if (userSubscriptions.length === 0) return [];
 
-    // ✅ أقدم تاريخ اشتراك = بداية الرسم البياني
     const earliestDate = userSubscriptions.reduce((earliest, sub) => {
       const subDate = this.parseDate(sub.startDate);
       return subDate < earliest ? subDate : earliest;
@@ -102,7 +101,6 @@ export class AnalyticsService {
       return { totalYearlyAmount: '0.00', subscriptionsCount: 0 };
     }
 
-    // ✅ من أقدم تاريخ اشتراك حتى اليوم — كل الصرف الكلي
     const earliestDate = userSubscriptions.reduce((earliest, sub) => {
       const subDate = this.parseDate(sub.startDate);
       return subDate < earliest ? subDate : earliest;
@@ -142,7 +140,6 @@ export class AnalyticsService {
 
     if (userSubscriptions.length === 0) return [];
 
-    // ✅ من أقدم اشتراك حتى اليوم للتصنيفات أيضاً
     const earliestDate = userSubscriptions.reduce((earliest, sub) => {
       const subDate = this.parseDate(sub.startDate);
       return subDate < earliest ? subDate : earliest;
@@ -311,9 +308,7 @@ export class AnalyticsService {
 
   // ─── Private helpers ──────────────────────────────────────────────────────
 
-  /**
-   * يولّد نطاقات شهرية من أقدم تاريخ اشتراك حتى الشهر الحالي
-   */
+  
   private getAllMonthRanges(earliestDate: Date, now: Date): MonthRange[] {
     const ranges: MonthRange[] = [];
 
