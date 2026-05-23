@@ -1,50 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import puppeteer from 'puppeteer';
-
-    .where(
-      eq(users.id, userId),
-    );
-
-  if (!user) {
-
-    throw new Error(
-      'User not found',
-    );
-  }
-
-  const rows = await db
-
-    .select({
-
-      name:
-        subscriptions.name,
-
-      price:
-        subscriptions.price,
-
-      billingCycle:
-        subscriptions.billingCycle,
-
-      renewalDate:
-        subscriptions.renewalDate,
-
-      status:
-        subscriptions.status,
-
-      categoryName:
-        categories.name,
-    })
-
-    .from(subscriptions)
-
-    .leftJoin(
-
-      categories,
-
-      eq(
-        subscriptions.categoryId,
+import puppeteer from 'puppeteer';oryId,
         categories.id,
       ),
     )
