@@ -1,40 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
-  and,ptions.renewalDate,
-        startDate: subscriptions.startDate,
-        endDate: subscriptions.endDate,
-        billingCycle: subscriptions.billingCycle,
-        status: subscriptions.status,
-      })
-      .from(subscriptions)
-      .where(
-        and(
-          eq(subscriptions.userId, userId),
-          eq(subscriptions.status, 'active'),
-          isNull(subscriptions.deletedAt),
-          gte(subscriptions.renewalDate, startDate),
-          lte(subscriptions.renewalDate, endDate),
-        ),
-      )
-      .orderBy(asc(subscriptions.renewalDate));
-  }
-
-  async getUpcoming(userId: number) {
-    const today = this.getRiyadhToday();
-
-    const sevenDaysFromNow = this.getRiyadhNow();
-    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-    const sevenDaysStr = this.formatDate(sevenDaysFromNow);
-
-    return db
-      .select({
-        id: subscriptions.id,
-        name: subscriptions.name,
-        price: subscriptions.price,
-        categoryId: subscriptions.categoryId,
-        renewalDate: subscriptions.renewalDate,
-        startDate: subscriptions.startDate,
-        endDate: subscriptions.endDate,
+  
         billingCycle: subscriptions.billingCycle,
         status: subscriptions.status,
       })
