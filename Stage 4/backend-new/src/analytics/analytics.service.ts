@@ -5,9 +5,9 @@ import {
   eq,
   gte,
   isNull,
+  isNotNull,
   lte,
   or,
-  isNotNull,
   sql,
 } from 'drizzle-orm';
 
@@ -31,6 +31,12 @@ type AnalyticsSubscription = {
   categoryName: string | null;
 };
 
+type MonthRange = {
+  month: string;
+  startDate: Date;
+  endDate: Date;
+};
+
 @Injectable()
 export class AnalyticsService {
   // ─── Timezone helpers ─────────────────────────────────────────────────────
@@ -48,8 +54,18 @@ export class AnalyticsService {
   // ─── Public endpoints ─────────────────────────────────────────────────────
 
   async getMonthly(userId: number) {
-    const monthRanges = this.getLastSixMonthRanges();
-    const userSubscriptions = await this.getAnalyticsSubscriptions(userId);
+    const now = this.getRiyadhNow();
+    const userSubscriptions = await this.getSpendingSubscriptions(userId);
+
+    if (userSubscriptions.length === 0) return [];
+
+    // ✅ أقدم تاريخ اشتراك = بداية الرسم البياني
+    const earliestDate = userSubscriptions.reduce((earliest, sub) => {
+      const subDate = this.parseDate(sub.startDate);
+      return subDate < earliest ? subDate : earliest;
+    }, this.parseDate(userSubscriptions[0].startDate));
+
+    const monthRanges = this.getAllMonthRanges(earliestDate, now);
 
     return monthRanges.map((monthRange) => {
       let totalAmount = 0;
@@ -82,10 +98,19 @@ export class AnalyticsService {
 
   async getYearly(userId: number) {
     const now = this.getRiyadhNow();
-    const yearStart = new Date(now.getFullYear(), 0, 1);
-    yearStart.setHours(0, 0, 0, 0);
+    const userSubscriptions = await this.getSpendingSubscriptions(userId);
 
-    const userSubscriptions = await this.getAnalyticsSubscriptions(userId);
+    if (userSubscriptions.length === 0) {
+      return { totalYearlyAmount: '0.00', subscriptionsCount: 0 };
+    }
+
+    // ✅ من أقدم تاريخ اشتراك حتى اليوم — كل الصرف الكلي
+    const earliestDate = userSubscriptions.reduce((earliest, sub) => {
+      const subDate = this.parseDate(sub.startDate);
+      return subDate < earliest ? subDate : earliest;
+    }, this.parseDate(userSubscriptions[0].startDate));
+
+    earliestDate.setHours(0, 0, 0, 0);
 
     let totalYearlyAmount = 0;
     const countedSubscriptions = new Set<number>();
@@ -93,7 +118,7 @@ export class AnalyticsService {
     for (const subscription of userSubscriptions) {
       const payments = this.generatePaymentsForRange({
         subscription,
-        rangeStart: yearStart,
+        rangeStart: earliestDate,
         rangeEnd: now,
       });
 
@@ -115,9 +140,17 @@ export class AnalyticsService {
 
   async getCategories(userId: number) {
     const now = this.getRiyadhNow();
-    const yearStart = new Date(now.getFullYear(), 0, 1);
+    const userSubscriptions = await this.getActiveSubscriptions(userId);
 
-    const userSubscriptions = await this.getAnalyticsSubscriptions(userId);
+    if (userSubscriptions.length === 0) return [];
+
+    // ✅ من أقدم اشتراك حتى اليوم للتصنيفات أيضاً
+    const earliestDate = userSubscriptions.reduce((earliest, sub) => {
+      const subDate = this.parseDate(sub.startDate);
+      return subDate < earliest ? subDate : earliest;
+    }, this.parseDate(userSubscriptions[0].startDate));
+
+    earliestDate.setHours(0, 0, 0, 0);
 
     const categoryMap = new Map<
       number,
@@ -132,7 +165,7 @@ export class AnalyticsService {
     for (const subscription of userSubscriptions) {
       const payments = this.generatePaymentsForRange({
         subscription,
-        rangeStart: yearStart,
+        rangeStart: earliestDate,
         rangeEnd: now,
       });
 
@@ -230,15 +263,9 @@ export class AnalyticsService {
       .orderBy(asc(subscriptions.renewalDate));
   }
 
-  // ─── Private helpers ──────────────────────────────────────────────────────
+  // ─── Private queries ──────────────────────────────────────────────────────
 
-  /**
-   * للحسابات المالية:
-   * ✅ الاشتراكات النشطة الحالية
-   * ✅ الاشتراكات المحذوفة التي عندها endDate (محذوفة بشكل صحيح)
-   * ❌ اشتراكات قديمة/تجريبية بدون endDate → مستبعدة
-   */
-  private async getAnalyticsSubscriptions(userId: number) {
+  private async getSpendingSubscriptions(userId: number) {
     return db
       .select({
         id: subscriptions.id,
@@ -256,12 +283,10 @@ export class AnalyticsService {
           eq(subscriptions.userId, userId),
           sql`${subscriptions.startDate} is not null`,
           or(
-            // نشطة حالياً
             and(
               eq(subscriptions.status, 'active'),
               isNull(subscriptions.deletedAt),
             ),
-            // محذوفة لكن بشكل صحيح (لها endDate)
             and(
               isNotNull(subscriptions.deletedAt),
               isNotNull(subscriptions.endDate),
@@ -269,6 +294,65 @@ export class AnalyticsService {
           ),
         ),
       );
+  }
+
+  private async getActiveSubscriptions(userId: number) {
+    return db
+      .select({
+        id: subscriptions.id,
+        price: subscriptions.price,
+        billingCycle: subscriptions.billingCycle,
+        startDate: subscriptions.startDate,
+        endDate: subscriptions.endDate,
+        categoryId: subscriptions.categoryId,
+        categoryName: categories.name,
+      })
+      .from(subscriptions)
+      .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
+      .where(
+        and(
+          eq(subscriptions.userId, userId),
+          eq(subscriptions.status, 'active'),
+          isNull(subscriptions.deletedAt),
+          sql`${subscriptions.startDate} is not null`,
+        ),
+      );
+  }
+
+  // ─── Private helpers ──────────────────────────────────────────────────────
+
+  /**
+   * يولّد نطاقات شهرية من أقدم تاريخ اشتراك حتى الشهر الحالي
+   */
+  private getAllMonthRanges(earliestDate: Date, now: Date): MonthRange[] {
+    const ranges: MonthRange[] = [];
+
+    const current = new Date(
+      earliestDate.getFullYear(),
+      earliestDate.getMonth(),
+      1,
+    );
+
+    const endMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    while (current <= endMonth) {
+      const startDate = new Date(current.getFullYear(), current.getMonth(), 1);
+      const endDate = new Date(
+        current.getFullYear(),
+        current.getMonth() + 1,
+        0,
+      );
+
+      ranges.push({
+        month: this.formatMonth(startDate),
+        startDate,
+        endDate,
+      });
+
+      current.setMonth(current.getMonth() + 1);
+    }
+
+    return ranges;
   }
 
   private generatePaymentsForRange(params: {
@@ -284,7 +368,6 @@ export class AnalyticsService {
     const subscriptionEnd = params.subscription.endDate
       ? this.parseDate(params.subscription.endDate)
       : new Date(params.rangeEnd);
-
     subscriptionEnd.setHours(23, 59, 59, 999);
 
     const rangeStart = new Date(params.rangeStart);
@@ -302,13 +385,20 @@ export class AnalyticsService {
 
     const paymentDate = new Date(subscriptionStart);
 
+    // تخطّي الدفعات قبل نطاق الحساب بكفاءة
+    while (paymentDate < rangeStart) {
+      this.moveDateForward(
+        paymentDate,
+        params.subscription.billingCycle as BillingCycle,
+      );
+    }
+
+    // كل دفعة في النطاق تُضاف مباشرة
     while (paymentDate <= effectiveEnd) {
-      if (paymentDate >= rangeStart) {
-        payments.push({
-          date: new Date(paymentDate),
-          amount: Number(params.subscription.price),
-        });
-      }
+      payments.push({
+        date: new Date(paymentDate),
+        amount: Number(params.subscription.price),
+      });
 
       this.moveDateForward(
         paymentDate,
@@ -317,23 +407,6 @@ export class AnalyticsService {
     }
 
     return payments;
-  }
-
-  private getLastSixMonthRanges() {
-    const now = this.getRiyadhNow();
-
-    return Array.from({ length: 6 }, (_, index) => {
-      const date = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1);
-
-      const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
-      const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-      return {
-        month: this.formatMonth(startDate),
-        startDate,
-        endDate,
-      };
-    });
   }
 
   private getCurrentMonthRange() {
