@@ -27,8 +27,7 @@ export const categories = pgTable('categories', {
 export const subscriptionProviders = pgTable('subscription_providers', {
   id: serial('id').primaey(),
   name: text('name').notNull().unique(),
-  categoryId: integer('ferences(() => categories.id),
-  logoUrl: text('logo_url'),
+  t('logo_url'),
   websiteUrl: text('website_url'),
   cancelUrl: text('cancel_url'),
   isPopular: boolean('is_popular').default(true),
