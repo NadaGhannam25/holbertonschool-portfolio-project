@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-type ReminderPreference = "قبل بيوم" | "قبل بثلاث أيام" | "قبل بأسبوع" | "إيقاف التذكير";
+type ReminderPreference =
+    | "قبل بيوم"
+    | "قبل بثلاث أيام"
+    | "قبل بأسبوع"
+    | "إيقاف التذكير";
 
 type EditSubscriptionValues = {
-    name?: string;
-    cancelUrl?: string;
     category: string;
     price: number;
     duration: string;
@@ -12,22 +14,46 @@ type EditSubscriptionValues = {
     status: string;
     notes: string;
     reminderPreference?: ReminderPreference;
+
+    name?: string;
+    cancelUrl?: string;
 };
 
 type EditSubscriptionModalProps = {
     isOpen: boolean;
     subscriptionName: string;
     initialValues: EditSubscriptionValues;
-    onClose: () => void;
+
     isCustomSubscription?: boolean;
+
+    onClose: () => void;
     onSave: (values: EditSubscriptionValues) => void;
 };
 
-const categoryOptions = ["العمل", "الترفيه", "الصحة", "التعليم", "أخرى"];
-const durationOptions = ["أسبوعي", "شهري", "3 أشهر", "6 أشهر", "سنة"];
-const statusOptions = ["نشط", "متوقف"];
+const categoryOptions = [
+    "العمل",
+    "الترفيه",
+    "الصحة",
+    "التعليم",
+    "أخرى",
+];
 
-const reminderOptions: ReminderPreference[] = ["قبل بيوم", "قبل بثلاث أيام", "قبل بأسبوع", "إيقاف التذكير"];
+const durationOptions = [
+    "أسبوعي",
+    "شهري",
+    "3 أشهر",
+    "6 أشهر",
+    "سنة",
+];
+
+const statusOptions = ["نشط", "غير نشط"];
+
+const reminderOptions: ReminderPreference[] = [
+    "قبل بيوم",
+    "قبل بثلاث أيام",
+    "قبل بأسبوع",
+    "إيقاف التذكير",
+];
 
 const arabicMonths = [
     "يناير",
@@ -48,32 +74,47 @@ const formatArabicDateDisplay = (value: string) => {
     if (!value) return "حدد تاريخ الاشتراك";
 
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "حدد تاريخ الاشتراك";
 
-    return `${date.getDate()} ${arabicMonths[date.getMonth()]} ${date.getFullYear()}`;
+    if (Number.isNaN(date.getTime())) {
+        return "حدد تاريخ الاشتراك";
+    }
+
+    return `${date.getDate()} ${
+        arabicMonths[date.getMonth()]
+    } ${date.getFullYear()}`;
 };
 
 function EditSubscriptionModal({
     isOpen,
     subscriptionName,
     initialValues,
-    onClose,
     isCustomSubscription = false,
+    onClose,
     onSave,
 }: EditSubscriptionModalProps) {
-    const [formData, setFormData] = useState<EditSubscriptionValues>({
-        ...initialValues,
-        reminderPreference: initialValues.reminderPreference || "قبل بيوم",
-    });
-    const [isReminderConfirmOpen, setIsReminderConfirmOpen] = useState(false);
-    const renewalDateInputRef = useRef<HTMLInputElement | null>(null);
+    const [formData, setFormData] =
+        useState<EditSubscriptionValues>({
+            ...initialValues,
+            reminderPreference:
+                initialValues.reminderPreference ||
+                "قبل بيوم",
+        });
+
+    const [isReminderConfirmOpen, setIsReminderConfirmOpen] =
+        useState(false);
+
+    const renewalDateInputRef =
+        useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
         if (isOpen) {
             setFormData({
                 ...initialValues,
-                reminderPreference: initialValues.reminderPreference || "قبل بيوم",
+                reminderPreference:
+                    initialValues.reminderPreference ||
+                    "قبل بيوم",
             });
+
             setIsReminderConfirmOpen(false);
         }
     }, [isOpen, initialValues]);
@@ -90,7 +131,9 @@ function EditSubscriptionModal({
         }));
     };
 
-    const handleReminderPreferenceChange = (value: ReminderPreference) => {
+    const handleReminderPreferenceChange = (
+        value: ReminderPreference
+    ) => {
         if (value === "إيقاف التذكير") {
             setIsReminderConfirmOpen(true);
             return;
@@ -99,18 +142,41 @@ function EditSubscriptionModal({
         updateField("reminderPreference", value);
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (
+        event: React.FormEvent<HTMLFormElement>
+    ) => {
         event.preventDefault();
 
+        const normalizedPrice = Number(formData.price);
+
         if (
-            (isCustomSubscription && !formData.name?.trim()) ||
             !formData.category ||
-            !formData.price ||
+            !Number.isFinite(normalizedPrice) ||
+            normalizedPrice < 0 ||
             !formData.duration ||
             !formData.renewalDate ||
             !formData.status
         ) {
-            window.dispatchEvent(new CustomEvent("dierha-toast", { detail: "يرجى تعبئة الحقول المطلوبة قبل حفظ التعديلات." }));
+            window.dispatchEvent(
+                new CustomEvent("dierha-toast", {
+                    detail:
+                        "يرجى تعبئة الحقول المطلوبة قبل حفظ التعديلات.",
+                })
+            );
+
+            return;
+        }
+
+        if (
+            isCustomSubscription &&
+            !formData.name?.trim()
+        ) {
+            window.dispatchEvent(
+                new CustomEvent("dierha-toast", {
+                    detail: "اسم التطبيق مطلوب.",
+                })
+            );
+
             return;
         }
 
@@ -119,7 +185,11 @@ function EditSubscriptionModal({
     };
 
     return (
-        <div className="edit-modal-overlay" role="dialog" aria-modal="true">
+        <div
+            className="edit-modal-overlay"
+            role="dialog"
+            aria-modal="true"
+        >
             <div className="edit-modal-card">
                 <div className="edit-modal-header">
                     <div>
@@ -127,36 +197,57 @@ function EditSubscriptionModal({
                         <p>{subscriptionName}</p>
                     </div>
 
-                    <button type="button" className="edit-modal-close" onClick={onClose}>
+                    <button
+                        type="button"
+                        className="edit-modal-close"
+                        onClick={onClose}
+                    >
                         ×
                     </button>
                 </div>
 
-                <form className="edit-modal-form" onSubmit={handleSubmit}>
+                <form
+                    className="edit-modal-form"
+                    onSubmit={handleSubmit}
+                >
                     <div className="edit-modal-grid">
                         {isCustomSubscription && (
                             <>
-                                <div className="edit-modal-field">
+                                <div className="edit-modal-field full">
                                     <label>
                                         اسم التطبيق <span>*</span>
                                     </label>
 
                                     <input
                                         type="text"
+                                        placeholder="اكتب اسم التطبيق"
                                         value={formData.name || ""}
-                                        onChange={(event) => updateField("name", event.target.value)}
-                                        placeholder="مثال: تطبيق خاص"
+                                        onChange={(event) =>
+                                            updateField(
+                                                "name",
+                                                event.target.value
+                                            )
+                                        }
                                     />
                                 </div>
 
-                                <div className="edit-modal-field">
-                                    <label>رابط الإلغاء اختياري</label>
+                                <div className="edit-modal-field full">
+                                    <label>
+                                        رابط إلغاء الاشتراك
+                                    </label>
 
                                     <input
                                         type="text"
-                                        value={formData.cancelUrl || ""}
-                                        onChange={(event) => updateField("cancelUrl", event.target.value)}
                                         placeholder="example.com/cancel"
+                                        value={
+                                            formData.cancelUrl || ""
+                                        }
+                                        onChange={(event) =>
+                                            updateField(
+                                                "cancelUrl",
+                                                event.target.value
+                                            )
+                                        }
                                     />
                                 </div>
                             </>
@@ -170,16 +261,28 @@ function EditSubscriptionModal({
                             <div className="edit-select-wrapper">
                                 <select
                                     value={formData.category}
-                                    onChange={(event) => updateField("category", event.target.value)}
+                                    onChange={(event) =>
+                                        updateField(
+                                            "category",
+                                            event.target.value
+                                        )
+                                    }
                                 >
-                                    {categoryOptions.map((category) => (
-                                        <option key={category} value={category}>
-                                            {category}
-                                        </option>
-                                    ))}
+                                    {categoryOptions.map(
+                                        (category) => (
+                                            <option
+                                                key={category}
+                                                value={category}
+                                            >
+                                                {category}
+                                            </option>
+                                        )
+                                    )}
                                 </select>
 
-                                <span className="edit-select-arrow">▾</span>
+                                <span className="edit-select-arrow">
+                                    ▾
+                                </span>
                             </div>
                         </div>
 
@@ -192,11 +295,19 @@ function EditSubscriptionModal({
                                 <input
                                     type="number"
                                     min="0"
+                                    step="0.01"
+                                    inputMode="decimal"
                                     value={formData.price}
                                     onChange={(event) =>
-                                        updateField("price", Number(event.target.value))
+                                        updateField(
+                                            "price",
+                                            Number(
+                                                event.target.value
+                                            )
+                                        )
                                     }
                                 />
+
                                 <span>ريال</span>
                             </div>
                         </div>
@@ -209,16 +320,28 @@ function EditSubscriptionModal({
                             <div className="edit-select-wrapper">
                                 <select
                                     value={formData.duration}
-                                    onChange={(event) => updateField("duration", event.target.value)}
+                                    onChange={(event) =>
+                                        updateField(
+                                            "duration",
+                                            event.target.value
+                                        )
+                                    }
                                 >
-                                    {durationOptions.map((duration) => (
-                                        <option key={duration} value={duration}>
-                                            {duration}
-                                        </option>
-                                    ))}
+                                    {durationOptions.map(
+                                        (duration) => (
+                                            <option
+                                                key={duration}
+                                                value={duration}
+                                            >
+                                                {duration}
+                                            </option>
+                                        )
+                                    )}
                                 </select>
 
-                                <span className="edit-select-arrow">▾</span>
+                                <span className="edit-select-arrow">
+                                    ▾
+                                </span>
                             </div>
                         </div>
 
@@ -230,19 +353,63 @@ function EditSubscriptionModal({
                             <div className="arabic-calendar-field">
                                 <button
                                     type="button"
-                                    className={`arabic-calendar-display ${formData.renewalDate ? "has-value" : ""}`}
+                                    className={`arabic-calendar-display ${
+                                        formData.renewalDate
+                                            ? "has-value"
+                                            : ""
+                                    }`}
                                     onClick={() => {
-                                        const input = renewalDateInputRef.current as (HTMLInputElement & { showPicker?: () => void }) | null;
+                                        const input =
+                                            renewalDateInputRef.current as
+                                                | (HTMLInputElement & {
+                                                      showPicker?: () => void;
+                                                  })
+                                                | null;
+
                                         input?.showPicker?.();
+
                                         input?.focus();
                                     }}
                                 >
-                                    <span>{formatArabicDateDisplay(formData.renewalDate)}</span>
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                        <path d="M7 3V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                        <path d="M17 3V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                        <path d="M4 9H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                        <path d="M6.5 5H17.5C18.8807 5 20 6.11929 20 7.5V18C20 19.6569 18.6569 21 17 21H7C5.34315 21 4 19.6569 4 18V7.5C4 6.11929 5.11929 5 6.5 5Z" stroke="currentColor" strokeWidth="1.8" />
+                                    <span>
+                                        {formatArabicDateDisplay(
+                                            formData.renewalDate
+                                        )}
+                                    </span>
+
+                                    <svg
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M7 3V6"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                        />
+
+                                        <path
+                                            d="M17 3V6"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                        />
+
+                                        <path
+                                            d="M4 9H20"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                        />
+
+                                        <path
+                                            d="M6.5 5H17.5C18.8807 5 20 6.11929 20 7.5V18C20 19.6569 18.6569 21 17 21H7C5.34315 21 4 19.6569 4 18V7.5C4 6.11929 5.11929 5 6.5 5Z"
+                                            stroke="currentColor"
+                                            strokeWidth="1.8"
+                                        />
                                     </svg>
                                 </button>
 
@@ -251,7 +418,12 @@ function EditSubscriptionModal({
                                     type="date"
                                     className="hidden-native-date-input"
                                     value={formData.renewalDate}
-                                    onChange={(event) => updateField("renewalDate", event.target.value)}
+                                    onChange={(event) =>
+                                        updateField(
+                                            "renewalDate",
+                                            event.target.value
+                                        )
+                                    }
                                 />
                             </div>
                         </div>
@@ -264,63 +436,122 @@ function EditSubscriptionModal({
                             <div className="edit-select-wrapper">
                                 <select
                                     value={formData.status}
-                                    onChange={(event) => updateField("status", event.target.value)}
+                                    onChange={(event) =>
+                                        updateField(
+                                            "status",
+                                            event.target.value
+                                        )
+                                    }
                                 >
-                                    {statusOptions.map((status) => (
-                                        <option key={status} value={status}>
-                                            {status}
-                                        </option>
-                                    ))}
+                                    {statusOptions.map(
+                                        (status) => (
+                                            <option
+                                                key={status}
+                                                value={status}
+                                            >
+                                                {status}
+                                            </option>
+                                        )
+                                    )}
                                 </select>
 
-                                <span className="edit-select-arrow">▾</span>
+                                <span className="edit-select-arrow">
+                                    ▾
+                                </span>
                             </div>
                         </div>
 
                         <div className="edit-modal-field">
-                            <label>التذكير قبل التجديد <span>*</span></label>
+                            <label>
+                                التذكير قبل التجديد{" "}
+                                <span>*</span>
+                            </label>
+
                             <div className="edit-select-wrapper">
                                 <select
-                                    value={formData.reminderPreference || "قبل بيوم"}
-                                    onChange={(event) => handleReminderPreferenceChange(event.target.value as ReminderPreference)}
+                                    value={
+                                        formData.reminderPreference ||
+                                        "قبل بيوم"
+                                    }
+                                    onChange={(event) =>
+                                        handleReminderPreferenceChange(
+                                            event.target
+                                                .value as ReminderPreference
+                                        )
+                                    }
                                 >
-                                    {reminderOptions.map((option) => (
-                                        <option key={option} value={option}>{option}</option>
-                                    ))}
+                                    {reminderOptions.map(
+                                        (option) => (
+                                            <option
+                                                key={option}
+                                                value={option}
+                                            >
+                                                {option}
+                                            </option>
+                                        )
+                                    )}
                                 </select>
-                                <span className="edit-select-arrow">▾</span>
+
+                                <span className="edit-select-arrow">
+                                    ▾
+                                </span>
                             </div>
                         </div>
 
                         <div className="edit-modal-field full">
-                            <label>ملاحظات اختيارية</label>
+                            <label>
+                                ملاحظات اختيارية
+                            </label>
 
                             <textarea
                                 placeholder="أضف ملاحظات حول هذا الاشتراك..."
                                 value={formData.notes}
-                                onChange={(event) => updateField("notes", event.target.value)}
+                                onChange={(event) =>
+                                    updateField(
+                                        "notes",
+                                        event.target.value
+                                    )
+                                }
                             />
                         </div>
                     </div>
 
                     <div className="edit-modal-actions">
-                        <button type="submit" className="edit-save-btn">
+                        <button
+                            type="submit"
+                            className="edit-save-btn"
+                        >
                             حفظ التعديلات
                         </button>
 
-                        <button type="button" className="edit-cancel-btn" onClick={onClose}>
+                        <button
+                            type="button"
+                            className="edit-cancel-btn"
+                            onClick={onClose}
+                        >
                             إلغاء
                         </button>
                     </div>
                 </form>
 
                 {isReminderConfirmOpen && (
-                    <div className="edit-modal-overlay nested-confirm-overlay" role="dialog" aria-modal="true">
+                    <div
+                        className="edit-modal-overlay nested-confirm-overlay"
+                        role="dialog"
+                        aria-modal="true"
+                    >
                         <div className="edit-modal-card compact-confirm-card edit-reminder-confirm-modal">
                             <div className="edit-modal-header">
                                 <div>
                                     <h2>إيقاف التذكير</h2>
-                                    <p>هل أنت متأكد من إيقاف التذكير لهذا الاشتراك؟ لن تصلك تذكيرات قبل موعد التجديد في حال تمت الموافقة.</p>
+
+                                    <p>
+                                        هل أنت متأكد من إيقاف
+                                        التذكير لهذا الاشتراك؟
+                                        لن تصلك تذكيرات قبل موعد
+                                        التجديد في حال تمت
+                                        الموافقة.
+                                    </p>
                                 </div>
                             </div>
 
@@ -329,8 +560,14 @@ function EditSubscriptionModal({
                                     type="button"
                                     className="edit-save-btn"
                                     onClick={() => {
-                                        updateField("reminderPreference", "إيقاف التذكير");
-                                        setIsReminderConfirmOpen(false);
+                                        updateField(
+                                            "reminderPreference",
+                                            "إيقاف التذكير"
+                                        );
+
+                                        setIsReminderConfirmOpen(
+                                            false
+                                        );
                                     }}
                                 >
                                     نعم، إيقاف التذكير
@@ -339,7 +576,11 @@ function EditSubscriptionModal({
                                 <button
                                     type="button"
                                     className="edit-cancel-btn"
-                                    onClick={() => setIsReminderConfirmOpen(false)}
+                                    onClick={() =>
+                                        setIsReminderConfirmOpen(
+                                            false
+                                        )
+                                    }
                                 >
                                     إلغاء
                                 </button>
