@@ -4,28 +4,6 @@
 import puppeteer from 'puppeteer';oryId,
         categories.id,
       ),
-    )
-
-    .where(
-      eq(
-        subscriptions.userId,
-        userId,
-      ),
-    );
-
-  const activeSubscriptions =
-
-    rows.filter(
-      (row) =>
-        row.status ===
-        'active',
-    );
-
-  const monthlyTotal =
-
-    activeSubscriptions.reduce(
-
-      (sum, row) => {
 
         return (
           sum +
