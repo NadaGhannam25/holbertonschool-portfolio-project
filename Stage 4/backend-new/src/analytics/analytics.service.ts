@@ -1,49 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   and,
-  asc,
-    }).format(new Date());حتى اليوم — كل الصرف الكلي
-    const earliestDate = userSubscriptions.reduce((earliest, sub) => {
-      const subDate = this.parseDate(sub.startDate);
-      return subDate < earliest ? subDate : earliest;
-    }, this.parseDate(userSubscriptions[0].startDate));
-
-    earliestDate.setHours(0, 0, 0, 0);
-
-    let totalYearlyAmount = 0;
-    const countedSubscriptions = new Set<number>();
-
-    for (const subscription of userSubscriptions) {
-      const payments = this.generatePaymentsForRange({
-        subscription,
-        rangeStart: earliestDate,
-        rangeEnd: now,
-      });
-
-      if (payments.length > 0) {
-        countedSubscriptions.add(subscription.id);
-      }
-
-      totalYearlyAmount += payments.reduce(
-        (sum, payment) => sum + payment.amount,
-        0,
-      );
-    }
-
-    return {
-      totalYearlyAmount: totalYearlyAmount.toFixed(2),
-      subscriptionsCount: countedSubscriptions.size,
-    };
-  }
-
-  async getCategories(userId: number) {
-    const now = this.getRiyadhNow();
-    const userSubscriptions = await this.getActiveSubscriptions(userId);
-
-    if (userSubscriptions.length === 0) return [];
-
-    // ✅ من أقدم اشتراك حتى اليوم للتصنيفات أيضاً
-    const earliestDate = userSubscriptions.reduce((earliest, sub) => {
+  asc,((earliest, sub) => {
       const subDate = this.parseDate(sub.startDate);
       return subDate < earliest ? subDate : earliest;
     }, this.parseDate(userSubscriptions[0].startDate));
