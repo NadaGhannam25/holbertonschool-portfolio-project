@@ -1,8 +1,416 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
+import puppeteer from 'puppeteer';
+import { eq } from 'drizzle-orm';
+
+import { db } from '../db';
+
+import {
+  categories,
+  subscriptions,
+  users,
+} from '../db/schema';
+
+function formatDate(
+  dateStr: string,
+): string {
+
+  const date = new Date(dateStr);
+
+  return date.toLocaleDateString(
+    'ar-SA',
+    {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    },
+  );
+}
+
+function formatBillingCycle(
+  cycle: string,
+): string {
+
+  const map:
+  Record<string, string> = {
+
+    weekly: 'أسبوعي',
+
+    monthly: 'شهري',
+
+    quarterly: 'كل 3 أشهر',
+
+    semi_annual: 'كل 6 أشهر',
+
+    yearly: 'سنوي',
+  };
+
+  return map[cycle] ?? cycle;
+}
+
+function formatStatus(
+  status: string,
+  deletedAt?: Date | string | null,
+): string {
+
+  if (deletedAt) {
+    return 'محذوف';
+  }
+
+  const map:
+  Record<string, string> = {
+
+    active: 'نشط',
+
+    inactive: 'غير نشط',
+  };
+
+  return map[status] ?? status;
+}
+
+function getMonthlyEquivalent(
+  price: string,
+  billingCycle: string,
+): number {
+
+  const amount =
+    Number(price);
+
+  if (
+    billingCycle === 'weekly'
+  ) {
+
+    return amount * 4;
+  }
+
+  if (
+    billingCycle === 'quarterly'
+  ) {
+
+    return amount / 3;
+  }
+
+  if (
+    billingCycle === 'semi_annual'
+  ) {
+
+    return amount / 6;
+  }
+
+  if (
+    billingCycle === 'yearly'
+  ) {
+
+    return amount / 12;
+  }
+
+  return amount;
+}
+
+export async function
+generateSubscriptionsPdf(
+  userId: number,
+): Promise<Buffer> {
+
+  const [user] = await db
+
+    .select({
+
+      name: users.name,
+
+      email: users.email,
+    })
+
+    .from(users)
+
+    .where(
+      eq(users.id, userId),
+    );
+
+  if (!user) {
+
+    throw new Error(
+      'User not found',
+    );
+  }
+
+  const rows = await db
+
+    .select({
+
+      name:
+        subscriptions.name,
+
+      price:
+        subscriptions.price,
+
+      billingCycle:
+        subscriptions.billingCycle,
+
+      renewalDate:
+        subscriptions.renewalDate,
+
+      status:
+        subscriptions.status,
+
+      deletedAt:
+        subscriptions.deletedAt,
+
+      categoryName:
+        categories.name,
+    })
+
+    .from(subscriptions)
+
+    .leftJoin(
+
+      categories,
+
+      eq(
+        subscriptions.categoryId,
+        categories.id,
+      ),
+    )
+
+    .where(
+      eq(
+        subscriptions.userId,
+        userId,
+      ),
+    );
+
+  const activeSubscriptions =
+
+    rows.filter(
+      (row) =>
+        row.status ===
+        'active' &&
+        !row.deletedAt,
+    );
+
+  const monthlyTotal =
+
+    activeSubscriptions.reduce(
+
+      (sum, row) => {
+
+        return (
+          sum +
+
+          getMonthlyEquivalent(
+            row.price,
+            row.billingCycle,
+          )
+        );
+      },
+
+      0,
+    );
+
+  const yearlyTotal =
+    monthlyTotal * 12;
+
+  const tableRows = rows
+
+    .map(
+      (subscription) => `
+
+        <tr>
+
+          <td>
+            ${subscription.name}
+          </td>
+
+          <td>
+
+            ${
+              subscription.categoryName ??
+              'أخرى'
+            }
+
+          </td>
+
+          <td>
+            ${subscription.price}
+            ريال
+          </td>
+
+          <td>
+
+            ${formatBillingCycle(
+              subscription.billingCycle,
+            )}
+
+          </td>
+
+          <td>
+
+            ${formatDate(
+              subscription.renewalDate,
+            )}
+
+          </td>
+
+          <td>
 
             ${formatStatus(
+              subscription.status ??
+              'active',
+              subscription.deletedAt,
+            )}
+
+          </td>
+
+        </tr>
+      `,
+    )
+
+    .join('');
+
+  const html = `
+
+<!DOCTYPE html>
+
+<html
+  lang="ar"
+  dir="rtl"
+>
+
+<head>
+
+<meta charset="UTF-8" />
+
+<style>
+
+body {
+
+  font-family:
+    Tahoma,
+    Arial,
+    sans-serif;
+
+  direction: rtl;
+
+  margin: 0;
+
+  padding: 0;
+
+  background: #FAFBFC;
+
+  color: #292B2E;
+}
+
+.wrapper {
+
+  width: 100%;
+
+  min-height: 100vh;
+
+  background: #FAFBFC;
+}
+
+.header {
+
+  background:
+    linear-gradient(
+      135deg,
+      #666CC0 0%,
+      #6E87C0 45%,
+      #F3B0B9 100%
+    );
+
+  padding:
+    55px
+    40px
+    45px;
+
+  text-align: center;
+
+  color: white;
+}
+
+.header img {
+
+  width: 220px;
+
+  margin-bottom: 22px;
+
+  background: transparent;
+
+  border-radius: 24px;
+
+  padding: 12px;
+
+}
+
+.header h1 {
+
+  margin: 0;
+
+  font-size: 38px;
+
+  font-weight: 800;
+}
+
+.header p {
+
+  margin-top: 12px;
+
+  font-size: 16px;
+
+  opacity: .95;
+}
+
+.content {
+
+  padding:
+    45px
+    55px;
+}
+
+.info {
+
+  background: white;
+
+  border:
+    1px solid #D6DAE1;
+
+  border-radius: 24px;
+
+  padding: 24px;
+
+  margin-bottom: 34px;
+
+  line-height: 2.1;
+
+  box-shadow:
+    0 6px 18px
+    rgba(102,108,192,0.05);
+}
+
+.info div {
+
+  margin-bottom: 8px;
+
+  font-size: 15px;
+}
+
+.cards {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 18px;
+
+  margin-bottom: 40px;
+}
+
+.card {
+
+  background:
     linear-gradient(
       180deg,
       #FFFFFF,
@@ -287,12 +695,6 @@ tr:nth-child(even) td {
     await browser.newPage();
 
   await page.setContent(
-    html,
-    {
-      waitUntil: 'load',
-    },
-  );
-
   const pdf = await page.pdf({
 
     format: 'A4',
