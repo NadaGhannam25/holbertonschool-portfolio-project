@@ -349,7 +349,7 @@ function SubscriptionDetails({
                     </div>
                 </section>
 
-                {/* قسم الأزرار الثلاثة على سطر واحد */}
+                {}
                 <section className="subscription-details-actions" style={{ display: 'flex', gap: '12px' }}>
                     <button
                         type="button"
@@ -474,7 +474,7 @@ function SubscriptionDetails({
 
             <Footer goToHome={goToHome} goToSubscriptions={goToSubscriptions} />
 
-            {/* مودال تأكيد الحذف النهائي */}
+            {}
             {isDeleteConfirmOpen && (
                 <div className="delete-confirm-overlay" role="dialog" aria-modal="true">
                     <div className="delete-confirm-card">
