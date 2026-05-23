@@ -12,7 +12,7 @@ type AddSubscriptionProps = {
     onLogout: () => void;
     goToHome: () => void;
     goToSubscriptions: () => void;
-};
+}; 
 
 type SubscriptionDuration = "أسبوعي" | "شهري" | "3 أشهر" | "6 أشهر" | "سنة";
 type SubscriptionStatus = "نشط" | "متوقف";
