@@ -233,43 +233,6 @@ body {
 .header p {
 
   margin-top: 12px;
-
-  font-size: 16px;
-
-  opacity: .95;
-}
-
-.content {
-
-  padding:
-    45px
-    55px;
-}
-
-.info {
-
-  background: white;
-
-  border:
-    1px solid #D6DAE1;
-
-  border-radius: 24px;
-
-  padding: 24px;
-
-  margin-bottom: 34px;
-
-  line-height: 2.1;
-
-  box-shadow:
-    0 6px 18px
-    rgba(102,108,192,0.05);
-}
-
-.info div {
-
-  margin-bottom: 8px;
-
   font-size: 15px;
 }
 
