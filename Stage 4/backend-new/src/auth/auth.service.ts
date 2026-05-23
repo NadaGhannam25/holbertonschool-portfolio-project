@@ -21,6 +21,14 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 @Injectable()
 export class AuthService {
   async register(body: RegisterDto) {
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, body.email));
+
+    if (existingUser.length > 0) {
+      throw new BadRequestException('يوجد حساب مسجل بهذا البريد الإلكتروني');
+    }
     const hashedPassword = await bcrypt.hash(body.password, 10);
 
     const newUser = await db
