@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 import * as jwt from 'jsonwebtoken';
 import { and, eq, gt } from 'drizzle-orm';
 import {
@@ -94,8 +95,7 @@ export class AuthService {
 
     if (!user) {
       return {
-        message:
-          'If this email exists, a reset password link has been sent.',
+        message: 'If this email exists, a reset password link has been sent.',
       };
     }
 
@@ -119,11 +119,9 @@ export class AuthService {
     });
 
     return {
-      message:
-        'If this email exists, a reset password link has been sent.',
+      message: 'If this email exists, a reset password link has been sent.',
     };
   }
-  
 
   async resetPassword(body: ResetPasswordDto) {
     const result = await db
@@ -140,7 +138,18 @@ export class AuthService {
 
     if (!user) {
       throw new BadRequestException(
-        'Invalid or expired reset password token',
+        'رابط إعادة التعيين منتهي الصلاحية أو غير صالح',
+      );
+    }
+
+    const isSamePassword = await bcrypt.compare(
+      body.newPassword,
+      user.passwordHash,
+    );
+
+    if (isSamePassword) {
+      throw new BadRequestException(
+        'كلمة المرور الجديدة يجب أن تكون مختلفة عن كلمة المرور الحالية',
       );
     }
 
@@ -156,36 +165,30 @@ export class AuthService {
       .where(eq(users.id, user.id));
 
     return {
-      message: 'Password reset successfully',
+      message: 'تم إعادة تعيين كلمة المرور بنجاح',
     };
   }
-  async updateProfile(
-  userId: number,
-  body: UpdateProfileDto,
-) {
 
-  await db
-    .update(users)
-    .set({
-      name: body.name,
-    })
-    .where(eq(users.id, userId));
+  async updateProfile(userId: number, body: UpdateProfileDto) {
+    await db
+      .update(users)
+      .set({
+        name: body.name,
+      })
+      .where(eq(users.id, userId));
 
-  const result = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-    })
-    .from(users)
-    .where(eq(users.id, userId));
+    const result = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+      })
+      .from(users)
+      .where(eq(users.id, userId));
 
-  return {
-
-    message:
-      'Profile updated successfully',
-
-    user: result[0],
-  };
-}
+    return {
+      message: 'Profile updated successfully',
+      user: result[0],
+    };
+  }
 }
