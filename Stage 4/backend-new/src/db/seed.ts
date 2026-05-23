@@ -1,26 +1,31 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import { categories } from "./schema";
 
 const pool = new Pool({
-  connectionString: process.en;
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
+
+const db = drizzle(pool);
 
 const defaultCategories = [
   "ترفيه",
   "عمل",
-
+  "تعليم",
   "صحة",
   "أخرى",
 ];
 
 async function seed() {
-  consding categories...");
+  console.log("Seeding categories...");
 
   for (const name of defaultCategories) {
     await db
-      .insert(cegories)
+      .insert(categories)
       .values({ name })
-      .onCoNothing();
+      .onConflictDoNothing();
   }
 
   console.log("Seeding done!");
