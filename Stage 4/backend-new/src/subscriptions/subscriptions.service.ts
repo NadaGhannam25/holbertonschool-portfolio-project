@@ -1,7 +1,15 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { and, desc, eq, ilike, sql, type SQL } from 'drizzle-orm';
 import { db } from '../db';
-import { categories, priceHistory, reminders, subscriptionProviders, subscriptions } from '../db/schema';
+import {
+  categories,
+  priceHistory,
+  reminders,
+  subscriptionProviders,
+  subscriptions,
+} from '../db/schema';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { FilterSubscriptionsDto } from './dto/filter-subscriptions.dto';
@@ -93,10 +101,12 @@ export class SubscriptionsService {
       const reminderDays = dto.reminderDays ?? 3;
       const remindersEnabled = dto.remindersEnabled ?? true;
       const startDate = dto.startDate;
-      const nextRenewalDate = this.getNextRenewalDate( 
-        startDate, 
+
+      const nextRenewalDate = this.getNextRenewalDate(
+        startDate,
         dto.billingCycle as BillingCycle,
       );
+
       const [subscription] = await tx
         .insert(subscriptions)
         .values({
@@ -116,27 +126,29 @@ export class SubscriptionsService {
           remindersEnabled,
         })
         .returning();
-        if (remindersEnabled) {
-          const renewalDate = this.parseDate(nextRenewalDate);
-          renewalDate.setHours(23, 59, 59, 999);
-          const remindAt = this.parseDate(nextRenewalDate);
-          remindAt.setDate(remindAt.getDate() - reminderDays);
-          const now = new Date();
-          if (renewalDate >= now) {
-            await tx.insert(reminders).values({
-              subscriptionId: subscription.id,
-              remindAt: this.formatDate(
-                remindAt <= now ? now : remindAt,
-              ),
-              sent: false,
-              sentAt: null,
-            });
-          }
-        }
 
-        return subscription;
-      });
-    }
+      if (remindersEnabled) {
+        const renewalDate = this.parseDate(nextRenewalDate);
+        renewalDate.setHours(23, 59, 59, 999);
+
+        const remindAt = this.parseDate(nextRenewalDate);
+        remindAt.setDate(remindAt.getDate() - reminderDays);
+
+        const now = new Date();
+
+        if (renewalDate >= now) {
+          await tx.insert(reminders).values({
+            subscriptionId: subscription.id,
+            remindAt: this.formatDate(remindAt <= now ? now : remindAt),
+            sent: false,
+            sentAt: null,
+          });
+        }
+      }
+
+      return subscription;
+    });
+  }
 
   async findOne(userId: number, id: number) {
     return this.getOwnedSubscription(userId, id);
@@ -187,6 +199,7 @@ export class SubscriptionsService {
       if (dto.status !== undefined) updateData.status = dto.status;
       if (dto.cancelUrl !== undefined) updateData.cancelUrl = dto.cancelUrl;
       if (dto.reminderDays !== undefined) updateData.reminderDays = dto.reminderDays;
+
       if (dto.remindersEnabled !== undefined) {
         updateData.remindersEnabled = dto.remindersEnabled;
       }
@@ -253,8 +266,11 @@ export class SubscriptionsService {
   async remove(userId: number, id: number) {
     return db.transaction(async (tx) => {
       await this.getOwnedSubscription(userId, id);
+
       const today = this.formatDate(new Date());
+
       await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
+
       const [deletedSubscription] = await tx
         .update(subscriptions)
         .set({
@@ -274,18 +290,19 @@ export class SubscriptionsService {
 
   async toggle(userId: number, id: number) {
     const currentSubscription = await this.getOwnedSubscription(userId, id);
-    const nextStatus = currentSubscription.status === 'active' ? 'inactive' : 'active';
+
+    const nextStatus =
+      currentSubscription.status === 'active' ? 'inactive' : 'active';
+
     const [updatedSubscription] = await db
       .update(subscriptions)
       .set({
         status: nextStatus,
-        endDate:
-          nextStatus === 'inactive'
-            ? this.formatDate(new Date())
-            : null,
+        endDate: nextStatus === 'inactive' ? this.formatDate(new Date()) : null,
       })
       .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
       .returning();
+
     return updatedSubscription;
   }
 
@@ -307,10 +324,21 @@ export class SubscriptionsService {
         cancelUrl: subscriptions.cancelUrl,
         reminderDays: subscriptions.reminderDays,
         remindersEnabled: subscriptions.remindersEnabled,
-        deletedAt: subscriptions.deletedAt,
         createdAt: subscriptions.createdAt,
+
+        provider: {
+          id: subscriptionProviders.id,
+          name: subscriptionProviders.name,
+          logoUrl: subscriptionProviders.logoUrl,
+          websiteUrl: subscriptionProviders.websiteUrl,
+          cancelUrl: subscriptionProviders.cancelUrl,
+        },
       })
       .from(subscriptions)
+      .leftJoin(
+        subscriptionProviders,
+        eq(subscriptions.providerId, subscriptionProviders.id),
+      )
       .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)));
 
     if (!subscription) {
@@ -422,20 +450,21 @@ export class SubscriptionsService {
 
     return `${year}-${month}-${day}`;
   }
-  private getNextRenewalDate(
-    startDateValue: string,
-    billingCycle: BillingCycle,
-  ) {
+
+  private getNextRenewalDate(startDateValue: string, billingCycle: BillingCycle) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
     const renewalDate = this.parseDate(startDateValue);
     renewalDate.setHours(0, 0, 0, 0);
+
     while (renewalDate < today) {
-    this.moveDateForward(renewalDate, billingCycle);
-  }
+      this.moveDateForward(renewalDate, billingCycle);
+    }
 
     return this.formatDate(renewalDate);
   }
+
   private formatPrice(price: number | string) {
     return Number(price).toFixed(2);
   }
