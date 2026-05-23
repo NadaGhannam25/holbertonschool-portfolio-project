@@ -2,48 +2,7 @@
  this.getOwnedSubscription(userId, id);
 
 
-  private moveDateForward(date: Date, billingCycle: BillingCycle) {
-    switch (billingCycle) {
-      case 'weekly':
-        date.setDate(date.getDate() + 7);
-        break;
-      case 'monthly':
-        date.setMonth(date.getMonth() + 1);
-        break;
-      case 'quarterly':
-        date.setMonth(date.getMonth() + 3);
-        break;
-      case 'semi_annual':
-        date.setMonth(date.getMonth() + 6);
-        break;
-      case 'yearly':
-        date.setFullYear(date.getFullYear() + 1);
-        break;
-      default:
-        date.setMonth(date.getMonth() + 1);
-    }
-  }
-
-  private getArabicMonthName(date: Date) {
-    const months = [
-      'يناير',
-      'فبراير',
-      'مارس',
-      'أبريل',
-      'مايو',
-      'يونيو',
-      'يوليو',
-      'أغسطس',
-      'سبتمبر',
-      'أكتوبر',
-      'نوفمبر',
-      'ديسمبر',
-    ];
-
-    return months[date.getMonth()];
-  }
-
-  private getDefaultCategoryName(categoryId?: number, categoryName?: string) {
+  private moveDateForward(date: Date, billingCycegoryId?: number, categoryName?: string) {
     const normalizedName = categoryName?.trim();
 
     if (normalizedName) {
