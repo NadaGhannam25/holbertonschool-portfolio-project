@@ -44,13 +44,7 @@ export async function syncDatabaseSchema() {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_password_expires timestamp;
 
     ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS provider_id integer;
-    ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS start_date date;
-    ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS end_date date;
-    ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS reminder_days integer DEFAULT 3;
-    ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS reminders_enabled boolean DEFAULT true;
-    ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS deleted_at timestamp;
-
-    UPDATE subscriptions
+    ALTER TABLE subscriptions AD
     SET start_date = renewal_date
     WHERE start_date IS NULL AND renewal_date IS NOT NULL;
 
