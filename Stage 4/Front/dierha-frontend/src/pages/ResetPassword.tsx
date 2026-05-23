@@ -4,7 +4,7 @@ import { useState } from "react";
 import ToastMessage from "../components/ToastMessage";   
 import { resetPassword } from "../services/authService";  
      
-type ResetPasswordProps = {   
+type ResetPasswordProps = {    
     token: string;
 };    
   
