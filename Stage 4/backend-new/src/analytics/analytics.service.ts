@@ -3,67 +3,7 @@ import {
   
         billingCycle: subscriptions.billingCycle,
         status: subscriptions.st
-
-  private async getActiveSubscriptions(userId: number) {
-    return db
-      .select({
-        id: subscriptions.id,
-        price: subscriptions.price,
-        billingCycle: subscriptions.billingCycle,
-        startDate: subscriptions.startDate,
-        endDate: subscriptions.endDate,
-        categoryId: subscriptions.categoryId,
-        categoryName: categories.name,
-      })
-      .from(subscriptions)
-      .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
-      .where(
-        and(
-          eq(subscriptions.userId, userId),
-          eq(subscriptions.status, 'active'),
-          isNull(subscriptions.deletedAt),
-          sql`${subscriptions.startDate} is not null`,
-        ),
-      );
-  }
-
-  // ─── Private helpers ──────────────────────────────────────────────────────
-
-  /**
-   * يولّد نطاقات شهرية من أقدم تاريخ اشتراك حتى الشهر الحالي
-   */
-  private getAllMonthRanges(earliestDate: Date, now: Date): MonthRange[] {
-    const ranges: MonthRange[] = [];
-
-    const current = new Date(
-      earliestDate.getFullYear(),
-      earliestDate.getMonth(),
-      1,
-    );
-
-    const endMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    while (current <= endMonth) {
-      const startDate = new Date(current.getFullYear(), current.getMonth(), 1);
-      const endDate = new Date(
-        current.getFullYear(),
-        current.getMonth() + 1,
-        0,
-      );
-
-      ranges.push({
-        month: this.formatMonth(startDate),
-        startDate,
-        endDate,
-      });
-
-      current.setMonth(current.getMonth() + 1);
-    }
-
-    return ranges;
-  }
-
-  private generatePaymentsForRange(params: {
+ivate generatePaymentsForRange(params: {
     subscription: AnalyticsSubscription;
     rangeStart: Date;
     rangeEnd: Date;
