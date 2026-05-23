@@ -147,13 +147,15 @@ It manages authentication, user data, subscription data, and the communication b
 
 | Technology | Purpose |
 |---|---|
-| Node.js | Running the backend server. |
-| Express.js | Creating API routes and handling requests. |
-| PostgreSQL | Storing users and subscription data. |
-| JWT | Managing secure authentication sessions. |
-| bcrypt | Hashing user passwords securely. |
-| Nodemailer / Resend | Supporting email reminder functionality. |
-| node-cron | Scheduling reminder tasks. |
+| NestJS | Backend framework used to build scalable and organized server-side applications. |
+| TypeScript | Main programming language used to improve code structure and maintainability. |
+| PostgreSQL | Relational database used to store users, subscriptions, categories, and related data. |
+| Drizzle ORM | Used to define the database schema and manage database queries. |
+| JWT | Used for authentication and protected API access. |
+| bcrypt | Used to securely hash user passwords. |
+| Resend | Email API service used to send subscription reminder emails and system notifications. |
+| Puppeteer | Used to generate PDFs or automate browser-based tasks such as exporting reports. |
+| cron | Used to schedule automated backend tasks, such as checking renewal dates and sending reminders. |
 
 ---
 
