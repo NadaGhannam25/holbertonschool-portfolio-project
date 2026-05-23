@@ -4,34 +4,6 @@
 import puppeteer from 'puppeteer';
 import { eq } from 'drizzle-orm';
 
-function formatStatus(
-  status: string,
-  deletedAt?: Date | string | null,
-): string {
-
-  if (deletedAt) {
-    return 'محذوف';
-  }
-
-  const map:
-  Record<string, string> = {
-
-    active: 'نشط',
-
-    inactive: 'غير نشط',
-  };
-
-  return map[status] ?? status;
-}
-
-function getMonthlyEquivalent(
-  price: string,
-  billingCycle: string,
-): number {
-
-  const amount =
-    Number(price);
-
   if (
     billingCycle === 'weekly'
   ) {
