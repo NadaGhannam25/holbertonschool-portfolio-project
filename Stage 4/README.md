@@ -311,10 +311,6 @@ During implementation, the team faced several challenges related to full-stack d
 - Managing authentication state on the frontend.
 - Handling JWT tokens securely.
 - Ensuring the database connection works properly.
-- Keeping the Arabic interface consistent.
-- Organizing frontend components and backend routes.
-- Testing API requests and fixing integration errors.
-- Improving the dashboard layout and data visualization.
 
 These challenges helped the team gain practical experience in building a full-stack web application.
 
