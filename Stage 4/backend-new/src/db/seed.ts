@@ -26,10 +26,4 @@ async function seed() {
       .insert(categories)
       .values({ name })
       .onConflictDoNothing();
-  }
-
-  console.log("Seeding done!");
-  process.exit(0);
-}
-
-seed();
+  
