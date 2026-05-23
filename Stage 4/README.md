@@ -335,7 +335,6 @@ The implementation included:
 - Spending analysis sections.
 - Basic integration between frontend and backend.
 
-Stage 4 allowed the team to apply the technical documentation from Stage 3 in a real development environment and move the project from design into a working product.
 
 ---
 
