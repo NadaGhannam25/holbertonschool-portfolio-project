@@ -16,7 +16,7 @@ import {
     CartesianGrid,
     ResponsiveContainer,
     Tooltip,
-    XAxis,
+    XAxis, 
     YAxis,
     PieChart,
     Pie,
