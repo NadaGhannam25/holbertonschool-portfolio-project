@@ -557,8 +557,6 @@ export class SubscriptionsService {
     const renewalDate = this.parseDate(startDateValue);
     renewalDate.setHours(0, 0, 0, 0);
 
-    // تاريخ التجديد القادم = تاريخ الاشتراك + مدة الاشتراك.
-    // مثال: 24 مايو + 3 أشهر = 24 أغسطس.
     this.moveDateForward(renewalDate, billingCycle);
 
     while (renewalDate < today) {
