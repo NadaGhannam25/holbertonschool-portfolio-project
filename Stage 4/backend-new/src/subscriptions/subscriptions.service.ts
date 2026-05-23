@@ -1,49 +1,5 @@
     }
 
-    if (filters?.paymentMonth !== undefined) {
-      conditions.push(
-        sql`extract(month from ${subscriptions.renewalDate}::date) = ${Number(filters.paymentMonth)}`,
-      );
-          id: subscriptionProviders.id,
-          name: subscriptionProviders.name,
-          logoUrl: subscriptionProviders.logoUrl,
-          websiteUrl: subscriptionProviders.websiteUrl,
-          cancelUrl: subscriptionProviders.cancelUrl,
-        },
-      })
-      .from(subscriptions)
-      .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
-      .leftJoin(
-        subscriptionProviders,
-        eq(subscriptions.providerId, subscriptionProviders.id),
-      )
-      .where(and(...conditions));
-  }
-
-  async exportPdf(userId: number) {
-    return generateSubscriptionsPdf(userId);
-  }
-
-  async create(userId: number, dto: CreateSubscriptionDto) {
-    return db.transaction(async (tx) => {
-      const reminderDays = dto.reminderDays ?? 3;
-      const remindersEnabled = dto.remindersEnabled ?? true;
-      const startDate = dto.startDate;
-
-      const nextRenewalDate = this.getNextRenewalDate(
-        startDate,
-        dto.billingCycle as BillingCycle,
-      );
-
-      const resolvedCategoryId = await this.resolveCategoryId(
-        tx,
-        dto.categoryId,
-        dto.categoryName,
-      );
-
-      const [subscription] = await tx
-        .insert(subscriptions)
-        .values({
           userId,
           providerId: dto.providerId,
           name: dto.name,
