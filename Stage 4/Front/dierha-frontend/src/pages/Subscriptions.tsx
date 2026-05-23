@@ -83,7 +83,7 @@ const formatBillingCycle = (cycle: BackendSubscription["billingCycle"]) => {
 };
 
 const formatStatus = (status: BackendSubscription["status"]) => {
-    return status === "active" ? "نشط" : "متوقف";
+    return status === "active" ? "نشط" : "غير نشط";
 };
 
 const formatDate = (date: string) => {
@@ -221,9 +221,14 @@ function Subscriptions({
     const renderSubscriptionLogo = (item: BackendSubscription) => {
         const localLogoFileName = logoFileNameMap[item.provider?.name || item.name];
         const localLogoPath = getLogoPath(localLogoFileName);
+        const providerLogoPath = getLogoPath(item.provider?.logoUrl || undefined);
 
         if (localLogoPath) {
             return <img src={localLogoPath} alt={`${item.name} logo`} />;
+        }
+
+        if (providerLogoPath) {
+            return <img src={providerLogoPath} alt={`${item.name} logo`} />;
         }
 
         if (item.provider?.logoUrl) {
