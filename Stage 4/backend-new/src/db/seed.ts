@@ -19,11 +19,3 @@ const defaultCategories = [
 ];
 
 async function seed() {
-  console.log("Seeding categories...");
-
-  for (const name of defaultCategories) {
-    await db
-      .insert(categories)
-      .values({ name })
-      .onConflictDoNothing();
-  
