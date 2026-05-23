@@ -4,32 +4,6 @@
 import puppeteer from 'puppeteer';
 import { eq } from 'drizzle-orm';
 
-import { db } from '../db';
-
-import {
-  categories,
-
-function formatBillingCycle(
-  cycle: string,
-): string {
-
-  const map:
-  Record<string, string> = {
-
-    weekly: 'أسبوعي',
-
-    monthly: 'شهري',
-
-    quarterly: 'كل 3 أشهر',
-
-    semi_annual: 'كل 6 أشهر',
-
-    yearly: 'سنوي',
-  };
-
-  return map[cycle] ?? cycle;
-}
-
 function formatStatus(
   status: string,
   deletedAt?: Date | string | null,
