@@ -7,30 +7,7 @@ export async function syncDatabaseSchema() {
     CREATE TABLE IF NOT EXISTS users (
       id serial PRIMARY KEY,
       name text NOT NULL,
-      email text NOT NULL UNIQUE,
-      password_hash text NOT NULL,
-      reset_password_token text,
-      category_id integer REFERENCES categories(id),
-      renewal_date date NOT NULL,
-      start_date date,
-      end_date date,
-      billing_cycle text NOT NULL,
-      notes text,
-      status text DEFAULT 'active',
-      cancel_url text,
-      reminder_days integer DEFAULT 3,
-      reminders_enabled boolean DEFAULT true,
-      deleted_at timestamp,
-      created_at timestamp DEFAULT now()
-    );
-
-    CREATE TABLE IF NOT EXISTS price_history (
-      id serial PRIMARY KEY,
-      subscription_id integer REFERENCES subscriptions(id),
-      old_price numeric(10, 2),
-      new_price numeric(10, 2) NOT NULL,
-      effective_from date,
-      changed_at timestamp DEFAULT now()
+      email text NOT NUtamp DEFAULT now()
     );
 
     CREATE TABLE IF NOT EXISTS reminders (
