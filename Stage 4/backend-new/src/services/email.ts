@@ -4,42 +4,7 @@ import { Resend } from 'resend';
 
 rage/v1/object/public/assets/dierha-logo.png';
   }
-function formatBillingCycle(cycle: string): string {
-  const map: Record<string, string> = {
-    weekly: 'أسبوعي',
-    monthly: 'شهري',
-    quarterly: 'كل ٣ أشهر',
-    semi_annual: 'كل ٦ أشهر',
-    yearly: 'سنوي',
-  };
-  return map[cycle] ?? cycle;
-}
-
-
-function buildReminderHtml(data: ReminderEmailData): string {
-  const cancelSection = data.cancelUrl
-    ? `<p style="text-align:center !important; margin-top:28px;">
-         <a href="${data.cancelUrl}" class="btn-secondary">إلغاء الاشتراك</a>
-       </p>`
-    : `<p class="manual-note">
-         هذا الاشتراك تمت إضافته يدويًا، لذلك لا يتوفر رابط إلغاء مباشر.
-         يمكنك إضافة رابط إلغاء الاشتراك من صفحة تفاصيل الاشتراك.
-       </p>`;
-
-  return `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head><meta charset="UTF-8" /><style>${EMAIL_STYLES}</style></head>
-<body>
-<div class="wrapper">
-  <div class="header">
-    <img src="${EMAIL_LOGO_URL}" alt="Dierha" />
-    <h1>تذكير بتجديد اشتراك</h1>
-  </div>
-  <div class="body">
-    <p>مرحبًا <strong>${data.userName}</strong></p>
-    <p>نذكّرك بأن اشتراكك في <strong>${data.subscriptionName}</strong> سيتجدد قريبًا.</p>
-    <div class="card">
-      <div class="row"><span>الخدمة</span><strong>${data.subscriptionName}</strong></div>
+function formatBillingCycle(cة</span><strong>${data.subscriptionName}</strong></div>
       <div class="row"><span>تاريخ التجديد</span><strong>${formatDate(data.renewalDate)}</strong></div>
       <div class="row"><span>المبلغ</span><strong>${data.amount} ريال</strong></div>
       <div class="row"><span>دورة الدفع</span><strong>${formatBillingCycle(data.billingCycle)}</strong></div>
