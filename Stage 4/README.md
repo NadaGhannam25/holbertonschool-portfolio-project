@@ -380,6 +380,3 @@ Overall, Stage 4 allowed the team to apply the technical decisions made in the p
 
 Overall, Stage 4 allowed the team to apply the technical decisions made in the previous stages and gain practical experience in developing, testing, and improving a full-stack web application. This stage also created a strong foundation for future enhancements, deployment, and further feature expansion.
 
-
-
-
