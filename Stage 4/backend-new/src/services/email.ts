@@ -2,100 +2,13 @@ import 'dotenv/config';
 import process from 'process';
 import { Resend } from 'resend';
 
+rage/v1/object/public/assets/dierha-logo.png';
 
-interface ReminderEmailData {
-  to: string;
-  userName: string;
-  subscriptionName: string;
-  renewalDate: string;
-  amount: string;
-  billingCycle: string;
-  cancelUrl?: string | null;
-}
-
-interface ResetPasswordEmailData {
-  to: string;
-  userName: string;
-  token: string;
-}
-
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-
-const EMAIL_LOGO_URL =
-  'https://zpijpebyajnkxsrnrfre.supabase.co/storage/v1/object/public/assets/dierha-logo.png';
-
-const EMAIL_STYLES = `
-  body, table, td, p, div, span, a {
-    direction: rtl !important;
-    text-align: right !important;
-  }
-  body {
-    font-family: Tahoma, Arial, sans-serif;
-    background: #FAFBFC;
-    margin: 0;
-    padding: 45px 0;
-    color: #292B2E;
-  }
-  .wrapper {
-    max-width: 660px;
-    margin: auto;
-    background: #FFFFFF;
-    border-radius: 24px;
-    overflow: hidden;
-    border: 1px solid #D6DAE1;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.04);
-  }
-  .header {
-    background: linear-gradient(300deg, #1D47DA, #F56F96) !important;
-    padding: 55px 40px 45px;
-    text-align: center !important;
-    color: #FFFFFF !important;
-  }
-  .header img {
-    width: 220px;
     margin: 0 auto 22px auto;
     display: block;
     background: transparent;
     border-radius: 24px;
-    padding: 12px;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-  }
-  .header h1 {
-    margin: 0;
-    font-size: 38px;
-    font-weight: 800;
-    color: #FFFFFF;
-    text-align: center !important;
-  }
-  .body {
-    padding: 45px 55px;
-    line-height: 2.1;
-    color: #292B2E;
-  }
-  .body p { font-size: 16px; color: #46494E; }
-  .card {
-    background: linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%);
-    border: 1px solid #D6DAE1;
-    border-radius: 24px;
-    padding: 26px;
-    margin: 35px 0;
-    box-shadow: 0 6px 16px rgba(102,108,192,0.06);
-  }
-  .row { padding: 20px 0; border-bottom: 1px solid #E5E9F1; }
-  .row:last-child { border-bottom: none; }
-  .row span {
-    display: block;
-    color: #6E87C0;
-    font-size: 14px;
-    margin-bottom: 8px;
-    font-weight: 700;
-  }
-  .row strong { color: #292B2E; font-size: 22px; font-weight: 800; }
-  .btn-primary, .btn-secondary {
-    display: inline-block;
-    background: linear-gradient(135deg, #F56F96) !important;
+    padding: 12px;gradient(135deg, #F56F96) !important;
     color: #FFFFFF !important;
     padding: 18px 52px;
     border-radius: 999px;
