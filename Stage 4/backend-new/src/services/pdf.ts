@@ -1,68 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import puppeteer from 'puppeteer';oryId,
-        categories.id,
-      ),
-
-        return (
-          sum +
-
-          getMonthlyEquivalent(
-            row.price,
-            row.billingCycle,
-          )
-        );
-      },
-
-      0,
-    );
-
-  const yearlyTotal =
-    monthlyTotal * 12;
-
-  const tableRows = rows
-
-    .map(
-      (subscription) => `
-
-        <tr>
-
-          <td>
-            ${subscription.name}
-          </td>
-
-          <td>
-
-            ${
-              subscription.categoryName ??
-              'أخرى'
-            }
-
-          </td>
-
-          <td>
-            ${subscription.price}
-            ريال
-          </td>
-
-          <td>
-
-            ${formatBillingCycle(
-              subscription.billingCycle,
-            )}
-
-          </td>
-
-          <td>
-
-            ${formatDate(
-              subscription.renewalDate,
-            )}
-
-          </td>
-
-          <td>
 
             ${formatStatus(
               subscription.status ??
