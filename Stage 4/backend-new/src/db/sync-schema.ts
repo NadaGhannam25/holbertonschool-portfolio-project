@@ -19,7 +19,7 @@ export async function syncDatabaseSchema() {
       user_id integer REFERENCES users(id),
       provider_id integer REFERENCES subscription_providers(id),
       name text NOT NULL,
-      price numeric(10, 2) NOT NULL,
+      price NOT NULL,
       category_id integer REFERENCES categories(id),
       renewal_date date NOT NULL,
       start_date date,
