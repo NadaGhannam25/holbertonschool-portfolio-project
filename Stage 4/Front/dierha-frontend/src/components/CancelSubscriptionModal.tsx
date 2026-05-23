@@ -40,12 +40,12 @@ const CancelSubscriptionModal = ({ isOpen, onClose, subscriptionName, cancelUrl 
                 {step === 1 ? (
                     <>
                         <div style={iconCircleStyle}><WarningIcon /></div>
-                        <h2 style={{ color: '#111827', marginBottom: '10px', fontSize: '20px' }}>هل أنت متأكد من حذف الاشتراك؟</h2>
+                        <h2 style={{ color: '#111827', marginBottom: '10px', fontSize: '20px' }}>هل أنت متأكد من إلغاء الاشتراك؟</h2>
                         <p style={{ color: '#6b7280', marginBottom: '25px', fontSize: '15px', lineHeight: '1.5' }}>
-                            سيؤدي ذلك إلى حذف اشتراكك في <strong>{subscriptionName}</strong> للأبد ولا يمكن التراجع عن هذه العملية.
+                            سيتم توجيهك إلى موقع <strong>{subscriptionName}</strong> الرسمي لإتمام إلغاء الاشتراك من هناك.
                         </p>
                         <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
-                            <button onClick={() => setStep(2)} style={deleteBtnStyle}>نعم، حذف الاشتراك</button>
+                            <button onClick={() => setStep(2)} style={deleteBtnStyle}>نعم، متابعة إلغاء الاشتراك</button>
                             <button onClick={onClose} style={secondaryBtn}>إلغاء</button>
                         </div>
                     </>
