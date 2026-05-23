@@ -4,47 +4,6 @@
 import puppeteer from 'puppeteer';
 import { eq } from 'drizzle-orm';
 
-import { db } from '../db';
-umeric',
-      month: 'long',
-      day: 'numeric',
-    },
-  );
-}
-
-function formatBillingCy
-  };
-
-  return map[cycle] ?? cycle;
-}
-
-function formatStatus(
-  status: string,
-): string {
-
-  const map:
-  Record<string, string> = {
-
-    active: 'نشط',
-
-    inactive: 'متوقف',
-
-    cancelled: 'ملغي',
-  };
-
-  return map[status] ?? status;
-}
-
-function getMonthlyEquivalent(
-  price: string,
-  billingCycle: string,
-): number {
-
-  const amount =
-    Number(price);
-
-  if (
-    billingCycle === 'weekly'
   ) {
 
     return amount * 4;
