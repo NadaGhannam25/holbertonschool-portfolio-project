@@ -3,7 +3,7 @@ import logo from "../assets/dierha-logo.png";
 import Footer from "../components/Footer";  
 import SettingsDropdown from "../components/SettingsDropdown";   
 import {     
-    type BackendSubscription,   
+    type BackendSubscription,    
     getCategoryAnalytics,    
     getMonthlyAnalytics, 
     getSubscriptions, 
