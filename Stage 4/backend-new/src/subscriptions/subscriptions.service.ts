@@ -1,39 +1,5 @@
     }
-
-          userId,,
-          newPrice: this.formatPrice(dto.price),
-          effectiveFrom: dto.renewalDate ?? currentSubscription.renewalD
-      return updatedSubscription;
-    });
-  }
-
-  async remove(userId: number, id: number) {
-    return db.transaction(async (tx) => {
-      await this.getOwnedSubscription(userId, id);
-
-      const today = this.formatDate(new Date());
-
-      await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
-
-      const [deletedSubscription] = await tx
-        .update(subscriptions)
-        .set({
-          status: 'inactive',
-          endDate: today,
-          deletedAt: new Date(),
-        })
-        .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
-        .returning();
-
-      return {
-        message: 'Subscription deleted successfully',
-        subscription: deletedSubscription,
-      };
-    });
-  }
-
-  async toggle(userId: number, id: number) {
-    const currentSubscription = await this.getOwnedSubscription(userId, id);
+ this.getOwnedSubscription(userId, id);
 
     const nextStatus =
       currentSubscription.status === 'active' ? 'inactive' : 'active';
