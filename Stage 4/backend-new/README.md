@@ -70,6 +70,9 @@ It is responsible for:
 | JWT | Used for authentication and protected API access. |
 | bcrypt | Used to securely hash user passwords. |
 | Node.js | Runtime environment used to run the backend server. |
+| Resend | Email API service used to send subscription reminder emails and system notifications. |
+| Puppeteer | Used to generate PDFs or automate browser-based tasks such as exporting reports. |
+| cron | Used to schedule automated backend tasks, such as checking renewal dates and sending reminders. |
 
 ---
 
