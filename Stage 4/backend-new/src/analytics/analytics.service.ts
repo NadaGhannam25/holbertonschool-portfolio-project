@@ -2,46 +2,6 @@ import { Injectable } from '@nestjs/common';
 import {
   and,
   asc,
-  eq,
-  gte,
-  isNull,
-  lte,
-  sql,
-} from 'drizzle-orm';
-
-import { db } from '../db';
-import { categories, subscriptions } from '../db/schema';
-
-type BillingCycle =
-  | 'weekly'
-  | 'monthly'
-  | 'quarterly'
-  | 'semi_annual'
-  | 'yearly';
-
-type AnalyticsSubscription = {
-  id: number;
-  price: string;
-  billingCycle: string;
-  startDate: string;
-  endDate: string | null;
-  categoryId: number | null;
-  categoryName: string | null;
-};
-
-type MonthRange = {
-  month: string;
-  startDate: Date;
-  endDate: Date;
-};
-
-@Injectable()
-export class AnalyticsService {
-  // ─── Timezone helpers ─────────────────────────────────────────────────────
-
-  private getRiyadhToday(): string {
-    return new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Asia/Riyadh',
     }).format(new Date());
   }
 
