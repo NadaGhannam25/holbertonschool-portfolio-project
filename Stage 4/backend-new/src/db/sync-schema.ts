@@ -10,19 +10,6 @@ export async function syncDatabaseSchema() {
       email text NOT NULL UNIQUE,
       password_hash text NOT NULL,
       reset_password_token text,
-      reset_password_expires timestamp,
-      created_at timestamp DEFAULT now()
-    );
-
-    CREATE TABLE IF NOT EXISTS categories (
-    
-
-    CREATE TABLE IF NOT EXISTS subscriptions (
-      id serial PRIMARY KEY,
-      user_id integer REFERENCES users(id),
-      provider_id integer REFERENCES subscription_providers(id),
-      name text NOT NULL,
-      price numeric(10, 2) NOT NULL,
       category_id integer REFERENCES categories(id),
       renewal_date date NOT NULL,
       start_date date,
