@@ -9,7 +9,7 @@ import {
     type BackendSubscription,
     getSubscriptionById,
     updateSubscription,
-    deleteSubscription,
+    deleteSubscription, 
     getSubscriptionSpending,
     type SubscriptionSpending,
 } from "../services/subscriptionService";
