@@ -23,7 +23,7 @@ async function seed() {
 
   for (const name of defaultCategories) {
     await db
-      .insert(categories)
+      .insert(cegories)
       .values({ name })
       .onConflictDoNothing();
   }
