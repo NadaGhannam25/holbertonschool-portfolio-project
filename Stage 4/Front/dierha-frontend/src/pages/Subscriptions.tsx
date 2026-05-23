@@ -6,7 +6,7 @@ import {
     type BackendSubscription,
     getSubscriptions,
 } from "../services/subscriptionService";
-
+ 
 type SubscriptionsProps = {
     onLogout: () => void;
     goToHome: () => void;
