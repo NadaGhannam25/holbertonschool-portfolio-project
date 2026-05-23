@@ -245,9 +245,10 @@ The integration allows the frontend to send user actions to the backend and rece
 
 1. The user fills in subscription details.
 2. The frontend sends the subscription data to the backend.
-3.  The backend validates the data.
+3. The backend validates the data.
 4. The backend saves the subscription in the database.
 5. The backend returns a success response.
+6. The frontend updates the subscription list.
 
 ---
 
