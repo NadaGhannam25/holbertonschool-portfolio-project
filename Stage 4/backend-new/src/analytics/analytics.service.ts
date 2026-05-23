@@ -1,43 +1,5 @@
 
-    // كل دفعة في النطاق تُضاف مباشرة
-    while (paymentDate <= effectiveEnd) {
-      payments.push({
-        date: new Date(paymentDate),
-        amount: Number(params.subscription.price),
-      });
-
-      this.moveDateForward(
-        paymentDate,
-        params.subscription.billingCycle as BillingCycle,
-      );
-    }
-
-    return payments;
-  }
-
-  private getCurrentMonthRange() {
-    const now = this.getRiyadhNow();
-    const start = new Date(now.getFullYear(), now.getMonth(), 1);
-    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    return {
-      startDate: this.formatDate(start),
-      endDate: this.formatDate(end),
-    };
-  }
-
-  private moveDateForward(date: Date, billingCycle: BillingCycle) {
-    switch (billingCycle) {
-      case 'weekly':
-        date.setDate(date.getDate() + 7);
-        break;
-      case 'monthly':
-        date.setMonth(date.getMonth() + 1);
-        break;
-      case 'quarterly':
-        date.setMonth(date.getMonth() + 3);
-        break;
-      case 'semi_annual':
+  
         date.setMonth(date.getMonth() + 6);
         break;
       case 'yearly':
