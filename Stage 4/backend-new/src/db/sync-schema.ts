@@ -15,20 +15,7 @@ export async function syncDatabaseSchema() {
     );
 
     CREATE TABLE IF NOT EXISTS categories (
-      id serial PRIMARY KEY,
-      name text NOT NULL UNIQUE
-    );
-
-    CREATE TABLE IF NOT EXISTS subscription_providers (
-      id serial PRIMARY KEY,
-      name text NOT NULL UNIQUE,
-      category_id integer REFERENCES categories(id),
-      logo_url text,
-      website_url text,
-      cancel_url text,
-      is_popular boolean DEFAULT true,
-      created_at timestamp DEFAULT now()
-    );
+    
 
     CREATE TABLE IF NOT EXISTS subscriptions (
       id serial PRIMARY KEY,
