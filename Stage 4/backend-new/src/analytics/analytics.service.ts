@@ -37,7 +37,6 @@ type MonthRange = {
 
 @Injectable()
 export class AnalyticsService {
-  // ─── Timezone helpers ─────────────────────────────────────────────────────
 
   private getRiyadhToday(): string {
     return new Intl.DateTimeFormat('en-CA', {
@@ -49,7 +48,6 @@ export class AnalyticsService {
     return this.parseDate(this.getRiyadhToday());
   }
 
-  // ─── Public endpoints ─────────────────────────────────────────────────────
 
   async getMonthly(userId: number) {
     const now = this.getRiyadhNow();
@@ -258,7 +256,6 @@ export class AnalyticsService {
       .orderBy(asc(subscriptions.renewalDate));
   }
 
-  // ─── Private queries ──────────────────────────────────────────────────────
 
   private async getSpendingSubscriptions(userId: number) {
     return db
@@ -306,7 +303,6 @@ export class AnalyticsService {
       );
   }
 
-  // ─── Private helpers ──────────────────────────────────────────────────────
 
   private getAllMonthRanges(earliestDate: Date, now: Date): MonthRange[] {
     const ranges: MonthRange[] = [];
