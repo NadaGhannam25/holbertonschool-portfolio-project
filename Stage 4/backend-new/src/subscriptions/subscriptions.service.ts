@@ -5,53 +5,7 @@
           name: dto.name,
           price: this.formatPrice(dto.price),
           categoryId: resolvedCategoryId,
-          renewalDate: nextRenewalDate,
-          startDate,
-          endDate: null,
-          billingCycle: dto.billingCycle,
-          notes: dto.notes,
-          status: dto.status ?? 'active',
-          cancelUrl: dto.cancelUrl,
-          reminderDays,
-          remindersEnabled,
-        })
-        .returning();
-
-      if (remindersEnabled) {
-        const renewalDate = this.parseDate(nextRenewalDate);
-        renewalDate.setHours(23, 59, 59, 999);
-
-        const remindAt = this.parseDate(nextRenewalDate);
-        remindAt.setDate(remindAt.getDate() - reminderDays);
-
-        const now = new Date();
-
-        if (renewalDate >= now) {
-          await tx.insert(reminders).values({
-            subscriptionId: subscription.id,
-            remindAt: this.formatDate(remindAt <= now ? now : remindAt),
-            sent: false,
-            sentAt: null,
-          });
-        }
-      }
-
-      return subscription;
-    });
-  }
-
-  async findOne(userId: number, id: number) {
-    return this.getOwnedSubscription(userId, id);
-  }
-
-  async getSubscriptionSpending(userId: number, id: number) {
-    const subscription = await this.getOwnedSubscription(userId, id);
-
-    const payments = this.generatePaymentTimeline({
-      service: subscription.name,
-      amount: Number(subscription.price),
-      startDate: subscription.startDate,
-      renewalDate: subscription.renewalDate,
+          renewalDate: nextRene,
       billingCycle: subscription.billingCycle as BillingCycle,
     });
 
