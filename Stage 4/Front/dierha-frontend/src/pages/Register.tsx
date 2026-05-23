@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ToastMessage from "../components/ToastMessage";
 
-type RegisterProps = {
+type RegisterProps = { 
     onRegister: (name: string, email: string, password: string) => void;
     goToLogin: () => void;
     isLoading?: boolean;
