@@ -1,67 +1,6 @@
     }
 
-          userId,
-          providerId: dto.providerId,
-          name: dto.name,
-          price: this.formatPrice(dto.price),
-          categoryId: resolvedCategoryId,
-          renewalDate: nextRene,
-      billingCycle: subscription.billingCycle as BillingCycle,
-    });
-
-    return {
-      subscription: {
-        id: subscription.id,
-        name: subscription.name,
-      },
-      payments,
-    };
-  }
-
-  async findPriceHistory(userId: number, id: number) {
-    const currentSubscription = await this.getOwnedSubscription(userId, id);
-
-    return db
-      .select()
-      .from(priceHistory)
-      .where(eq(priceHistory.subscriptionId, currentSubscription.id))
-      .orderBy(desc(priceHistory.changedAt));
-  }
-
-  async update(userId: number, id: number, dto: UpdateSubscriptionDto) {
-    const currentSubscription = await this.getOwnedSubscription(userId, id);
-
-    return db.transaction(async (tx) => {
-      const updateData: Partial<typeof subscriptions.$inferInsert> = {};
-
-      if (dto.providerId !== undefined) updateData.providerId = dto.providerId;
-      if (dto.name !== undefined) updateData.name = dto.name;
-      if (dto.price !== undefined) updateData.price = this.formatPrice(dto.price);
-      if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
-      if (dto.renewalDate !== undefined) updateData.renewalDate = dto.renewalDate;
-      if (dto.billingCycle !== undefined) updateData.billingCycle = dto.billingCycle;
-      if (dto.notes !== undefined) updateData.notes = dto.notes;
-      if (dto.status !== undefined) updateData.status = dto.status;
-      if (dto.cancelUrl !== undefined) updateData.cancelUrl = dto.cancelUrl;
-      if (dto.reminderDays !== undefined) updateData.reminderDays = dto.reminderDays;
-
-      if (dto.remindersEnabled !== undefined) {
-        updateData.remindersEnabled = dto.remindersEnabled;
-      }
-
-      const [updatedSubscription] = await tx
-        .update(subscriptions)
-        .set(updateData)
-        .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
-        .returning();
-
-      if (
-        dto.price !== undefined &&
-        Number(currentSubscription.price) !== Number(dto.price)
-      ) {
-        await tx.insert(priceHistory).values({
-          subscriptionId: id,
-          oldPrice: currentSubscription.price,
+          userId,,
           newPrice: this.formatPrice(dto.price),
           effectiveFrom: dto.renewalDate ?? currentSubscription.renewalDate,
         });
