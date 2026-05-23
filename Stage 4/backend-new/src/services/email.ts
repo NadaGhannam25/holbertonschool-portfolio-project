@@ -3,29 +3,6 @@ import process from 'process';
 import { Resend } from 'resend';
 
 rage/v1/object/public/assets/dierha-logo.png';
-
-    margin: 0 auto 22px auto;
-    display: block;
-    background: transparent;
-    border-radius: 24px;
-    padding: 12px;gradient(135deg, #F56F96) !important;
-    color: #FFFFFF !important;
-    padding: 18px 52px;
-    border-radius: 999px;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 800;
-    border: none;
-    box-shadow: 0 12px 24px rgba(255,92,147,0.28);
-  }
-  .footer {
-    margin-top: 40px;
-    text-align: center !important;
-    color: #63676E;
-    font-size: 14px;
-    padding: 30px;
-    background: #E5E9F1;
-    border-top: 1px solid #D6DAE1;
   }
   .manual-note {
     color: #63676E;
