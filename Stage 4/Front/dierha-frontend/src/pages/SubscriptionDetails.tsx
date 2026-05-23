@@ -5,7 +5,7 @@ import CancelSubscriptionModal from "../components/CancelSubscriptionModal";
 import SettingsDropdown from "../components/SettingsDropdown";
 import ToastMessage from "../components/ToastMessage";
 import EditSubscriptionModal from "../components/EditSubscriptionModal";
-import {
+import { 
     type BackendSubscription,
     getSubscriptionById,
     updateSubscription,
