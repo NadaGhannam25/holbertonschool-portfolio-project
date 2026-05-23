@@ -372,8 +372,10 @@ const providers = [
     name: 'Ninja',
     categoryId: 5,
     logoUrl: 'ninja-logo.png',
-    websiteUrl: 'https://www.ninja.sa',
-    cancelUrl: 'https://www.ninja.sa',
+    websiteUrl:
+      'https://ananinja.com/sa/ar?gad_source=1&gad_campaignid=21368424669&gbraid=0AAAAAoaKhgTijYkEkwIiST0gKq8MitE5w&gclid=Cj0KCQjwoMXQBhDcARIsAH-eEtuELKb0ersQMMG0mhuVvFrz-WzYH9IVV6GWl0l8hueGXiby5-dT-_saAv2ZEALw_wcB',
+    cancelUrl:
+      'https://ananinja.com/sa/ar?gad_source=1&gad_campaignid=21368424669&gbraid=0AAAAAoaKhgTijYkEkwIiST0gKq8MitE5w&gclid=Cj0KCQjwoMXQBhDcARIsAH-eEtuELKb0ersQMMG0mhuVvFrz-WzYH9IVV6GWl0l8hueGXiby5-dT-_saAv2ZEALw_wcB',
     isPopular: true,
   },
 ];
@@ -383,7 +385,16 @@ async function seedProviders() {
     await db
       .insert(subscriptionProviders)
       .values(provider)
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: subscriptionProviders.name,
+        set: {
+          categoryId: provider.categoryId,
+          logoUrl: provider.logoUrl,
+          websiteUrl: provider.websiteUrl,
+          cancelUrl: provider.cancelUrl,
+          isPopular: provider.isPopular,
+        },
+      });
   }
 
   console.log('Subscription providers seeded successfully');
