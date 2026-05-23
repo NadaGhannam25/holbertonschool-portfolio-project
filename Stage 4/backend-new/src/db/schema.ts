@@ -63,11 +63,3 @@ export const priceHistory = pgTable('price_history', {
   effectiveFrom: date('effective_from').notNull(),
   changedAt: timestamp('changed_at').defaultNow(),
 });
-
-export const reminders = pgTable('reminders', {
-  id: serial('id').primaryKey(),
-  subscriptionId: integer('subscription_id').references(() => subscriptions.id),
-  remindAt: date('remind_at').notNull(),
-  sent: boolean('sent').default(false),
-  sentAt: timestamp('sent_at'),
-});
