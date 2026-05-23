@@ -160,6 +160,7 @@ export class SubscriptionsService {
     const payments = this.generatePaymentTimeline({
       service: subscription.name,
       amount: Number(subscription.price),
+      startDate: subscription.startDate,
       renewalDate: subscription.renewalDate,
       billingCycle: subscription.billingCycle as BillingCycle,
     });
@@ -326,6 +327,11 @@ export class SubscriptionsService {
         remindersEnabled: subscriptions.remindersEnabled,
         createdAt: subscriptions.createdAt,
 
+        category: {
+          id: categories.id,
+          name: categories.name,
+        },
+
         provider: {
           id: subscriptionProviders.id,
           name: subscriptionProviders.name,
@@ -335,6 +341,7 @@ export class SubscriptionsService {
         },
       })
       .from(subscriptions)
+      .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
       .leftJoin(
         subscriptionProviders,
         eq(subscriptions.providerId, subscriptionProviders.id),
@@ -351,6 +358,7 @@ export class SubscriptionsService {
   private generatePaymentTimeline(params: {
     service: string;
     amount: number;
+    startDate: string;
     renewalDate: string;
     billingCycle: BillingCycle;
   }) {
@@ -365,28 +373,41 @@ export class SubscriptionsService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const currentDate = this.parseDate(params.renewalDate);
+    const currentDate = this.parseDate(params.startDate);
     currentDate.setHours(0, 0, 0, 0);
+
+    while (currentDate <= today) {
+      payments.push({
+        service: params.service,
+        amount: params.amount,
+        date: this.formatDate(currentDate),
+        month: this.getArabicMonthName(currentDate),
+        status: 'paid',
+      });
+
+      this.moveDateForward(currentDate, params.billingCycle);
+    }
+
+    let upcomingDate = this.parseDate(params.renewalDate);
+    upcomingDate.setHours(0, 0, 0, 0);
+
+    if (upcomingDate <= today) {
+      upcomingDate = new Date(currentDate);
+    }
 
     let upcomingCount = 0;
 
     while (upcomingCount < 2) {
-      const paymentDate = new Date(currentDate);
-
-      const status: 'paid' | 'upcoming' =
-        paymentDate < today ? 'paid' : 'upcoming';
-
       payments.push({
         service: params.service,
         amount: params.amount,
-        date: this.formatDate(paymentDate),
-        month: this.getArabicMonthName(paymentDate),
-        status,
+        date: this.formatDate(upcomingDate),
+        month: this.getArabicMonthName(upcomingDate),
+        status: 'upcoming',
       });
 
-      if (status === 'upcoming') upcomingCount += 1;
-
-      this.moveDateForward(currentDate, params.billingCycle);
+      upcomingCount += 1;
+      this.moveDateForward(upcomingDate, params.billingCycle);
     }
 
     return payments;
