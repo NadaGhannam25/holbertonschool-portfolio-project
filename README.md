@@ -127,6 +127,47 @@ By the end of this stage, the team produced a complete technical documentation p
 Stage 3 helped the team move from planning to technical design with a more organized and realistic understanding of the platform. It also ensured that the user requirements, interface design, system structure, data flow, and quality practices are clearly documented before development begins.
 
 ---
+
+---
+## Stage 4: Implementation
+
+### Objective
+
+The objective of this stage was to begin implementing the **Subscriptions Organiser Platform** based on the technical documentation prepared in Stage 3. This stage focused on turning the planned MVP features, system architecture, database design, and user interface mockups into a working web application.
+
+---
+
+### What This Stage Is About
+
+This stage focuses on building the actual MVP by developing the front-end, back-end, authentication flow, database connection, and the main subscription management features.
+
+It represents the transition from planning and design into real development, where the team starts coding, testing, integrating components, and making sure the platform works as expected.
+
+---
+
+### What We Did
+
+During this stage, the team started implementing the main parts of the MVP, including:
+
+- Built the front-end interface for the main screens, such as login, register, dashboard, and subscription management pages.
+- Developed the initial back-end structure to support user authentication and subscription-related operations.
+- Connected the application to the database to store user and subscription data.
+- Implemented basic authentication functionality, including sign up, login, and logout.
+- Worked on integrating the front-end with the back-end through API requests.
+- Continued improving the user interface to make the platform clearer, more organized, and easier to use.
+- Tested the main user flows to identify issues and improve functionality.
+
+---
+
+### Outcome
+
+By the end of this stage, the team had started building a functional version of the **Subscriptions Organiser Platform**. The MVP began moving from documentation into an actual working application, with core features such as authentication, dashboard layout, subscription tracking, and database connection being implemented.
+
+Stage 4 helped the team apply the technical documentation from Stage 3 in practice and improve the project through development, testing, and integration.
+
+---
+
+---
 ## Authors
 
 ### Shaden Majed Alalwani  
@@ -148,3 +189,8 @@ GitHub: https://github.com/sondos04
 Riyadh, Saudi Arabia  
 Student at Holberton School  
 GitHub: https://github.com/rahafalharthi1111-png
+
+### Rinad Fahad Alzuaybir
+Riyadh, Saudi Arabia  
+Student at Holberton School  
+GitHub: 
