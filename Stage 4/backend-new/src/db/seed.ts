@@ -11,11 +11,3 @@ const pool = new Pool({
 const db = drizzle(pool);
 
 const defaultCategories = [
-  "ترفيه",
-  "عمل",
-  "تعليم",
-  "صحة",
-  "أخرى",
-];
-
-async function seed() {
