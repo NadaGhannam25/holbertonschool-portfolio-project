@@ -4,9 +4,186 @@
 import puppeteer from 'puppeteer';
 import { eq } from 'drizzle-orm';
 
+import { db } from '../db';
+
+import {
+  categories,
+  subscriptions,
+  users,
+} from '../db/schema';
+
+function formatDate(
+  dateStr: string,
+): string {
+
+  const date = new Date(dateStr);
+
+  return date.toLocaleDateString(
+    'ar-SA',
+    {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    },
+  );
+}
+
+function formatBillingCycle(
+  cycle: string,
+): string {
+
+  const map:
+  Record<string, string> = {
+
+    weekly: 'أسبوعي',
+
+    monthly: 'شهري',
+
+    quarterly: 'كل 3 أشهر',
+
+    semi_annual: 'كل 6 أشهر',
+
+    yearly: 'سنوي',
+  };
+
+  return map[cycle] ?? cycle;
+}
+
+function formatStatus(
+  status: string,
+  deletedAt?: Date | string | null,
+): string {
+
+  if (deletedAt) {
+    return 'محذوف';
+  }
+
+  const map:
+  Record<string, string> = {
+
+    active: 'نشط',
+
+    inactive: 'غير نشط',
+  };
+
+  return map[status] ?? status;
+}
+
+function getMonthlyEquivalent(
+  price: string,
+  billingCycle: string,
+): number {
+
+  const amount =
+    Number(price);
+
   if (
     billingCycle === 'weekly'
   ) {
+
+    return amount * 4;
+  }
+
+  if (
+    billingCycle === 'quarterly'
+  ) {
+
+    return amount / 3;
+  }
+
+  if (
+    billingCycle === 'semi_annual'
+  ) {
+
+    return amount / 6;
+  }
+
+  if (
+    billingCycle === 'yearly'
+  ) {
+
+    return amount / 12;
+  }
+
+  return amount;
+}
+
+export async function
+generateSubscriptionsPdf(
+  userId: number,
+): Promise<Buffer> {
+
+  const [user] = await db
+
+    .select({
+
+      name: users.name,
+
+      email: users.email,
+    })
+
+    .from(users)
+
+    .where(
+      eq(users.id, userId),
+    );
+
+  if (!user) {
+
+    throw new Error(
+      'User not found',
+    );
+  }
+
+  const rows = await db
+
+    .select({
+
+      name:
+        subscriptions.name,
+
+      price:
+        subscriptions.price,
+
+      billingCycle:
+        subscriptions.billingCycle,
+
+      renewalDate:
+        subscriptions.renewalDate,
+
+      status:
+        subscriptions.status,
+
+      deletedAt:
+        subscriptions.deletedAt,
+
+      categoryName:
+        categories.name,
+    })
+
+    .from(subscriptions)
+
+    .leftJoin(
+
+      categories,
+
+      eq(
+        subscriptions.categoryId,
+        categories.id,
+      ),
+    )
+
+    .where(
+      eq(
+        subscriptions.userId,
+        userId,
+      ),
+    );
+
+  const activeSubscriptions =
+
+    rows.filter(
+      (row) =>
         row.status ===
         'active' &&
         !row.deletedAt,
@@ -518,6 +695,12 @@ tr:nth-child(even) td {
     await browser.newPage();
 
   await page.setContent(
+    html,
+    {
+      waitUntil: 'load',
+    },
+  );
+
   const pdf = await page.pdf({
 
     format: 'A4',
