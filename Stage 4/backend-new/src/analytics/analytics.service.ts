@@ -1,44 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
-  and,
-  asc,((earliest, sub) => {
-      const subDate = this.parseDate(sub.startDate);
-      return subDate < earliest ? subDate : earliest;
-    }, this.parseDate(userSubscriptions[0].startDate));
-new Set<number>(),
-        });
-      }
-
-      const category = categoryMap.get(categoryId)!;
-
-      category.totalAmount += payments.reduce(
-        (sum, payment) => sum + payment.amount,
-        0,
-      );
-
-      category.subscriptions.add(subscription.id);
-    }
-
-    return Array.from(categoryMap.values())
-      .map((category) => ({
-        categoryId: category.categoryId,
-        categoryName: category.categoryName,
-        totalAmount: category.totalAmount.toFixed(2),
-        subscriptionsCount: category.subscriptions.size,
-      }))
-      .sort((a, b) => a.categoryName.localeCompare(b.categoryName));
-  }
-
-  async getCalendar(userId: number) {
-    const { startDate, endDate } = this.getCurrentMonthRange();
-
-    return db
-      .select({
-        id: subscriptions.id,
-        name: subscriptions.name,
-        price: subscriptions.price,
-        categoryId: subscriptions.categoryId,
-        renewalDate: subscriptions.renewalDate,
+  and,ptions.renewalDate,
         startDate: subscriptions.startDate,
         endDate: subscriptions.endDate,
         billingCycle: subscriptions.billingCycle,
