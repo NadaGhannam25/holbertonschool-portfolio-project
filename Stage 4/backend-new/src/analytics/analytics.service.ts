@@ -2,36 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   and,
   asc,
-    }).format(new Date());
-  }
-
-  private getRiyadhNow(): Dat 0) {
-          countedSubscriptions.add(subscription.id);
-        }
-
-        totalAmount += payments.reduce(
-          (sum, payment) => sum + payment.amount,
-          0,
-        );
-      }
-
-      return {
-        month: monthRange.month,
-        totalAmount: totalAmount.toFixed(2),
-        subscriptionsCount: countedSubscriptions.size,
-      };
-    });
-  }
-
-  async getYearly(userId: number) {
-    const now = this.getRiyadhNow();
-    const userSubscriptions = await this.getSpendingSubscriptions(userId);
-
-    if (userSubscriptions.length === 0) {
-      return { totalYearlyAmount: '0.00', subscriptionsCount: 0 };
-    }
-
-    // ✅ من أقدم تاريخ اشتراك حتى اليوم — كل الصرف الكلي
+    }).format(new Date());حتى اليوم — كل الصرف الكلي
     const earliestDate = userSubscriptions.reduce((earliest, sub) => {
       const subDate = this.parseDate(sub.startDate);
       return subDate < earliest ? subDate : earliest;
