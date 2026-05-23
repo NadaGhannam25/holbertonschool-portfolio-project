@@ -6,7 +6,7 @@ import {
     type BackendSubscription,   
     getCategoryAnalytics,   
     getMonthlyAnalytics,
-    getSubscriptions,
+    getSubscriptions, 
     getUpcomingRenewals,
     exportSubscriptionsPdf,
 } from "../services/subscriptionService";
