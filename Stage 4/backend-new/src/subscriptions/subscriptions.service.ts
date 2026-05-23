@@ -1,48 +1,6 @@
     }
  this.getOwnedSubscription(userId, id);
 
-    cons
-          id: categories.id,
-          name: categories.name,
-        },
-
-        provider: {
-          id: subscriptionProviders.id,
-          name: subscriptionProviders.name,
-          logoUrl: subscriptionProviders.logoUrl,
-          websiteUrl: subscriptionProviders.websiteUrl,
-          cancelUrl: subscriptionProviders.cancelUrl,
-        },
-      })
-      .from(subscriptions)
-      .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
-      .leftJoin(
-        subscriptionProviders,
-        eq(subscriptions.providerId, subscriptionProviders.id),
-      )
-      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)));
-
-    if (!subscription) {
-      throw new NotFoundException('Subscription not found');
-    }
-
-    return subscription;
-  }
-
-  private generatePaymentTimeline(params: {
-    service: string;
-    amount: number;
-    startDate: string;
-    renewalDate: string;
-    billingCycle: BillingCycle;
-  }) {
-    const payments: {
-      service: string;
-      amount: number;
-      date: string;
-      month: string;
-      status: 'paid' | 'upcoming';
-    }[] = [];
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
