@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 type ReminderPreference = "قبل بيوم" | "قبل بثلاث أيام" | "قبل بأسبوع" | "إيقاف التذكير";
 
 type EditSubscriptionValues = {
+    name?: string;
+    cancelUrl?: string;
     category: string;
     price: number;
     duration: string;
@@ -17,6 +19,7 @@ type EditSubscriptionModalProps = {
     subscriptionName: string;
     initialValues: EditSubscriptionValues;
     onClose: () => void;
+    isCustomSubscription?: boolean;
     onSave: (values: EditSubscriptionValues) => void;
 };
 
@@ -55,6 +58,7 @@ function EditSubscriptionModal({
     subscriptionName,
     initialValues,
     onClose,
+    isCustomSubscription = false,
     onSave,
 }: EditSubscriptionModalProps) {
     const [formData, setFormData] = useState<EditSubscriptionValues>({
@@ -99,6 +103,7 @@ function EditSubscriptionModal({
         event.preventDefault();
 
         if (
+            (isCustomSubscription && !formData.name?.trim()) ||
             !formData.category ||
             !formData.price ||
             !formData.duration ||
@@ -129,6 +134,34 @@ function EditSubscriptionModal({
 
                 <form className="edit-modal-form" onSubmit={handleSubmit}>
                     <div className="edit-modal-grid">
+                        {isCustomSubscription && (
+                            <>
+                                <div className="edit-modal-field">
+                                    <label>
+                                        اسم التطبيق <span>*</span>
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        value={formData.name || ""}
+                                        onChange={(event) => updateField("name", event.target.value)}
+                                        placeholder="مثال: تطبيق خاص"
+                                    />
+                                </div>
+
+                                <div className="edit-modal-field">
+                                    <label>رابط الإلغاء اختياري</label>
+
+                                    <input
+                                        type="text"
+                                        value={formData.cancelUrl || ""}
+                                        onChange={(event) => updateField("cancelUrl", event.target.value)}
+                                        placeholder="example.com/cancel"
+                                    />
+                                </div>
+                            </>
+                        )}
+
                         <div className="edit-modal-field">
                             <label>
                                 التصنيف <span>*</span>
