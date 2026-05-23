@@ -6,7 +6,7 @@ import { resetPassword } from "../services/authService";
      
 type ResetPasswordProps = {   
     token: string;
-};   
+};    
   
 function PasswordEyeIcon({ hidden }: { hidden: boolean }) {
     if (hidden) {
