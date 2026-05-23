@@ -1,42 +1,7 @@
     }
  this.getOwnedSubscription(userId, id);
 
-    const nextStatus =
-      currentSubscription.status === 'active' ? 'inactive' : 'active';
-
-    const [updatedSubscription] = await db
-      .update(subscriptions)
-      .set({
-        status: nextStatus,
-        endDate: nextStatus === 'inactive' ? this.formatDate(new Date()) : null,
-      })
-      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
-      .returning();
-
-    return updatedSubscription;
-  }
-
-  private async getOwnedSubscription(userId: number, id: number) {
-    const [subscription] = await db
-      .select({
-        id: subscriptions.id,
-        userId: subscriptions.userId,
-        providerId: subscriptions.providerId,
-        name: subscriptions.name,
-        price: subscriptions.price,
-        categoryId: subscriptions.categoryId,
-        renewalDate: subscriptions.renewalDate,
-        startDate: subscriptions.startDate,
-        endDate: subscriptions.endDate,
-        billingCycle: subscriptions.billingCycle,
-        notes: subscriptions.notes,
-        status: subscriptions.status,
-        cancelUrl: subscriptions.cancelUrl,
-        reminderDays: subscriptions.reminderDays,
-        remindersEnabled: subscriptions.remindersEnabled,
-        createdAt: subscriptions.createdAt,
-
-        category: {
+    cons
           id: categories.id,
           name: categories.name,
         },
