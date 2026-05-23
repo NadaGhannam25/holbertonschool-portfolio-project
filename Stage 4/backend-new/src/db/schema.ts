@@ -25,7 +25,7 @@ export const categories = pgTable('categories', {
 });
 
 export const subscriptionProviders = pgTable('subscription_providers', {
-  id: serial('id').primaryKey(),
+  id: serial('id').primaey(),
   name: text('name').notNull().unique(),
   categoryId: integer('category_id').references(() => categories.id),
   logoUrl: text('logo_url'),
