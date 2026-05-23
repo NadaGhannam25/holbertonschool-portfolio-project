@@ -330,6 +330,8 @@ The implementation included:
 - Authentication screens.
 - Backend API structure.
 - Database connection.
+- Subscription management functionality.
+
   
 Stage 4 allowed the team to apply the technical documentation from Stage 3 in a real development environment and move the project from design into a working product.
 
