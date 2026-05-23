@@ -2,47 +2,7 @@
 
           userId,,
           newPrice: this.formatPrice(dto.price),
-          effectiveFrom: dto.renewalDate ?? currentSubscription.renewalDate,
-        });
-      }
-
-      const reminderSettingsChanged =
-        dto.reminderDays !== undefined ||
-        dto.remindersEnabled !== undefined ||
-        dto.renewalDate !== undefined;
-
-      if (reminderSettingsChanged) {
-        await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
-
-        const finalRemindersEnabled =
-          dto.remindersEnabled ?? currentSubscription.remindersEnabled ?? true;
-
-        const finalReminderDays =
-          dto.reminderDays ?? currentSubscription.reminderDays ?? 3;
-
-        const finalRenewalDate =
-          dto.renewalDate ?? currentSubscription.renewalDate;
-
-        if (finalRemindersEnabled) {
-          const renewalDate = this.parseDate(finalRenewalDate);
-          renewalDate.setHours(23, 59, 59, 999);
-
-          const remindAt = this.parseDate(finalRenewalDate);
-          remindAt.setDate(remindAt.getDate() - finalReminderDays);
-
-          const now = new Date();
-
-          if (renewalDate >= now) {
-            await tx.insert(reminders).values({
-              subscriptionId: id,
-              remindAt: this.formatDate(remindAt <= now ? now : remindAt),
-              sent: false,
-              sentAt: null,
-            });
-          }
-        }
-      }
-
+          effectiveFrom: dto.renewalDate ?? currentSubscription.renewalD
       return updatedSubscription;
     });
   }
