@@ -5,37 +5,7 @@ import {
       const subDate = this.parseDate(sub.startDate);
       return subDate < earliest ? subDate : earliest;
     }, this.parseDate(userSubscriptions[0].startDate));
-
-    earliestDate.setHours(0, 0, 0, 0);
-
-    const categoryMap = new Map<
-      number,
-      {
-        categoryId: number;
-        categoryName: string;
-        totalAmount: number;
-        subscriptions: Set<number>;
-      }
-    >();
-
-    for (const subscription of userSubscriptions) {
-      const payments = this.generatePaymentsForRange({
-        subscription,
-        rangeStart: earliestDate,
-        rangeEnd: now,
-      });
-
-      if (payments.length === 0) continue;
-
-      const categoryId = subscription.categoryId ?? 5;
-      const categoryName = subscription.categoryName ?? 'أخرى';
-
-      if (!categoryMap.has(categoryId)) {
-        categoryMap.set(categoryId, {
-          categoryId,
-          categoryName,
-          totalAmount: 0,
-          subscriptions: new Set<number>(),
+new Set<number>(),
         });
       }
 
