@@ -4,26 +4,6 @@ import { Resend } from 'resend';
 
 rage/v1/object/public/assets/dierha-logo.png';
   }
-  .manual-note {
-    color: #63676E;
-    font-size: 15px;
-    line-height: 2.2;
-    margin-top: 35px;
-  }
-`;
-
-function getFrontendUrl(): string {
-  return process.env.FRONTEND_URL ?? 'http://localhost:5173';
-}
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('ar-SA', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
 function formatBillingCycle(cycle: string): string {
   const map: Record<string, string> = {
     weekly: 'أسبوعي',
