@@ -8,34 +8,6 @@ import { eq } from 'drizzle-orm';
     billingCycle === 'weekly'
   ) {
 
-    return amount * 4;
-  }
-
-  if (
-    billingCycle === 'quarterly'
-  ) {
-
-    return amount / 3;
-  }
-
-  if (
-    billingCycle === 'semi_annual'
-  ) {
-
-    return amount / 6;
-  }
-
-  if (
-    billingCycle === 'yearly'
-  ) {
-
-    return amount / 12;
-  }
-
-  return amount;
-}
-
-export async function
 generateSubscriptionsPdf(
   userId: number,
 ): Promise<Buffer> {
