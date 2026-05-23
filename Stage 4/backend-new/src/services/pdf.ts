@@ -7,47 +7,6 @@ import { eq } from 'drizzle-orm';
   if (
     billingCycle === 'weekly'
   ) {
-
-generateSubscriptionsPdf(
-  userId: number,
-): Promise<Buffer> {
-
-      renewalDate:
-        subscriptions.renewalDate,
-
-      status:
-        subscriptions.status,
-
-      deletedAt:
-        subscriptions.deletedAt,
-
-      categoryName:
-        categories.name,
-    })
-
-    .from(subscriptions)
-
-    .leftJoin(
-
-      categories,
-
-      eq(
-        subscriptions.categoryId,
-        categories.id,
-      ),
-    )
-
-    .where(
-      eq(
-        subscriptions.userId,
-        userId,
-      ),
-    );
-
-  const activeSubscriptions =
-
-    rows.filter(
-      (row) =>
         row.status ===
         'active' &&
         !row.deletedAt,
