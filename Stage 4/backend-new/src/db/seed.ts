@@ -25,7 +25,7 @@ async function seed() {
     await db
       .insert(cegories)
       .values({ name })
-      .onConflictDoNothing();
+      .onCoNothing();
   }
 
   console.log("Seeding done!");
