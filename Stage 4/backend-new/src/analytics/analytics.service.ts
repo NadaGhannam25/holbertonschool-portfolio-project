@@ -2,45 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   
         billingCycle: subscriptions.billingCycle,
-        status: subscriptions.status,
-      })
-      .from(subscriptions)
-      .where(
-        and(
-          eq(subscriptions.userId, userId),
-          eq(subscriptions.status, 'active'),
-          isNull(subscriptions.deletedAt),
-          gte(subscriptions.renewalDate, today),
-          lte(subscriptions.renewalDate, sevenDaysStr),
-        ),
-      )
-      .orderBy(asc(subscriptions.renewalDate));
-  }
-
-  // ─── Private queries ──────────────────────────────────────────────────────
-
-  private async getSpendingSubscriptions(userId: number) {
-    return db
-      .select({
-        id: subscriptions.id,
-        price: subscriptions.price,
-        billingCycle: subscriptions.billingCycle,
-        startDate: subscriptions.startDate,
-        endDate: subscriptions.endDate,
-        categoryId: subscriptions.categoryId,
-        categoryName: categories.name,
-      })
-      .from(subscriptions)
-      .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
-      .where(
-        and(
-          eq(subscriptions.userId, userId),
-          eq(subscriptions.status, 'active'),
-          isNull(subscriptions.deletedAt),
-          sql`${subscriptions.startDate} is not null`,
-        ),
-      );
-  }
+        status: subscriptions.st
 
   private async getActiveSubscriptions(userId: number) {
     return db
