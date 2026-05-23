@@ -5,9 +5,7 @@ import {
   eq,
   gte,
   isNull,
-  isNotNull,
   lte,
-  or,
   sql,
 } from 'drizzle-orm';
 
@@ -281,17 +279,9 @@ export class AnalyticsService {
       .where(
         and(
           eq(subscriptions.userId, userId),
+          eq(subscriptions.status, 'active'),
+          isNull(subscriptions.deletedAt),
           sql`${subscriptions.startDate} is not null`,
-          or(
-            and(
-              eq(subscriptions.status, 'active'),
-              isNull(subscriptions.deletedAt),
-            ),
-            and(
-              isNotNull(subscriptions.deletedAt),
-              isNotNull(subscriptions.endDate),
-            ),
-          ),
         ),
       );
   }
