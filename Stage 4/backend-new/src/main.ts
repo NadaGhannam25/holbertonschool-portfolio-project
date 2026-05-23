@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { startCronJobs } from './services/cron';
+import { syncDatabaseSchema } from './db/sync-schema';
 
 function validateEnvironment() {
   if (!process.env.JWT_SECRET) {
@@ -13,6 +14,8 @@ function validateEnvironment() {
 
 async function bootstrap() {
   validateEnvironment();
+
+  await syncDatabaseSchema();
 
   const app = await NestFactory.create(AppModule);
 
