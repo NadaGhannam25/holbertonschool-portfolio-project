@@ -1,98 +1,280 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <a href="http://nestjs.com/" target="blank">
+    <img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" />
+  </a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<h1 align="center">Dierha Backend</h1>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+<p align="center">
+  Backend API for the Dierha Subscription Management Platform
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+<p align="center">
+  A NestJS-based backend service responsible for authentication, subscription management, categories, analytics, database operations, and API communication for the Dierha full-stack application.
+</p>
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+<p align="center">
+  <a href="https://www.npmjs.com/~nestjscore" target="_blank">
+    <img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" />
+  </a>
+  <a href="https://www.npmjs.com/~nestjscore" target="_blank">
+    <img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" />
+  </a>
+  <a href="https://www.npmjs.com/~nestjscore" target="_blank">
+    <img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" />
+  </a>
+  <img src="https://img.shields.io/badge/Framework-NestJS-red" alt="NestJS" />
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Database-PostgreSQL-336791" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Stage-4%20Implementation-purple" alt="Stage 4" />
+</p>
 
-## Project setup
+---
 
-```bash
-$ pnpm install
+## Overview
+
+This repository contains the backend implementation for **Dierha**, an Arabic-first subscription management platform.
+
+The backend handles the main server-side logic of the application. It connects the frontend with the database, manages user authentication, processes subscription data, organizes categories, and provides analytics needed for the dashboard and spending insights.
+
+This backend was developed as part of **Stage 4: Implementation**, where the project moved from planning and technical documentation into a working full-stack web application.
+
+---
+
+## Backend Role in Dierha
+
+The backend acts as the main communication layer between the frontend interface and the database.
+
+It is responsible for:
+
+- Receiving API requests from the frontend.
+- Validating user input before processing requests.
+- Handling user authentication and secure access.
+- Managing user and subscription data.
+- Connecting the application to the PostgreSQL database.
+- Organizing subscriptions into categories.
+- Providing analytics data for spending insights.
+- Returning structured responses to support frontend updates.
+
+---
+
+## Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| NestJS | Backend framework used to build scalable and organized server-side applications. |
+| TypeScript | Main programming language used to improve code structure and maintainability. |
+| PostgreSQL | Relational database used to store users, subscriptions, categories, and related data. |
+| Drizzle ORM | Used to define the database schema and manage database queries. |
+| JWT | Used for authentication and protected API access. |
+| bcrypt | Used to securely hash user passwords. |
+| Node.js | Runtime environment used to run the backend server. |
+
+---
+
+## Main Backend Modules
+
+### Authentication Module
+
+The authentication module manages user access to the platform.
+
+It includes:
+
+- User registration.
+- User login.
+- Password hashing.
+- JWT token generation.
+- Protected route support.
+- Authentication guards.
+
+---
+
+### Subscriptions Module
+
+The subscriptions module manages the main functionality of the platform.
+
+It supports:
+
+- Creating new subscriptions.
+- Retrieving user subscriptions.
+- Updating subscription details.
+- Deleting subscriptions.
+- Tracking renewal dates.
+- Connecting each subscription to the correct user.
+
+---
+
+### Categories Module
+
+The categories module helps organize subscriptions into clear and meaningful groups.
+
+Examples of categories include:
+
+- Entertainment.
+- Work.
+- Education.
+- Health.
+- Other.
+
+This allows users to better understand how their recurring payments are distributed across different areas.
+
+---
+
+### Analytics Module
+
+The analytics module provides the data needed for dashboard insights and spending summaries.
+
+It supports:
+
+- Total spending overview.
+- Category-based spending analysis.
+- Subscription summaries.
+- Data prepared for frontend charts and statistics.
+
+---
+
+### Database Module
+
+The database module manages the connection between the backend and PostgreSQL.
+
+It includes:
+
+- Database schema definition.
+- Database connection setup.
+- Seed data support.
+- Schema synchronization.
+- Drizzle configuration.
+
+---
+
+## API Functionality
+
+The backend provides API functionality required for the main MVP features.
+
+| Area | Description |
+|---|---|
+| Authentication | Handles user registration, login, password hashing, and JWT generation. |
+| Subscriptions | Allows users to create, view, update, and delete subscriptions. |
+| Categories | Organizes subscriptions by category. |
+| Analytics | Provides spending summaries and dashboard insights. |
+| Database | Stores and retrieves users, subscriptions, categories, and related data. |
+
+---
+
+## Authentication Flow
+
+The authentication flow works as follows:
+
+1. The frontend sends the user email and password to the backend.
+2. The backend validates the request data.
+3. During registration, the backend checks whether the email already exists.
+4. The password is hashed before being stored in the database.
+5. During login, the backend compares the entered password with the stored hashed password.
+6. If the credentials are valid, the backend generates a JWT token.
+7. The token is returned to the frontend.
+8. The frontend uses the token for authenticated requests.
+
+---
+
+## Database Design
+
+The backend database supports the main MVP entities required for Dierha.
+
+### Main Entities
+
+| Entity | Purpose |
+|---|---|
+| Users | Stores user account information. |
+| Subscriptions | Stores subscription details for each user. |
+| Categories | Stores subscription categories. |
+| Analytics Data | Supports dashboard summaries and spending insights. |
+
+### Subscription Data
+
+Each subscription may include:
+
+- Subscription name.
+- Price.
+- Billing cycle.
+- Renewal date.
+- Category.
+- Status.
+- User ID.
+- Cancellation link.
+
+This structure helps ensure that each subscription is connected to the correct user and can be displayed, updated, analyzed, or deleted when needed.
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the backend root folder.
+
+Example:
+
+```env
+DATABASE_URL=your_database_connection_url
+JWT_SECRET=your_jwt_secret
+PORT=4000
 ```
 
-## Compile and run the project
+### Installation
+Install the project dependencies:
 
-```bash
-# development
-$ pnpm run start
+```npm install```
 
-# watch mode
-$ pnpm run start:dev
 
-# production mode
-$ pnpm run start:prod
-```
+### Run the backend in development mode:
 
-## Run tests
+```npm run start:dev```
 
-```bash
-# unit tests
-$ pnpm run test
+### Run the backend normally:
 
-# e2e tests
-$ pnpm run test:e2e
+```npm run start```
 
-# test coverage
-$ pnpm run test:cov
-```
+### Run the backend in production mode:
 
-## Deployment
+```npm run start:prod```
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Stage 4 Backend Outcome
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+By the end of Stage 4, the backend provided the main foundation required for the Dierha MVP.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+The backend implementation included:
 
-## Resources
+- A structured NestJS backend application.
+- Authentication logic.
+- JWT-based access handling.
+- Database connection.
+- User and subscription data management.
+- Category organization.
+- Analytics support.
+- API communication with the frontend.
 
-Check out a few resources that may come in handy when working with NestJS:
+This backend helped transform Dierha from a planned system into a working full-stack web application.
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Future Improvements
 
-## Support
+Future backend improvements may include:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- More advanced reminder scheduling.
+- Improved validation and error handling.
+- Deployment optimization.
+- More detailed analytics.
+- Additional security enhancements.
+- Expanded automated testing.
+- More advanced role-based access control.
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Conclusion
 
-## License
+The Dierha backend represents the core server-side foundation of the platform. It provides the main services needed to support user authentication, subscription management, category organization, analytics, and database communication.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Through this backend implementation, the project became more connected, structured, and ready to support the frontend application with real data and secure API operations. It also helped transform Dierha from a planned MVP into a functional full-stack system.
+
+Overall, this backend provides a strong base for future development, including improved reminders, enhanced analytics, stronger validation, deployment readiness, and additional security improvements.
