@@ -372,3 +372,9 @@ Stage 4 represents the point where Dierha moved from planning and documentation 
 The implementation helped transform the project idea into a functional web application that supports authentication, subscription management, dashboard views, spending analysis, and basic frontend-backend communication.
 
 Overall, Stage 4 allowed the team to apply the technical decisions made in the previous stages and gain practical experience in developing, testing, and improving a full-stack web application. This stage also created a strong foundation for future enhancements, deployment, and further feature expansion.
+
+
+
+
+
+
