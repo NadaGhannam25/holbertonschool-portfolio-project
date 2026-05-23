@@ -3,47 +3,6 @@
 
 
             ${formatStatus(
-  background: white;
-
-  border-radius: 24px;
-
-  padding: 12px;
-
-  box-shadow:
-    0 12px 28px
-    rgba(0,0,0,0.12);
-}
-
-.header h1 {
-
-  margin: 0;
-
-  font-size: 38px;
-
-  font-weight: 800;
-}
-
-.header p {
-
-  margin-top: 12px;
-  font-size: 15px;
-}
-
-.cards {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 18px;
-
-  margin-bottom: 40px;
-}
-
-.card {
-
-  background:
     linear-gradient(
       180deg,
       #FFFFFF,
