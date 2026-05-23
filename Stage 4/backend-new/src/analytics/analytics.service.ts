@@ -39,6 +39,7 @@ type MonthRange = {
 
 @Injectable()
 export class AnalyticsService {
+  // ─── Timezone helpers ─────────────────────────────────────────────────────
 
   private getRiyadhToday(): string {
     return new Intl.DateTimeFormat('en-CA', {
@@ -50,12 +51,15 @@ export class AnalyticsService {
     return this.parseDate(this.getRiyadhToday());
   }
 
+  // ─── Public endpoints ─────────────────────────────────────────────────────
+
   async getMonthly(userId: number) {
     const now = this.getRiyadhNow();
     const userSubscriptions = await this.getSpendingSubscriptions(userId);
 
     if (userSubscriptions.length === 0) return [];
 
+    // ✅ أقدم تاريخ اشتراك = بداية الرسم البياني
     const earliestDate = userSubscriptions.reduce((earliest, sub) => {
       const subDate = this.parseDate(sub.startDate);
       return subDate < earliest ? subDate : earliest;
@@ -100,6 +104,7 @@ export class AnalyticsService {
       return { totalYearlyAmount: '0.00', subscriptionsCount: 0 };
     }
 
+    // ✅ من أقدم تاريخ اشتراك حتى اليوم — كل الصرف الكلي
     const earliestDate = userSubscriptions.reduce((earliest, sub) => {
       const subDate = this.parseDate(sub.startDate);
       return subDate < earliest ? subDate : earliest;
@@ -139,6 +144,7 @@ export class AnalyticsService {
 
     if (userSubscriptions.length === 0) return [];
 
+    // ✅ من أقدم اشتراك حتى اليوم للتصنيفات أيضاً
     const earliestDate = userSubscriptions.reduce((earliest, sub) => {
       const subDate = this.parseDate(sub.startDate);
       return subDate < earliest ? subDate : earliest;
@@ -257,6 +263,7 @@ export class AnalyticsService {
       .orderBy(asc(subscriptions.renewalDate));
   }
 
+  // ─── Private queries ──────────────────────────────────────────────────────
 
   private async getSpendingSubscriptions(userId: number) {
     return db
@@ -312,6 +319,11 @@ export class AnalyticsService {
       );
   }
 
+  // ─── Private helpers ──────────────────────────────────────────────────────
+
+  /**
+   * يولّد نطاقات شهرية من أقدم تاريخ اشتراك حتى الشهر الحالي
+   */
   private getAllMonthRanges(earliestDate: Date, now: Date): MonthRange[] {
     const ranges: MonthRange[] = [];
 
@@ -373,6 +385,7 @@ export class AnalyticsService {
 
     const paymentDate = new Date(subscriptionStart);
 
+    // تخطّي الدفعات قبل نطاق الحساب بكفاءة
     while (paymentDate < rangeStart) {
       this.moveDateForward(
         paymentDate,
@@ -380,6 +393,7 @@ export class AnalyticsService {
       );
     }
 
+    // كل دفعة في النطاق تُضاف مباشرة
     while (paymentDate <= effectiveEnd) {
       payments.push({
         date: new Date(paymentDate),
