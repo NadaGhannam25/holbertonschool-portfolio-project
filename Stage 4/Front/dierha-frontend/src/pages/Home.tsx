@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import SettingsDropdown from "../components/SettingsDropdown";   
 import {    
     type BackendSubscription,   
-    getCategoryAnalytics,   
+    getCategoryAnalytics,    
     getMonthlyAnalytics,
     getSubscriptions, 
     getUpcomingRenewals,
