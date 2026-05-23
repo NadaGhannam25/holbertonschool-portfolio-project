@@ -222,21 +222,16 @@ PORT=4000
 ### Installation
 Install the project dependencies:
 
-```npm install```
+## backend:
+```
+cd backend-new
+npm install drizzle-kit@latest --save-dev
+npx drizzle-kit --version
+npx drizzle-kit generate
+npx drizzle-kit migrate
+npm run start:dev
 
-
-### Run the backend in development mode:
-
-```npm run start:dev```
-
-### Run the backend normally:
-
-```npm run start```
-
-### Run the backend in production mode:
-
-```npm run start:prod```
-
+```
 ---
 
 ### Stage 4 Backend Outcome
