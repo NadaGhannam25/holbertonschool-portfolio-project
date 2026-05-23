@@ -84,6 +84,7 @@ export async function getSubscriptionById(id: number | string) {
 export async function updateSubscription(
     id: number | string,
     data: {
+        providerId?: number;
         name?: string;
         price?: number;
         categoryId?: number;
@@ -177,7 +178,20 @@ export async function exportSubscriptionsPdf() {
     }
 
     const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
 
-    window.open(url, "_blank");
+    const downloadUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = downloadUrl;
+
+    link.download = "subscriptions-report.pdf";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    window.URL.revokeObjectURL(downloadUrl);
 }
