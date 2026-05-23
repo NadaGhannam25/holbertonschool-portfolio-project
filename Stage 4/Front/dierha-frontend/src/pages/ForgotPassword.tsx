@@ -2,7 +2,7 @@ import { useState } from "react";
 import ToastMessage from "../components/ToastMessage";
 import { requestPasswordReset } from "../services/authService";
 
-type ForgotPasswordProps = {
+type ForgotPasswordProps = { 
   goToLogin: () => void;
 };
 
