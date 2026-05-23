@@ -18,7 +18,7 @@ const defaultCategories = [
 ];
 
 async function seed() {
-  console.log("Seeding categories...");
+  consding categories...");
 
   for (const name of defaultCategories) {
     await db
