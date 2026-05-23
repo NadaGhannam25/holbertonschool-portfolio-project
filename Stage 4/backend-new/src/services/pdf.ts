@@ -6,24 +6,6 @@ import { eq } from 'drizzle-orm';
 
   ) {
 
-    return amount * 4;
-  }
-
-  if (
-    billingCycle === 'quarterly'
-  ) {
-
-    return amount / 3;
-  }
-
-  if (
-    billingCycle === 'semi_annual'
-  ) {
-
-    return amount / 6;
-  }
-
-  if (
     billingCycle === 'yearly'
   ) {
 
