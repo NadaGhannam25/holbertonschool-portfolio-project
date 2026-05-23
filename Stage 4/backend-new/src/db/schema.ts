@@ -62,7 +62,7 @@ export const priceHistory = pgTable('price_history', {
   newPrice: decimal('new_price', { precision: 18, scale: 2 }).notNull(),
   effectiveFrom: date('effective_from').notNull(),
   changedAt: timestamp('changed_at').defaultNow(),
-});
+}
 
 export const reminders = pgTable('reminders', {
   id: serial('id').primaryKey(),
