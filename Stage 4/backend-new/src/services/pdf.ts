@@ -5,23 +5,7 @@ import puppeteer from 'puppeteer';
 import { eq } from 'drizzle-orm';
 
 import { db } from '../db';
-
-import {
-  categories,
-  subscriptions,
-  users,
-} from '../db/schema';
-
-function formatDate(
-  dateStr: string,
-): string {
-
-  const date = new Date(dateStr);
-
-  return date.toLocaleDateString(
-    'ar-SA',
-    {
-      year: 'numeric',
+umeric',
       month: 'long',
       day: 'numeric',
     },
