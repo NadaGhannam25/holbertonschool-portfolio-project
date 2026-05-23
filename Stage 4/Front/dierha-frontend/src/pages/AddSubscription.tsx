@@ -15,7 +15,7 @@ type AddSubscriptionProps = {
 }; 
 
 type SubscriptionDuration = "أسبوعي" | "شهري" | "3 أشهر" | "6 أشهر" | "سنة";
-type SubscriptionStatus = "نشط" | "متوقف";
+type SubscriptionStatus = "نشط" | "غير نشط";
 type ReminderPreference =
     | "قبل بيوم"
     | "قبل بثلاث أيام"
@@ -172,12 +172,16 @@ function AddSubscription({
     }, [formData.selectedAppId]);
 
     const appName = useMemo(() => {
-        if (formData.selectedAppId === "other") {
-            return formData.customAppName.trim() || "تطبيق جديد";
+         if (formData.selectedAppId === "other") {
+          return formData.customAppName.trim();
         }
 
         return selectedApp.name;
-    }, [formData.selectedAppId, formData.customAppName, selectedApp.name]);
+    }, [
+         formData.selectedAppId,
+         formData.customAppName,
+         selectedApp.name,
+    ]);
 
     const updateField = (field: keyof AddSubscriptionForm, value: string) => {
         setFormData((previous) => ({
@@ -209,12 +213,21 @@ function AddSubscription({
         setIsAppMenuOpen(false);
     };
 
+    const normalizedPrice = Number(formData.price);
+
+     const isCustomAppNameValid =
+       formData.selectedAppId !== "other" ||
+       formData.customAppName.trim().length > 0;
+
     const isFormValid =
-        appName.trim() &&
-        formData.category.trim() &&
-        formData.price.trim() &&
-        formData.renewalDate &&
-        formData.status.trim();
+       isCustomAppNameValid &&
+       appName.trim() &&
+       formData.category.trim() &&
+       formData.price.trim() &&
+       Number.isFinite(normalizedPrice) &&
+       normalizedPrice >= 0 &&
+       formData.renewalDate &&
+       formData.status.trim();
 
     const renderAppLogo = (app: AppOption, customName?: string) => {
         const appLogo = getLogoPath(app.logoFileName);
@@ -255,7 +268,12 @@ function AddSubscription({
 
                 categoryName: formData.category,
 
-                price: Number(formData.price),
+                providerId:
+                    formData.selectedAppId !== "other"
+                        ? selectedApp.providerId
+                        : undefined,
+
+                price: normalizedPrice,
 
                 startDate: formData.renewalDate,
 
@@ -467,6 +485,8 @@ function AddSubscription({
                                     <input
                                         type="number"
                                         min="0"
+                                        step="0.01"
+                                        inputMode="decimal"
                                         placeholder="0.00"
                                         value={formData.price}
                                         onChange={(event) =>
@@ -592,7 +612,7 @@ function AddSubscription({
                                     }
                                 >
                                     <option value="نشط">نشط</option>
-                                    <option value="متوقف">متوقف</option>
+                                    <option value="غير نشط">غير نشط</option>
                                 </select>
                             </div>
 
