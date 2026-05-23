@@ -24,7 +24,12 @@
 ## Overview
 
 This README focuses on **Stage 4: Implementation** of the Dierha project.
-Dierha is an Arabic-first subscription management web application that helps users organize their digital subscriptions, track renewal dates, and understand their spending without connecting a bank 
+Dierha is an Arabic-first subscription management web application that helps users organize their digital subscriptions, track renewal dates, and understand their spending without connecting a bank
+account.
+
+In Stage 4, the team moved from planning and technical documentation into actual development. The main goal was to implement the core MVP features by building the frontend interface, developing backend services, connecting the database, and integrating the main user flows.
+
+
 ---
 
 ## Stage 4 Objective
