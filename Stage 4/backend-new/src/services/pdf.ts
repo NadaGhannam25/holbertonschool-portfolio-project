@@ -12,22 +12,7 @@ umeric',
   );
 }
 
-function formatBillingCycle(
-  cycle: string,
-): string {
-
-  const map:
-  Record<string, string> = {
-
-    weekly: 'أسبوعي',
-
-    monthly: 'شهري',
-
-    quarterly: 'كل 3 أشهر',
-
-    semi_annual: 'كل 6 أشهر',
-
-    yearly: 'سنوي',
+function formatBillingCy
   };
 
   return map[cycle] ?? cycle;
