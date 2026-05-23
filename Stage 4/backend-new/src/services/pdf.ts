@@ -2,34 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import puppeteer from 'puppeteer';
-import { eq } from 'drizzle-orm';
-
-  ) {
-
-    billingCycle === 'yearly'
-  ) {
-
-    return amount / 12;
-  }
-
-  return amount;
-}
-
-export async function
-generateSubscriptionsPdf(
-  userId: number,
-): Promise<Buffer> {
-
-  const [user] = await db
-
-    .select({
-
-      name: users.name,
-
-      email: users.email,
-    })
-
-    .from(users)
 
     .where(
       eq(users.id, userId),
