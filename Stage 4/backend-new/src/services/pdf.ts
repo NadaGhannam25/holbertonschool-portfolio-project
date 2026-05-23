@@ -12,41 +12,6 @@ generateSubscriptionsPdf(
   userId: number,
 ): Promise<Buffer> {
 
-  const [user] = await db
-
-    .select({
-
-      name: users.name,
-
-      email: users.email,
-    })
-
-    .from(users)
-
-    .where(
-      eq(users.id, userId),
-    );
-
-  if (!user) {
-
-    throw new Error(
-      'User not found',
-    );
-  }
-
-  const rows = await db
-
-    .select({
-
-      name:
-        subscriptions.name,
-
-      price:
-        subscriptions.price,
-
-      billingCycle:
-        subscriptions.billingCycle,
-
       renewalDate:
         subscriptions.renewalDate,
 
