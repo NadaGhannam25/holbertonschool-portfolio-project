@@ -2,7 +2,6 @@ import 'dotenv/config';
 import process from 'process';
 import { Resend } from 'resend';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface ReminderEmailData {
   to: string;
@@ -20,11 +19,9 @@ interface ResetPasswordEmailData {
   token: string;
 }
 
-// ─── Resend client ───────────────────────────────────────────────────────────
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const EMAIL_LOGO_URL =
   'https://zpijpebyajnkxsrnrfre.supabase.co/storage/v1/object/public/assets/dierha-logo.png';
@@ -148,7 +145,6 @@ function formatBillingCycle(cycle: string): string {
   return map[cycle] ?? cycle;
 }
 
-// ─── HTML builders (private) ──────────────────────────────────────────────────
 
 function buildReminderHtml(data: ReminderEmailData): string {
   const cancelSection = data.cancelUrl
@@ -214,7 +210,6 @@ function buildResetPasswordHtml(data: ResetPasswordEmailData): string {
 </body></html>`;
 }
 
-// ─── Public senders ───────────────────────────────────────────────────────────
 
 export async function sendReminderEmail(
   data: ReminderEmailData,
