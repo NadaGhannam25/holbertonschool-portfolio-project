@@ -4,40 +4,6 @@
       conditions.push(
         sql`extract(month from ${subscriptions.renewalDate}::date) = ${Number(filters.paymentMonth)}`,
       );
-    }
-
-    if (filters?.paymentYear !== undefined) {
-      conditions.push(
-        sql`extract(year from ${subscriptions.renewalDate}::date) = ${Number(filters.paymentYear)}`,
-      );
-    }
-
-    return db
-      .select({
-        id: subscriptions.id,
-        userId: subscriptions.userId,
-        providerId: subscriptions.providerId,
-        name: subscriptions.name,
-        price: subscriptions.price,
-        categoryId: subscriptions.categoryId,
-        renewalDate: subscriptions.renewalDate,
-        startDate: subscriptions.startDate,
-        endDate: subscriptions.endDate,
-        billingCycle: subscriptions.billingCycle,
-        notes: subscriptions.notes,
-        status: subscriptions.status,
-        cancelUrl: subscriptions.cancelUrl,
-        reminderDays: subscriptions.reminderDays,
-        remindersEnabled: subscriptions.remindersEnabled,
-        deletedAt: subscriptions.deletedAt,
-        createdAt: subscriptions.createdAt,
-
-        category: {
-          id: categories.id,
-          name: categories.name,
-        },
-
-        provider: {
           id: subscriptionProviders.id,
           name: subscriptionProviders.name,
           logoUrl: subscriptionProviders.logoUrl,
