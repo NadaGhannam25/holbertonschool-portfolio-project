@@ -2,21 +2,7 @@ import { pool } from './index';
 
 export async function syncDatabaseSchema() {
   // MVP safety sync: keeps existing Supabase/Postgres tables compatible with the latest code.
-  // It is idempotent, so running it more than once is safe.
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id serial PRIMARY KEY,
-      name text NOT NULL,
-      email text NOT NUtamp DEFAULT now()
-    );
-
-    CREATE TABLE IF NOT EXISTS reminders (
-      id serial PRIMARY KEY,
-      subscription_id integer REFERENCES subscriptions(id),
-      remind_at date NOT NULL,
-      sent boolean DEFAULT false,
-      sent_at timestamp
-    );
+  // It is idempotent, so running it more than onc
 
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_password_token text;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_password_expires timestamp;
