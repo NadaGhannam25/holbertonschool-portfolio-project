@@ -177,7 +177,7 @@ function buildReminderHtml(data: ReminderEmailData): string {
       <div class="row"><span>الخدمة</span><strong>${data.subscriptionName}</strong></div>
       <div class="row"><span>تاريخ التجديد</span><strong>${formatDate(data.renewalDate)}</strong></div>
       <div class="row"><span>المبلغ</span><strong>${data.amount} ريال</strong></div>
-      <div class="row"><span>دورة الدفع</span><strong>${formatBillingCycle(data.billingCycle)}</strong></div>
+      <div class="row"><span>مدة الاشتراك</span><strong>${formatBillingCycle(data.billingCycle)}</strong></div>
     </div>
     ${cancelSection}
   </div>
