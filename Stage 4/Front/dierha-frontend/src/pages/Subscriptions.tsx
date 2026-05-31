@@ -136,7 +136,9 @@ function Subscriptions({
     useEffect(() => {
         const loadSubscriptions = async () => {
             try {
+                if (subscriptionsData.length === 0) {
                 setLoading(true);
+            }
 
                 const categoryId =
                     activeCategory !== "الكل"
