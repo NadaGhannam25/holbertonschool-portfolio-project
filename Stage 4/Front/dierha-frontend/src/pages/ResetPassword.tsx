@@ -203,7 +203,10 @@ function ResetPassword({ token }: ResetPasswordProps) {
                 <button
                     type="button"
                     className="back-to-login-btn"
-                    onClick={() => { window.location.href = "/"; }}
+                    onClick={() => {
+                      localStorage.clear(); 
+                      sessionStorage.clear();
+                      window.location.href = "/"; }}
                     disabled={isLoading}
                 >
                     العودة لتسجيل الدخول
