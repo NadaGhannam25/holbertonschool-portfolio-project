@@ -153,7 +153,7 @@ function Subscriptions({
                 setSubscriptionsData(Array.isArray(data) ? data : []);
             } catch (err) {
                 console.warn("Subscriptions API request failed.", err);
-                setSubscriptionsData([]);
+                
             } finally {
                 setLoading(false);
             }
