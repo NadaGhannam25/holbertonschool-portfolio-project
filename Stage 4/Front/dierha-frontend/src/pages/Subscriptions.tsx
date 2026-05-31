@@ -160,41 +160,43 @@ function Subscriptions({
         loadSubscriptions();
     }, [debouncedSearchTerm, activeCategory]);
 
-    const filteredSubscriptionsData = useMemo(() => {
-        return subscriptionsData.filter((item) => {
-            const normalizedSearch = debouncedSearchTerm.toLowerCase();
-            const itemName = item.name?.toLowerCase() ?? "";
-            const itemCategory = item.category?.name ?? "أخرى";
+     const filteredSubscriptionsData = useMemo(() => {
 
-            const searchMatches = normalizedSearch
-                ? itemName.includes(normalizedSearch) ||
-                  itemCategory.toLowerCase().includes(normalizedSearch)
-                : true;
+    return subscriptionsData.filter((item) => {
 
-            const categoryMatches =
-                activeCategory === "الكل" || itemCategory === activeCategory;
 
-            const subscriptionDateValue = item.startDate || item.renewalDate;
-            let dateMatches = true;
 
-            if (selectedMonth || selectedYear) {
-                if (!subscriptionDateValue) return false;
+        if (!selectedMonth && !selectedYear) return true;
 
-                const subscriptionDate = new Date(subscriptionDateValue);
-                if (Number.isNaN(subscriptionDate.getTime())) return false;
+        const subscriptionDateValue = item.startDate || item.renewalDate;
 
-                const itemMonth = String(subscriptionDate.getMonth() + 1).padStart(2, "0");
-                const itemYear = String(subscriptionDate.getFullYear());
+        if (!subscriptionDateValue) return false;
 
-                const monthMatches = selectedMonth ? itemMonth === selectedMonth : true;
-                const yearMatches = selectedYear ? itemYear === selectedYear : true;
+        const subscriptionDate = new Date(subscriptionDateValue);
 
-                dateMatches = monthMatches && yearMatches;
-            }
+        if (Number.isNaN(subscriptionDate.getTime())) return false;
 
-            return searchMatches && categoryMatches && dateMatches;
-        });
-    }, [subscriptionsData, debouncedSearchTerm, activeCategory, selectedMonth, selectedYear]);
+
+
+        const itemMonth = String(subscriptionDate.getMonth() + 1).padStart(2, "0");
+
+        const itemYear = String(subscriptionDate.getFullYear());
+
+       
+
+        const monthMatches = selectedMonth ? itemMonth === selectedMonth : true;
+
+        const yearMatches = selectedYear ? itemYear === selectedYear : true;
+
+
+
+        return monthMatches && yearMatches;
+
+    });
+
+
+
+}, [subscriptionsData, selectedMonth, selectedYear]); 
 
     const handleDetailsClick = (id: number) => {
         goToSubscriptionDetails(id);
