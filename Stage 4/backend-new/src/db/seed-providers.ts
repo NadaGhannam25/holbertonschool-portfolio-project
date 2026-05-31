@@ -307,7 +307,7 @@ const providers = [
     categoryId: 3,
     logoUrl: 'udemy-logo.png',
     websiteUrl: 'https://www.udemy.com',
-    cancelUrl: 'https://www.udemy.com/user/edit-account/subscriptions',
+    cancelUrl: 'https://www.udemy.com/user/manage-subscriptions',
     isPopular: true,
   },
   {
@@ -348,7 +348,7 @@ const providers = [
     categoryId: 4,
     logoUrl: 'myfitnesspal-logo.png',
     websiteUrl: 'https://www.myfitnesspal.com',
-    cancelUrl: 'https://www.myfitnesspal.com/account/subscription',
+    cancelUrl: 'https://www.myfitnesspal.com/premium/account',
     isPopular: false,
   },
   {
