@@ -102,7 +102,7 @@ function EditSubscriptionModal({
 
     const [isReminderConfirmOpen, setIsReminderConfirmOpen] =
         useState(false);
-
+    const [calculatedRenewalDate, setCalculatedRenewalDate] = useState<string>("");
     const renewalDateInputRef =
         useRef<HTMLInputElement | null>(null);
 
@@ -118,7 +118,41 @@ function EditSubscriptionModal({
             setIsReminderConfirmOpen(false);
         }
     }, [isOpen, initialValues]);
+    useEffect(() => {
+        if (!formData.renewalDate) {
+            setCalculatedRenewalDate("");
+            return;
+        }
 
+        const date = new Date(formData.renewalDate);
+        if (Number.isNaN(date.getTime())) return;
+
+        switch (formData.duration) {
+            case "أسبوعي":
+                date.setDate(date.getDate() + 7);
+                break;
+            case "شهري":
+                date.setMonth(date.getMonth() + 1);
+                break;
+            case "3 أشهر":
+                date.setMonth(date.getMonth() + 3);
+                break;
+            case "6 أشهر":
+                date.setMonth(date.getMonth() + 6);
+                break;
+            case "سنة":
+                date.setFullYear(date.getFullYear() + 1);
+                break;
+            default:
+                break;
+        }
+
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+        
+        setCalculatedRenewalDate(`${yyyy}-${mm}-${dd}`);
+    }, [formData.renewalDate, formData.duration]);
     if (!isOpen) return null;
 
     const updateField = (
@@ -180,9 +214,9 @@ function EditSubscriptionModal({
             return;
         }
 
-        onSave(formData);
-        onClose();
-    };
+        onSave({...formData,
+            renewalDate: calculatedRenewalDate || formData.renewalDate });
+        onClose(); };
 
     return (
         <div
@@ -425,6 +459,17 @@ function EditSubscriptionModal({
                                         )
                                     }
                                 />
+                            </div>
+                        </div>
+                        <div className="edit-modal-field full">
+                            <label style={{ color: "#4F46E5", fontWeight: "bold" }}>
+                            </label>
+                            <div className="arabic-calendar-field" style={{ opacity: 0.85 }}>
+                                <div className="arabic-calendar-display" style={{ background: "#f3f4f6", border: "1px #e5e7eb" }}>
+                                    <span style={{ color: "#1f2937", fontWeight: "600" }}>
+                                        {formatArabicDateDisplay(calculatedRenewalDate)}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
