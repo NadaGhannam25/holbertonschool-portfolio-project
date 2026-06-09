@@ -18,6 +18,7 @@ import Subscriptions from "./pages/Subscriptions";
 import AddSubscription from "./pages/AddSubscription";
 import SubscriptionDetails from "./pages/SubscriptionDetails";
 import TopLogo from "./components/TopLogo";
+import DierhaLanding from "./pages/DierhaLanding/DierhaLanding";
 
 import { loginUser, logoutUser, registerUser } from "./services/authService";
 
@@ -110,11 +111,15 @@ function AppContent() {
     return (
         <Routes>
             <Route
+                path="/"
+                element={<DierhaLanding />}
+            />
+            <Route
                 path="/home"
                 element={
                     <Home
                         onLogout={handleLogout}
-                        goToHome={() => navigate("/")}
+                        goToHome={() => navigate("/home")}
                         goToSubscriptions={() =>
                             navigate("/subscriptions")
                         }
@@ -130,7 +135,7 @@ function AppContent() {
                 element={
                     <Subscriptions
                         onLogout={handleLogout}
-                        goToHome={() => navigate("/")}
+                        goToHome={() => navigate("/home")}
                         goToSubscriptions={() =>
                             navigate("/subscriptions")
                         }
@@ -149,7 +154,7 @@ function AppContent() {
                 element={
                     <AddSubscription
                         onLogout={handleLogout}
-                        goToHome={() => navigate("/")}
+                        goToHome={() => navigate("/home")}
                         goToSubscriptions={() =>
                             navigate("/subscriptions")
                         }
