@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:4000";
+const API_BASE_URL = "https://dierha-backend.onrender.com";
 
 type AuthUser = {
     id?: number;
