@@ -10,12 +10,9 @@ import {
   Put,
   Query,
   Req,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 
-import type { Response } from 'express';
-import { sendReminderEmail } from '../services/email';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedRequest } from '../auth/guards/jwt-auth.guard';
 
@@ -52,25 +49,6 @@ export class SubscriptionsController {
       request.user!.sub,
       createSubscriptionDto,
     );
-  }
-
-  @Get('pdf/export')
-  async exportPdf(
-    @Req() request: AuthenticatedRequest,
-    @Res() res: Response,
-  ) {
-    const pdfBuffer =
-      await this.subscriptionsService.exportPdf(
-        request.user!.sub,
-      );
-
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition':
-        'inline; filename=subscriptions.pdf',
-    });
-
-    return res.send(pdfBuffer);
   }
 
   @Get(':id/spending')
