@@ -164,6 +164,8 @@ function Home({
     const [chartFilter, setChartFilter] = useState<ChartFilter>("monthly");
     const [loading, setLoading] = useState(true);
     const [pdfMessage, setPdfMessage] = useState("");
+    const [pdfLoading, setPdfLoading] = useState(false);
+
 
     useEffect(() => {
         const loadDashboard = async () => {
@@ -308,6 +310,7 @@ function Home({
         }));
     }, [subscriptions]);
 
+    // نعتمد على analytics data دائماً (تشمل المحذوفة) — الـ fallback فقط لو فشل الطلب كلياً
     const visibleCategoryChartData = categoryChartData.length > 0
         ? categoryChartData
         : fallbackCategoryChartData;
@@ -566,7 +569,7 @@ function Home({
                     <div className="metric-card">
                         <span>إجمالي الاشتراكات</span>
                         <strong>{subscriptions.length}</strong>
-                        <p>كل الاشتراكات المسجلة</p>
+                        <p>كل الاشتراكات النشطة</p>
                     </div>
 
                     <div className="metric-card">
@@ -610,21 +613,24 @@ function Home({
                                     type="button"
                                     className="export-pdf-btn home-table-export-btn"
                                     aria-label="تصدير جدول الاشتراكات بصيغة PDF"
+                                    disabled={pdfLoading}
                                     onClick={async () => {
-                                        if (tableSubscriptions.length === 0) {
-                                            setPdfMessage("لا توجد اشتراكات لتصديرها حاليًا.");
-                                            return;
-                                        }
-
                                         try {
+                                            setPdfLoading(true);
                                             await exportSubscriptionsPdf();
                                         } catch (error) {
                                             console.error(error);
-                                            setPdfMessage("تعذر تصدير ملف PDF حاليًا.");
+                                            setPdfMessage(
+                                                error instanceof Error
+                                                    ? error.message
+                                                    : "تعذر تصدير ملف PDF حاليًا."
+                                            );
+                                        } finally {
+                                            setPdfLoading(false);
                                         }
                                     }}
                                 >
-                                     تصدير PDF
+                                    {pdfLoading ? "جاري التصدير..." : "تصدير PDF"}
                                 </button>
                             </div>
 
