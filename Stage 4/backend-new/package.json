@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "setup": "npm install && pnpm add -D drizzle-kit@latest && pnpm add class-validator class-transformer && pnpm add node-cron jspdf jspdf-autotable && pnpm add -D @types/node-cron && pnpm add puppeteer && pnpm exec drizzle-kit push",
+    "setup": "npm install && pnpm add -D drizzle-kit@latest && pnpm add class-validator class-transformer && pnpm add node-cron jspdf jspdf-autotable && pnpm add -D @types/node-cron && pnpm add puppeteer",
     "seed:providers": "pnpm ts-node src/db/seed-providers.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -35,7 +35,9 @@
     "jspdf-autotable": "^3.8.4",
     "node-cron": "^3.0.3",
     "pg": "^8.20.0",
+    "puppeteer": "^25.1.0",
     "reflect-metadata": "^0.2.2",
+    "resend": "^6.12.4",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
