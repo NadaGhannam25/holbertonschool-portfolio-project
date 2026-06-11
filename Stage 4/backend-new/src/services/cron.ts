@@ -69,6 +69,8 @@ function moveDateForward(date: Date, billingCycle: BillingCycle) {
 async function createNextReminder(
   subscription: typeof subscriptions.$inferSelect,
 ) {
+  if (subscription.status !== 'active') return;
+  if (subscription.deletedAt !== null && subscription.deletedAt !== undefined) return;
   if (!subscription.remindersEnabled) return;
 
   const renewalDate = parseDate(subscription.renewalDate);
@@ -126,6 +128,8 @@ async function runReminderJob(): Promise<void> {
         eq(reminders.sent, false),
         isNull(reminders.sentAt),
         lte(reminders.remindAt, today),
+        eq(subscriptions.status, 'active'),
+        isNull(subscriptions.deletedAt),
       ),
     );
 
@@ -220,7 +224,9 @@ export function startCronJobs(): void {
     }
   });
 
-  cron.schedule('5 9 * * *', async () => {
+  const dailyCronTime = process.env.TZ === 'Asia/Riyadh' ? '5 9 * * *' : '5 6 * * *';
+
+  cron.schedule(dailyCronTime, async () => {
     try {
       console.log('[Cron] Running daily renewal update...');
       await updateExpiredSubscriptions();
@@ -231,5 +237,5 @@ export function startCronJobs(): void {
   });
 
   console.log('[Cron] Reminder sender scheduled every minute');
-  console.log('[Cron] Renewal updater scheduled daily at 9:05 AM');
+  console.log(`[Cron] Renewal updater scheduled daily at 9:05 AM Riyadh (cron: ${dailyCronTime})`);
 }
