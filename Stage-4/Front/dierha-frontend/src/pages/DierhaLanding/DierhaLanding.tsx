@@ -1,3 +1,4 @@
+// @ts-ignore
 import logo from "../../assets/dierha-logo.png";
 import "./DierhaLanding.css";
 export {};
