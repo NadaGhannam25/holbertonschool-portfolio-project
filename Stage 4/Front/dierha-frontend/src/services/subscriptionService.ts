@@ -162,9 +162,10 @@ export async function getSubscriptionSpending(id: number | string) {
 
 export async function exportSubscriptionsPdf() {
     const token = localStorage.getItem("dierha_token");
+    const baseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
 
     const response = await fetch(
-        "http://localhost:4000/api/subscriptions/pdf/export",
+        `${baseUrl}/api/subscriptions/export/pdf`,
         {
             method: "GET",
             headers: {
@@ -174,24 +175,26 @@ export async function exportSubscriptionsPdf() {
     );
 
     if (!response.ok) {
-        throw new Error("فشل تصدير ملف PDF");
+        let errorMsg = "فشل تصدير ملف PDF";
+        try {
+            const errJson = await response.json() as { message?: string };
+            if (errJson?.message) errorMsg = errJson.message;
+        } catch {
+        }
+        throw new Error(errorMsg);
     }
 
     const blob = await response.blob();
-
     const downloadUrl = window.URL.createObjectURL(blob);
 
     const link = document.createElement("a");
-
     link.href = downloadUrl;
-
-    link.download = "subscriptions-report.pdf";
-
+    link.download = `dierha-subscriptions-${new Date().toISOString().slice(0, 10)}.pdf`;
     document.body.appendChild(link);
-
     link.click();
-
     link.remove();
 
-    window.URL.revokeObjectURL(downloadUrl);
+    setTimeout(() => {
+        window.URL.revokeObjectURL(downloadUrl);
+    }, 2000);
 }
