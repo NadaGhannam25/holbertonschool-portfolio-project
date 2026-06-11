@@ -25,8 +25,8 @@ export class PdfController {
 
       res.end(pdfBuffer);
     } catch (error) {
-      console.error('[PDF] Error:', error);
-      res.status(500).json({ message: 'Failed to export PDF report' });
+      console.error('[PDF] Full Error:', error);
+      res.status(500).json({ message: 'Failed to export PDF report' , error: String(error) });
     }
   }
 }
