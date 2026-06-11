@@ -92,7 +92,7 @@ function AppContent() {
 
     const handleLogout = async () => {
         await logoutUser();
-        navigate("/login");
+        navigate("/");
     };
 
     const SubscriptionDetailsWrapper = () => {
