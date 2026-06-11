@@ -1,6 +1,6 @@
 import logo from "../../assets/dierha-logo.png";
 import "./DierhaLanding.css";
-
+export {};
 function DierhaLanding() {
     const scrollTo = (id: string) => {
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
