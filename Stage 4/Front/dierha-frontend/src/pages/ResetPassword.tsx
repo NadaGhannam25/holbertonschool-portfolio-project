@@ -206,7 +206,7 @@ function ResetPassword({ token }: ResetPasswordProps) {
                     onClick={() => {
                       localStorage.clear(); 
                       sessionStorage.clear();
-                      window.location.href = "/"; }}
+                      window.location.href = "/login"; }}
                     disabled={isLoading}
                 >
                     العودة لتسجيل الدخول
