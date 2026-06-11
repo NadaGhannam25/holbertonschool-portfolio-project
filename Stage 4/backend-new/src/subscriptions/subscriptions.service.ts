@@ -200,15 +200,32 @@ export class SubscriptionsService {
       if (dto.name !== undefined) updateData.name = dto.name;
       if (dto.price !== undefined) updateData.price = this.formatPrice(dto.price);
       if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
-      if (dto.renewalDate !== undefined) updateData.renewalDate = dto.renewalDate;
-      if (dto.billingCycle !== undefined) updateData.billingCycle = dto.billingCycle;
       if (dto.notes !== undefined) updateData.notes = dto.notes;
       if (dto.status !== undefined) updateData.status = dto.status;
       if (dto.cancelUrl !== undefined) updateData.cancelUrl = dto.cancelUrl;
       if (dto.reminderDays !== undefined) updateData.reminderDays = dto.reminderDays;
+      if (dto.remindersEnabled !== undefined) updateData.remindersEnabled = dto.remindersEnabled;
 
-      if (dto.remindersEnabled !== undefined) {
-        updateData.remindersEnabled = dto.remindersEnabled;
+      if (dto.renewalDate !== undefined) {
+        const parsed = this.parseDate(dto.renewalDate);
+        parsed.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (parsed >= today) {
+          updateData.renewalDate = dto.renewalDate;
+        }
+      }
+
+      if (dto.billingCycle !== undefined && dto.billingCycle !== currentSubscription.billingCycle) {
+        updateData.billingCycle = dto.billingCycle;
+
+        const recalculated = this.getNextRenewalDate(
+          currentSubscription.startDate,
+          dto.billingCycle as BillingCycle,
+        );
+        updateData.renewalDate = recalculated;
+      } else if (dto.billingCycle !== undefined) {
+        updateData.billingCycle = dto.billingCycle;
       }
 
       const [updatedSubscription] = await tx
@@ -225,14 +242,15 @@ export class SubscriptionsService {
           subscriptionId: id,
           oldPrice: currentSubscription.price,
           newPrice: this.formatPrice(dto.price),
-          effectiveFrom: dto.renewalDate ?? currentSubscription.renewalDate,
+          effectiveFrom: updateData.renewalDate ?? currentSubscription.renewalDate,
         });
       }
 
       const reminderSettingsChanged =
         dto.reminderDays !== undefined ||
         dto.remindersEnabled !== undefined ||
-        dto.renewalDate !== undefined;
+        dto.renewalDate !== undefined ||
+        dto.billingCycle !== undefined; 
 
       if (reminderSettingsChanged) {
         await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
@@ -244,7 +262,7 @@ export class SubscriptionsService {
           dto.reminderDays ?? currentSubscription.reminderDays ?? 3;
 
         const finalRenewalDate =
-          dto.renewalDate ?? currentSubscription.renewalDate;
+          updateData.renewalDate ?? currentSubscription.renewalDate;
 
         if (finalRemindersEnabled) {
           const renewalDate = this.parseDate(finalRenewalDate);
@@ -301,16 +319,41 @@ export class SubscriptionsService {
     const nextStatus =
       currentSubscription.status === 'active' ? 'inactive' : 'active';
 
-    const [updatedSubscription] = await db
-      .update(subscriptions)
-      .set({
-        status: nextStatus,
-        endDate: nextStatus === 'inactive' ? this.formatDate(new Date()) : null,
-      })
-      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
-      .returning();
+    return db.transaction(async (tx) => {
+      const [updatedSubscription] = await tx
+        .update(subscriptions)
+        .set({
+          status: nextStatus,
+          endDate: nextStatus === 'inactive' ? this.formatDate(new Date()) : null,
+        })
+        .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+        .returning();
 
-    return updatedSubscription;
+      // عند إعادة التفعيل: نحذف أي reminders قديمة ونبني reminder جديد
+      // عند التعطيل: نحذف الـ reminders فقط (لا داعي لتذكير اشتراك غير نشط)
+      await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
+
+      if (nextStatus === 'active' && currentSubscription.remindersEnabled) {
+        const renewalDate = this.parseDate(currentSubscription.renewalDate);
+        renewalDate.setHours(23, 59, 59, 999);
+
+        const remindAt = this.parseDate(currentSubscription.renewalDate);
+        remindAt.setDate(remindAt.getDate() - (currentSubscription.reminderDays ?? 3));
+
+        const now = new Date();
+
+        if (renewalDate >= now) {
+          await tx.insert(reminders).values({
+            subscriptionId: id,
+            remindAt: this.formatDate(remindAt <= now ? now : remindAt),
+            sent: false,
+            sentAt: null,
+          });
+        }
+      }
+
+      return updatedSubscription;
+    });
   }
 
   private async getOwnedSubscription(userId: number, id: number) {
@@ -352,7 +395,11 @@ export class SubscriptionsService {
         subscriptionProviders,
         eq(subscriptions.providerId, subscriptionProviders.id),
       )
-      .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)));
+      .where(and(
+        eq(subscriptions.id, id),
+        eq(subscriptions.userId, userId),
+        sql`${subscriptions.deletedAt} is null`,
+      ));
 
     if (!subscription) {
       throw new NotFoundException('Subscription not found');
