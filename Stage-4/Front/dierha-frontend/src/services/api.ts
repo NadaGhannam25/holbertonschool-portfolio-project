@@ -1,6 +1,4 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  "https://dierha-backend.onrender.com";
+const API_BASE_URL = "https://dierha-backend.onrender.com";
 
 type RequestOptions = RequestInit;
 
