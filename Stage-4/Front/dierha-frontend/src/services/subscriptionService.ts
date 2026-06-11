@@ -162,7 +162,7 @@ export async function getSubscriptionSpending(id: number | string) {
 
 export async function exportSubscriptionsPdf() {
     const token = localStorage.getItem("dierha_token");
-    const baseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+    const baseUrl = import.meta.env.VITE_API_URL ?? "https://dierha-backend.onrender.com";
 
     const response = await fetch(
         `${baseUrl}/api/subscriptions/export/pdf`,
