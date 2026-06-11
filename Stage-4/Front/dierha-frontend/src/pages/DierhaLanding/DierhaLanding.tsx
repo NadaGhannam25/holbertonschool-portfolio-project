@@ -1,5 +1,4 @@
 import logo from "../../assets/dierha-logo.png";
-import Footer from "../../components/Footer";
 import "./DierhaLanding.css";
 
 function DierhaLanding() {
