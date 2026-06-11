@@ -53,7 +53,7 @@ const providers = [
   },
   {
     name: 'Google One',
-    categoryId: 5,
+    categoryId: 2,
     logoUrl: 'google-one-logo.png',
     websiteUrl: 'https://one.google.com',
     cancelUrl: 'https://one.google.com/settings',
@@ -157,7 +157,7 @@ const providers = [
   },
   {
     name: 'Jahez',
-    categoryId: 1,
+    categoryId: 5,
     logoUrl: 'jahez-logo.png',
     websiteUrl: 'https://jahez.net',
     cancelUrl: 'https://jahez.net',
@@ -165,7 +165,7 @@ const providers = [
   },
   {
     name: 'HungerStation',
-    categoryId: 1,
+    categoryId: 5,
     logoUrl: 'hungerstation-logo.png',
     websiteUrl: 'https://hungerstation.com',
     cancelUrl: 'https://hungerstation.com',
@@ -290,7 +290,7 @@ const providers = [
     categoryId: 2,
     logoUrl: 'gemini-logo.png',
     websiteUrl: 'https://gemini.google.com',
-    cancelUrl: 'https://one.google.com/settings',
+    cancelUrl: 'https://gemini.google/subscriptions/',
     isPopular: true,
   },
   {
@@ -307,7 +307,7 @@ const providers = [
     categoryId: 3,
     logoUrl: 'udemy-logo.png',
     websiteUrl: 'https://www.udemy.com',
-    cancelUrl: 'https://www.udemy.com/user/manage-subscriptions',
+    cancelUrl: 'https://www.udemy.com/personal-plan/?srsltid=AfmBOopdhCmB128pJTIBa6DvIac3uK5Oa9mZLU_NxfgPxLXLdtCh00kJ',
     isPopular: true,
   },
   {
@@ -348,7 +348,7 @@ const providers = [
     categoryId: 4,
     logoUrl: 'myfitnesspal-logo.png',
     websiteUrl: 'https://www.myfitnesspal.com',
-    cancelUrl: 'https://www.myfitnesspal.com/premium/account',
+    cancelUrl: 'https://www.myfitnesspal.com/',
     isPopular: false,
   },
   {
@@ -362,7 +362,7 @@ const providers = [
 
   {
     name: 'iCloud+',
-    categoryId: 5,
+    categoryId: 2,
     logoUrl: 'icloud-plus-logo.png',
     websiteUrl: 'https://www.icloud.com',
     cancelUrl: 'https://support.apple.com/billing',
