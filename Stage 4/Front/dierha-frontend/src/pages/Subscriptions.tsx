@@ -124,6 +124,11 @@ function Subscriptions({
 
     const [subscriptionsData, setSubscriptionsData] = useState<BackendSubscription[]>([]);
     const [loading, setLoading] = useState(true);
+    // يتتبع إذا كان المستخدم عنده اشتراكات سابقة
+    // نحفظه في sessionStorage بحيث لو شاف اشتراكات في نفس الجلسة يبقى true
+    const [hadSubscriptionsBefore, setHadSubscriptionsBefore] = useState<boolean>(() => {
+        return sessionStorage.getItem("dierha_had_subs") === "true";
+    });
 
     useEffect(() => {
         const timer = window.setTimeout(() => {
@@ -150,7 +155,13 @@ function Subscriptions({
                     categoryId
                 );
 
-                setSubscriptionsData(Array.isArray(data) ? data : []);
+                const result = Array.isArray(data) ? data : [];
+                setSubscriptionsData(result);
+                
+                if (result.length > 0) {
+                    sessionStorage.setItem("dierha_had_subs", "true");
+                    setHadSubscriptionsBefore(true);
+                }
             } catch (err) {
                 console.warn("Subscriptions API request failed.", err);
                 
@@ -296,6 +307,8 @@ function Subscriptions({
 
                         <section className="subscriptions-alt-toolbar subscriptions-alt-toolbar-balanced">
                             <div className="subscriptions-toolbar-layout">
+
+                                {/* بحث */}
                                 <div className="subscriptions-search-area">
                                     <input
                                         type="text"
@@ -305,125 +318,131 @@ function Subscriptions({
                                     />
                                 </div>
 
-                                <div className="subscriptions-filter-area">
-                                    <div className="month-year-filter-wrapper category-filter-wrapper">
-                                        <button
-                                            type="button"
-                                            className={activeCategory !== "الكل" ? "month-year-filter-button has-value" : "month-year-filter-button"}
-                                            onClick={() => {
-                                                setIsCategoryPickerOpen((previous) => !previous);
-                                                setIsMonthPickerOpen(false);
-                                            }}
-                                        >
-                                            <span>{activeCategory === "الكل" ? "اختر التصنيف" : activeCategory}</span>
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                                <path d="M3 6h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                <path d="M6 12h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                <path d="M10 18h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                            </svg>
-                                        </button>
-
-                                        {isCategoryPickerOpen && (
-                                            <div className="month-year-picker-popover compact-filter-popover">
-                                                <div className="month-grid category-grid">
-                                                    {categories.map((category) => (
-                                                        <button
-                                                            key={category}
-                                                            type="button"
-                                                            className={activeCategory === category ? "active" : ""}
-                                                            onClick={() => {
-                                                                setActiveCategory(category);
-                                                                setIsCategoryPickerOpen(false);
-                                                            }}
-                                                        >
-                                                            {category}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="month-year-filter-wrapper date-filter-wrapper">
-                                        <button
-                                            type="button"
-                                            className={selectedMonth || selectedYear ? "month-year-filter-button has-value" : "month-year-filter-button"}
-                                            onClick={() => {
-                                                setIsMonthPickerOpen((previous) => !previous);
-                                                setIsCategoryPickerOpen(false);
-                                            }}
-                                        >
-                                            <span>{formatMonthYearFilter(selectedMonth, selectedYear)}</span>
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                                <path d="M7 3V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                <path d="M17 3V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                <path d="M4 9H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                <path d="M6.5 5H17.5C18.8807 5 20 6.11929 20 7.5V18C20 19.6569 18.6569 21 17 21H7C5.34315 21 4 19.6569 4 18V7.5C4 6.11929 5.11929 5 6.5 5Z" stroke="currentColor" strokeWidth="1.8" />
-                                            </svg>
-                                        </button>
-
-                                        {isMonthPickerOpen && (
-                                            <div className="month-year-picker-popover">
-                                                <div className="month-year-picker-header">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            setSelectedYear((previous) =>
-                                                                String(Number(previous || new Date().getFullYear()) - 1)
-                                                            )
-                                                        }
-                                                    >
-                                                        ‹
-                                                    </button>
-
-                                                    <select
-                                                        value={selectedYear || String(new Date().getFullYear())}
-                                                        onChange={(event) => setSelectedYear(event.target.value)}
-                                                    >
-                                                        {yearOptions.map((year) => (
-                                                            <option key={year} value={year}>
-                                                                {year}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            setSelectedYear((previous) =>
-                                                                String(Number(previous || new Date().getFullYear()) + 1)
-                                                            )
-                                                        }
-                                                    >
-                                                        ›
-                                                    </button>
-                                                </div>
-
-                                                <div className="month-grid">
-                                                    {arabicMonthOptions.map((month) => (
-                                                        <button
-                                                            key={month.value}
-                                                            type="button"
-                                                            className={selectedMonth === month.value ? "active" : ""}
-                                                            onClick={() => handleSelectMonth(month.value)}
-                                                        >
-                                                            {month.label}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
+                                {/* تصنيف */}
+                                <div className="month-year-filter-wrapper category-filter-wrapper">
                                     <button
                                         type="button"
-                                        className="clear-all-filters-btn"
-                                        onClick={handleClearAllFilters}
+                                        className={activeCategory !== "الكل" ? "month-year-filter-button has-value" : "month-year-filter-button"}
+                                        onClick={() => {
+                                            setIsCategoryPickerOpen((previous) => !previous);
+                                            setIsMonthPickerOpen(false);
+                                        }}
                                     >
-                                        إعادة تعيين الفلتر
+                                        <span>{activeCategory === "الكل" ? "اختر التصنيف" : activeCategory}</span>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M3 6h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                            <path d="M6 12h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                            <path d="M10 18h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                        </svg>
                                     </button>
 
-                                    <div className="view-mode-toggle" aria-label="طريقة عرض الاشتراكات">
+                                    {isCategoryPickerOpen && (
+                                        <div className="month-year-picker-popover compact-filter-popover">
+                                            <div className="month-grid category-grid">
+                                                {categories.map((category) => (
+                                                    <button
+                                                        key={category}
+                                                        type="button"
+                                                        className={activeCategory === category ? "active" : ""}
+                                                        onClick={() => {
+                                                            setActiveCategory(category);
+                                                            setIsCategoryPickerOpen(false);
+                                                        }}
+                                                    >
+                                                        {category}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* تاريخ */}
+                                <div className="month-year-filter-wrapper date-filter-wrapper">
+                                    <button
+                                        type="button"
+                                        className={selectedMonth || selectedYear ? "month-year-filter-button has-value" : "month-year-filter-button"}
+                                        onClick={() => {
+                                            setIsMonthPickerOpen((previous) => !previous);
+                                            setIsCategoryPickerOpen(false);
+                                        }}
+                                    >
+                                        <span>{formatMonthYearFilter(selectedMonth, selectedYear)}</span>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M7 3V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                            <path d="M17 3V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                            <path d="M4 9H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                            <path d="M6.5 5H17.5C18.8807 5 20 6.11929 20 7.5V18C20 19.6569 18.6569 21 17 21H7C5.34315 21 4 19.6569 4 18V7.5C4 6.11929 5.11929 5 6.5 5Z" stroke="currentColor" strokeWidth="1.8" />
+                                        </svg>
+                                    </button>
+
+                                    {isMonthPickerOpen && (
+                                        <div className="month-year-picker-popover">
+                                            <div className="month-year-picker-header">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setSelectedYear((previous) =>
+                                                            String(Number(previous || new Date().getFullYear()) - 1)
+                                                        )
+                                                    }
+                                                >
+                                                    ‹
+                                                </button>
+
+                                                <select
+                                                    value={selectedYear || String(new Date().getFullYear())}
+                                                    onChange={(event) => setSelectedYear(event.target.value)}
+                                                >
+                                                    {yearOptions.map((year) => (
+                                                        <option key={year} value={year}>
+                                                            {year}
+                                                        </option>
+                                                    ))}
+                                                </select>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setSelectedYear((previous) =>
+                                                            String(Number(previous || new Date().getFullYear()) + 1)
+                                                        )
+                                                    }
+                                                >
+                                                    ›
+                                                </button>
+                                            </div>
+
+                                            <div className="month-grid">
+                                                {arabicMonthOptions.map((month) => (
+                                                    <button
+                                                        key={month.value}
+                                                        type="button"
+                                                        className={selectedMonth === month.value ? "active" : ""}
+                                                        onClick={() => handleSelectMonth(month.value)}
+                                                    >
+                                                        {month.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* مسافة فاضية — تدفع إعادة التعيين وزر الظهور لأقصى اليسار */}
+                                <div style={{ flex: 1 }} />
+
+                                {/* إعادة تعيين الفلتر */}
+                                <button
+                                    type="button"
+                                    className="clear-all-filters-btn"
+                                    onClick={handleClearAllFilters}
+                                >
+                                    إعادة تعيين الفلتر
+                                </button>
+
+                                {/* ظهور الاشتراكات */}
+                                <div className="view-mode-toggle" aria-label="طريقة عرض الاشتراكات">
                                         <button
                                             type="button"
                                             title="عرض كمربعات"
@@ -453,7 +472,6 @@ function Subscriptions({
                                             </svg>
                                         </button>
                                     </div>
-                                </div>
                             </div>
                         </section>
 
@@ -519,7 +537,9 @@ function Subscriptions({
                                     ))
                                 ) : (
                                     <div className="subscriptions-empty-card">
-                                        لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد.
+                                        {hadSubscriptionsBefore
+                                            ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
+                                            : "لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد."}
                                     </div>
                                 )}
                             </section>
@@ -588,7 +608,9 @@ function Subscriptions({
                                     ))
                                 ) : (
                                     <div className="subscriptions-empty-card">
-                                        لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد.
+                                        {hadSubscriptionsBefore
+                                            ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
+                                            : "لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد."}
                                     </div>
                                 )}
                             </section>
