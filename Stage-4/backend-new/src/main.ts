@@ -25,6 +25,7 @@ async function bootstrap() {
   origin: [
     'https://dierha.com',
     'https://www.dierha.com',
+    'https://holbertonschool-portfolio.nada-ghannam19.workers.dev',
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
