@@ -22,11 +22,13 @@ async function bootstrap() {
   const allowedOrigin = process.env.FRONTEND_URL ?? 'http://localhost:5173';
 
   app.enableCors({
-    origin: allowedOrigin,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  });
-
+  origin: [
+    'https://dierha.com',
+    'https://www.dierha.com',
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+});
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
