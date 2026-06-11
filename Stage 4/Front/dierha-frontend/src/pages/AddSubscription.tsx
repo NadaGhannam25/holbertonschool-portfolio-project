@@ -143,7 +143,7 @@ function AddSubscription({
     goToSubscriptions,
 }: AddSubscriptionProps) {
     const [formData, setFormData] = useState<AddSubscriptionForm>({
-        selectedAppId: "netflix",
+        selectedAppId: "",
         customAppName: "",
         cancelUrl: "",
         category: "الترفيه",
@@ -165,22 +165,20 @@ function AddSubscription({
     const renewalDateInputRef = useRef<HTMLInputElement | null>(null);
 
     const selectedApp = useMemo(() => {
-        return (
-            appOptions.find((app) => app.id === formData.selectedAppId) ||
-            appOptions[0]
-        );
+        return appOptions.find((app) => app.id === formData.selectedAppId) || null;
     }, [formData.selectedAppId]);
 
     const appName = useMemo(() => {
+         if (!formData.selectedAppId) return "اختر التطبيق";
          if (formData.selectedAppId === "other") {
           return formData.customAppName.trim();
         }
 
-        return selectedApp.name;
+        return selectedApp?.name ?? "";
     }, [
          formData.selectedAppId,
          formData.customAppName,
-         selectedApp.name,
+         selectedApp,
     ]);
 
     const updateField = (field: keyof AddSubscriptionForm, value: string) => {
@@ -270,7 +268,7 @@ function AddSubscription({
 
                 providerId:
                     formData.selectedAppId !== "other"
-                        ? selectedApp.providerId
+                        ? selectedApp?.providerId
                         : undefined,
 
                 price: normalizedPrice,
@@ -363,14 +361,25 @@ function AddSubscription({
                                     }
                                 >
                                     <div className="app-select-current">
-                                        <span className="app-select-logo">
-                                            {renderAppLogo(selectedApp, appName)}
-                                        </span>
-
-                                        <div>
-                                            <strong>{appName}</strong>
-                                            <p>{selectedApp.category}</p>
-                                        </div>
+                                        {selectedApp ? (
+                                            <>
+                                                <span className="app-select-logo">
+                                                    {renderAppLogo(selectedApp, appName)}
+                                                </span>
+                                                <div>
+                                                    <strong>{appName}</strong>
+                                                    <p>{selectedApp?.category}</p>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="app-select-placeholder">
+                                                <span className="app-select-logo app-select-logo-empty">＋</span>
+                                                <div>
+                                                    <strong>اختر التطبيق</strong>
+                                                    <p>انقر لاختيار الاشتراك</p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <span
