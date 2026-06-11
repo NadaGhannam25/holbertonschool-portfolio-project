@@ -41,28 +41,71 @@ const logoModules = import.meta.glob("../assets/*-logo.png", {
     import: "default",
 }) as Record<string, string>;
 
-const getLogoPath = (fileName?: string) => {
-    if (!fileName) return undefined;
-    return logoModules[`../assets/${fileName}`];
+const logoFileNameMap: Record<string, string> = {
+    // ترفيه
+    "netflix": "netflix-logo.png",
+    "spotify": "spotify-logo.png",
+    "youtube premium": "youtube-premium-logo.png",
+    "shahid": "shahid-logo.png",
+    "osn+": "osn-plus-logo.png",
+    "starzplay": "starzplay-logo.png",
+    "amazon prime": "amazon-prime-logo.png",
+    "apple music": "apple-music-logo.png",
+    "disney+": "disney-plus-logo.png",
+    "deezer": "deezer-logo.png",
+    "crunchyroll": "crunchyroll-logo.png",
+    "twitch turbo": "twitch-turbo-logo.png",
+    "stc tv": "stc-tv-logo.png",
+    "thmanyah": "thmanyah-logo.png",
+
+    // عمل 
+    "canva": "canva-pro-logo.png",
+    "canva pro": "canva-pro-logo.png",
+    "adobe creative cloud": "adobe-creative-cloud-logo.png",
+    "adobe acrobat": "adobe-acrobat-logo.png",
+    "microsoft 365": "microsoft-365-logo.png",
+    "google one": "google-one-logo.png",
+    "dropbox": "dropbox-logo.png",
+    "notion": "notion-plus-logo.png",
+    "notion plus": "notion-plus-logo.png",
+    "chatgpt": "chatgpt-logo.png",
+    "gemini": "gemini-logo.png",
+    "claude": "claude-logo.png",
+    "slack": "slack-logo.png",
+    "zoom": "zoom-logo.png",
+    "figma": "figma-logo.png",
+    "github pro": "github-pro-logo.png",
+    "grammarly": "grammarly-logo.png",
+    "trello": "trello-logo.png",
+    "monday.com": "monday-logo.png",
+    "asana": "asana-logo.png",
+    "jira": "jira-logo.png",
+    "salla": "salla-logo.png",
+    "zid": "zid-logo.png",
+    "icloud+": "icloud-plus-logo.png",
+
+    // تعليم
+    "udemy": "udemy-logo.png",
+    "linkedin learning": "linkedin-learning-logo.png",
+    "quizlet": "quizlet-logo.png",
+
+    // صحة
+    "calm": "calm-logo.png",
+    "headspace": "headspace-logo.png",
+    "myfitnesspal": "myfitnesspal-logo.png",
+    "fitbit premium": "fitbit-premium-logo.png",
+
+    // أخرى
+    "jahez": "jahez-logo.png",
+    "hungerstation": "hungerstation-logo.png",
+    "ninja": "ninja-logo.png",
 };
 
-const logoFileNameMap: Record<string, string> = {
-    Netflix: "netflix-logo.png",
-    Spotify: "spotify-logo.png",
-    "YouTube Premium": "youtube-premium-logo.png",
-    Canva: "canva-pro-logo.png",
-    "Canva Pro": "canva-pro-logo.png",
-    "Adobe Creative Cloud": "adobe-creative-cloud-logo.png",
-    "Microsoft 365": "microsoft-365-logo.png",
-    "Google One": "google-one-logo.png",
-    Dropbox: "dropbox-logo.png",
-    Notion: "notion-plus-logo.png",
-    "Notion Plus": "notion-plus-logo.png",
-    ChatGPT: "chatgpt-logo.png",
-    Shahid: "shahid-logo.png",
-    "OSN+": "osn-plus-logo.png",
-    STARZPLAY: "starzplay-logo.png",
-    "Amazon Prime": "amazon-prime-logo.png",
+const getLogoPath = (name?: string) => {
+    if (!name) return undefined;
+    const fileName = logoFileNameMap[name.toLowerCase().trim()];
+    if (!fileName) return undefined;
+    return logoModules[`../assets/${fileName}`];
 };
 
 const categoryIdMap: Record<string, number> = {
@@ -106,7 +149,6 @@ const formatDate = (date: string) => {
         day: "numeric",
     });
 };
-
 
 const addBillingCycleToDate = (
     dateValue: string,
@@ -247,8 +289,7 @@ function SubscriptionDetails({
         return new Date(b.date).getTime() - new Date(a.date).getTime();
     });
 
-    const localLogoFileName = logoFileNameMap[subscription.provider?.name || subscription.name];
-    const logoPath = getLogoPath(localLogoFileName) || getLogoPath(subscription.provider?.logoUrl || undefined);
+    const logoPath = getLogoPath(subscription.provider?.name || subscription.name);
     const categoryName = subscription.category?.name ?? "أخرى";
     const price = Number(subscription.price).toFixed(2);
     const statusLabel = formatStatus(subscription.status);
@@ -283,6 +324,14 @@ function SubscriptionDetails({
         }
     };
 
+    const hasLogo = logoPath || (
+        subscription.provider?.logoUrl &&
+        /^https?:\/\//i.test(subscription.provider.logoUrl)
+    );
+    const logoContainerStyle = hasLogo
+        ? { background: "#f1f3f9" }
+        : { background: "linear-gradient(135deg, #1D47DA, #020B5C)", color: "#fff" };
+
     return (
         <div className="home-page">
             <header className="top-navigation">
@@ -315,11 +364,21 @@ function SubscriptionDetails({
 
                 <section className="subscription-details-summary">
                     <div className="details-service-main">
-                        <div className="details-service-logo">
+                        <div className="details-service-logo" style={logoContainerStyle}>
                             {logoPath ? (
-                                <img src={logoPath} alt={`${subscription.name} logo`} className="details-service-logo-image" />
-                            ) : subscription.provider?.logoUrl ? (
-                                <img src={subscription.provider.logoUrl} alt={`${subscription.name} logo`} className="details-service-logo-image" />
+                                <img
+                                    src={logoPath}
+                                    alt={`${subscription.name} logo`}
+                                    className="details-service-logo-image"
+                                    style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+                                />
+                            ) : subscription.provider?.logoUrl && /^https?:\/\//i.test(subscription.provider.logoUrl) ? (
+                                <img
+                                    src={subscription.provider.logoUrl}
+                                    alt={`${subscription.name} logo`}
+                                    className="details-service-logo-image"
+                                    style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+                                />
                             ) : (
                                 <span>{subscription.name.charAt(0).toUpperCase()}</span>
                             )}
@@ -349,7 +408,6 @@ function SubscriptionDetails({
                     </div>
                 </section>
 
-                {}
                 <section className="subscription-details-actions" style={{ display: 'flex', gap: '12px' }}>
                     <button
                         type="button"
@@ -368,26 +426,26 @@ function SubscriptionDetails({
                     >
                         حذف الاشتراك
                     </button>
+
                     <button
-        type="button"
-        className="details-cancel-sub-btn highlight-hover-btn"
-        style={{ 
-            flex: 1, 
-            backgroundColor: '#ffffff', 
-            color: '#4b5563', 
-            border: '1px solid #ffffff',
-            padding: '12px', 
-            borderRadius: '16px', 
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
-            transition: 'all 0.3s ease'
-        }}
-        onClick={() => setIsCancelModalOpen(true)}
-    >
-        إلغاء الاشتراك
-                </button>
-                    
+                        type="button"
+                        className="details-cancel-sub-btn highlight-hover-btn"
+                        style={{ 
+                            flex: 1, 
+                            backgroundColor: '#ffffff', 
+                            color: '#4b5563', 
+                            border: '1px solid #ffffff',
+                            padding: '12px', 
+                            borderRadius: '16px', 
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onClick={() => setIsCancelModalOpen(true)}
+                    >
+                        إلغاء الاشتراك
+                    </button>
                 </section>
 
                 <section className="subscription-details-grid details-grid-without-side">
@@ -474,7 +532,6 @@ function SubscriptionDetails({
 
             <Footer goToHome={goToHome} goToSubscriptions={goToSubscriptions} />
 
-            {}
             {isDeleteConfirmOpen && (
                 <div className="delete-confirm-overlay" role="dialog" aria-modal="true">
                     <div className="delete-confirm-card">
@@ -488,8 +545,6 @@ function SubscriptionDetails({
                     </div>
                 </div>
             )}
-
-            
 
             <EditSubscriptionModal
                 isOpen={isEditModalOpen}
@@ -551,13 +606,13 @@ function SubscriptionDetails({
                     }
                 }}
             />
-            <CancelSubscriptionModal
-    isOpen={isCancelModalOpen}
-    onClose={() => setIsCancelModalOpen(false)}
-    subscriptionName={subscription.name}
 
-                cancelUrl={subscription.provider?.cancelUrl ?? subscription.cancelUrl ?? undefined} 
-/>
+            <CancelSubscriptionModal
+                isOpen={isCancelModalOpen}
+                onClose={() => setIsCancelModalOpen(false)}
+                subscriptionName={subscription.name}
+                cancelUrl={subscription.provider?.cancelUrl ?? subscription.cancelUrl ?? undefined}
+            />
         </div>
     );
 }
