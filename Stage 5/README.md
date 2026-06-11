@@ -16,6 +16,7 @@
 
 # 1. Results Summary
 
+
 ## 1.1 Project Overview
 
 Dierha is an Arabic web platform that helps users manage their digital subscriptions from a single dashboard, without linking a bank account.
@@ -29,8 +30,33 @@ The platform enables users to:
 * Analyze monthly and yearly spending patterns
 
 ---
+## 1.2 Project Journey Overview
 
-## 1.2 MVP Feature Completion
+The Dierha project progressed through five structured stages, transforming an initial idea into a fully functional MVP.
+
+### Stage 1: Ideation
+
+The team identified a common challenge faced by many users: managing multiple digital subscriptions and keeping track of renewal dates. Based on this problem, the concept of Dierha was established as an Arabic-first subscription management platform.
+
+### Stage 2: Planning
+
+During the planning stage, the team developed the Project Charter, defined the project scope, established SMART objectives, identified key stakeholders, and created a roadmap for the MVP development process.
+
+### Stage 3: Technical Documentation
+
+The team designed the system architecture, database schema, API specifications, ER diagrams, sequence diagrams, and technical workflows. These documents served as the foundation for implementation and helped reduce ambiguity during development.
+
+### Stage 4: Development and Testing
+
+The MVP was implemented using React, NestJS, PostgreSQL, Drizzle ORM, and Resend API. Core features including authentication, subscription management, spending analytics, email reminders, PDF export, and dashboard reporting were developed and tested. Multiple iterations were performed to resolve integration, timezone, analytics, and user interface challenges.
+
+### Stage 5: Closure and Reflection
+
+The final stage focused on evaluating project outcomes, documenting lessons learned, reflecting on team performance, and preparing the final presentation and demonstration. This stage provided an opportunity to assess the overall success of the project and identify recommendations for future improvements.
+
+---
+
+## 1.3 MVP Feature Completion
 
 | Feature                                                      | Planned | Delivered | Status   |
 | ------------------------------------------------------------ | ------- | --------- | -------- |
@@ -46,17 +72,28 @@ The platform enables users to:
 
 ---
 
-## 1.3 SMART Objectives - Evaluation
+## 1.4 SMART Objectives - Evaluation
 
 | Objective             | Target                                                                                                 | Result                                                                                                               |
-| --------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| --------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | User Management       | 80% of users can register and log in within 1 minutes                                                  | Auth flow is smooth and straightforward; registration and login tested successfully during development               |
 | Subscription Tracking | Full CRUD functionality available by end of Stage 4                                                    | Create, Read, Update, and Delete are all fully functional with category support                                      |
 | Reminders & Insights  | Automated email reminders 1,3 ,and 7 days before renewal; monthly,yearly spending summary on dashboard | Reminder emails implemented via Resend API with Riyadh timezone correction; monthly analytics displayed on dashboard |
 
 ---
 
-## 1.4 Technical Stack Delivered
+## 1.5 Key Project Outcomes
+
+
+- 100% of planned MVP features were successfully delivered.
+- Full CRUD functionality was implemented for subscription management.
+- Automated email reminders were successfully integrated and tested.
+- PDF export functionality was completed and validated.
+- The platform supports both monthly and yearly spending analytics.
+
+---
+## 1.6 Technical Stack Delivered
+
 
 | Layer      | Technology                | Purpose                                                           |
 | ---------- | ------------------------- | ----------------------------------------------------------------- |
@@ -146,7 +183,7 @@ Some tasks were not clearly assigned, leading to:
 
 #### Solution
 
-Better ownership and coordination practices were introduced.Use management tools such as GitHub Project make different.
+Better ownership and coordination practices were introduced, including the use of GitHub Projects to improve task visibility, ownership, and team coordination.
 
 #### Lesson Learned
 
@@ -221,7 +258,6 @@ The team conducted a retrospective session at the end of Stage 4 to evaluate the
 * Explore advanced analytics and personalized insights earlier in the development process to provide greater value to users.
 
 
-Database schema design using Drizzle ORM, Supabase configuration, subscription CRUD functionality, category management 
 ---
 
 ## 3.3 Individual Contributions
