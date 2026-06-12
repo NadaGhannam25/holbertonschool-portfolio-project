@@ -849,7 +849,7 @@ a { text-decoration: none; color: inherit; }
   left: 0;
   width: 8px;
   height: 100%;
-  background: linear-gradient(180deg, var(--logo-blue), var(--logo-navy));
+  background: var(--logo-blue);
   border-radius: var(--radius-medium) 0 0 var(--radius-medium);
 }
 
