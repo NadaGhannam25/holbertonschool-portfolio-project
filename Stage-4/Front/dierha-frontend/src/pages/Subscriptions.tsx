@@ -281,10 +281,12 @@ function Subscriptions({
 
             <main className="dashboard-wrapper">
                 {loading && (
-                    <div className="loading-state-card">
-                        <span className="loading-spinner" />
-                        <strong>جاري تحميل الاشتراكات...</strong>
-                    </div>
+                    <div className="dierha-page-loader">
+  <span className="dierha-page-loader-ring" aria-hidden="true" />
+  <strong className="dierha-page-loader-text">
+    جاري تحميل الاشتراكات...
+  </strong>
+</div>
                 )}
 
                 {!loading && (
