@@ -87,23 +87,24 @@ const team: TeamMember[] = [
     tags: ["Product", "Frontend", "UX/UI"],
     image: nadaPhoto,
   },
+ {
+  name: "شادن العلواني",
+  major: "علوم اقتصاد مالي",
+  description:
+    "تحليل الجانب المالي وتحويل بيانات الاشتراكات إلى قرارات واضحة.",
+  tags: ["Finance", "Backend", "Analysis"],
+  image: shadenPhoto,
+  imageClass: "dl-team-photo-cover dl-team-photo-zoom",
+},
   {
-    name: "شادن العلواني",
-    major: "علوم اقتصاد مالي",
-    description:
-      "تحليل الجانب المالي وتحويل بيانات الاشتراكات إلى قرارات واضحة.",
-    tags: ["Finance", "Backend", "Analysis"],
-    image: shadenPhoto,
-    imageClass: "dl-team-photo-cover",
-  },
-  {
-    name: "سندس الربيش",
-    major: "هندسة كهرباء واتصالات",
-    description:
-      "دعم بناء الأنظمة واختبار التجربة وتدفق البيانات بشكل موثوق.",
-    tags: ["Systems", "Backend", "Testing"],
-    image: sondosPhoto,
-  },
+  name: "سندس الربيش",
+  major: "هندسة كهرباء واتصالات",
+  description:
+    "دعم بناء الأنظمة واختبار التجربة وتدفق البيانات بشكل موثوق.",
+  tags: ["Systems", "Backend", "Testing"],
+  image: sondosPhoto,
+  imageClass: "dl-team-photo-cover dl-team-photo-zoom",
+},
   {
     name: "رهف الحارثي",
     major: "كيمياء",
@@ -553,8 +554,7 @@ export default function DierhaLanding() {
           <div className="dl-container">
             <div className="dl-section-heading">
 
-              <h2>فريق العمل</h2>
-
+    <h2>فريق العمل والتطوير</h2>
               <p>
                 فريق جمع بين التصميم والتطوير والتحليل لتحويل
                 ديرها إلى تجربة رقمية واضحة.
@@ -646,13 +646,48 @@ export default function DierhaLanding() {
           <div>
             <h4>تابعنا</h4>
 
-            <div className="dl-socials">
-              <span>𝕏</span>
-              <span>in</span>
-              <span>◎</span>
-            </div>
-          </div>
-        </div>
+           <div className="dl-socials">
+  <span aria-label="X">𝕏</span>
+
+  <span aria-label="LinkedIn">in</span>
+
+  <span
+    className="dl-instagram-icon"
+    aria-label="Instagram"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <rect
+        x="3"
+        y="3"
+        width="18"
+        height="18"
+        rx="5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+
+      <circle
+        cx="12"
+        cy="12"
+        r="4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+
+      <circle
+        cx="17.5"
+        cy="6.5"
+        r="1"
+        fill="currentColor"
+      />
+    </svg>
+  </span>
+</div>
 
         <div className="dl-container dl-copyright">
           © 2026 ديرها — جميع الحقوق محفوظة
