@@ -1405,3 +1405,23 @@
         height: 230px;
     }
 }
+
+
+.dl-team-grid .dl-team-card:nth-child(2) .dl-team-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    object-fit: cover !important;
+    object-position: center 28% !important;
+    transform: scale(1.22) !important;
+}
+
+
+.dl-team-grid .dl-team-card:nth-child(3) .dl-team-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    object-fit: cover !important;
+    object-position: center 24% !important;
+    transform: scale(1.12) !important;
+}
