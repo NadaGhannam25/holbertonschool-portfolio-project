@@ -341,10 +341,14 @@ function Home({
         return (
             <div className="home-page">
                 <main className="dashboard-wrapper">
-                    <div className="loading-state-card">
-                        <span className="loading-spinner" />
-                        <strong>جاري تحميل بيانات الصفحة الرئيسية...</strong>
-                    </div>
+
+    <div className="dierha-page-loader">
+  <span className="dierha-page-loader-ring" aria-hidden="true" />
+  <strong className="dierha-page-loader-text">
+    جاري تحميل بيانات الصفحة الرئيسية...
+  </strong>
+</div>
+                    
                 </main>
             </div>
         );
