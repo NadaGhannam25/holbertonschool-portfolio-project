@@ -976,8 +976,8 @@
     height: 100%;
     padding: 0;
     object-fit: cover;
-    object-position: center 15%;
-    transform: scale(1.1);
+    object-position: center 10%;
+    transform: scale(1.0);
     transform-origin: center center;
 }
 
@@ -986,8 +986,8 @@
     height: 100%;
     padding: 0;
     object-fit: cover;
-    object-position: center 15%;
-    transform: scale(1.10);
+    object-position: center 10%;
+    transform: scale(1.0);
     transform-origin: center center;
 }
 
