@@ -405,7 +405,7 @@ export default function DierhaLanding() {
                             {features.map((feature) => (
                                 <article className="dl-feature-card" key={feature.title}>
                                     <span className={`dl-feature-icon ${feature.tone}`}>
-                                        {feature.icon}
+                                        <FeatureIcon type={feature.icon} />
                                     </span>
                                     <div>
                                         <h3>{feature.title}</h3>
