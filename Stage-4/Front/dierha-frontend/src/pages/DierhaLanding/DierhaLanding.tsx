@@ -313,41 +313,47 @@ export default function DierhaLanding() {
             </header>
 
             <main>
-                <section className="dl-hero" id="home">
-                    <div className="dl-container dl-hero-grid">
-                        <DashboardPreview />
+               
+<section className="dl-hero" id="home">
+    <div className="dl-container dl-hero-grid">
+        <DashboardPreview />
 
-                        <div className="dl-hero-copy">
-                                <h1>
-                                    جاهز تدير اشتراكاتك
-                            <br />
-                                بشكل <span>صحيح؟</span>
-                                </h1>
-                            </div>
+        <div className="dl-hero-copy">
+            <h1>
+                جاهز تدير اشتراكاتك
+                <br />
+                بشكل <span>صحيح؟</span>
+            </h1>
 
-                            <p>
-                                اجمع اشتراكاتك في مكان واحد، تابع مواعيد التجديد،
-                                وافهم مصروفاتك الشهرية بوضوح وهدوء.
-                            </p>
+            <p>
+                اجمع اشتراكاتك في مكان واحد، تابع مواعيد التجديد،
+                وافهم مصروفاتك الشهرية بوضوح وهدوء.
+            </p>
 
-                            <div className="dl-hero-actions">
-                                <a className="dl-btn dl-btn-primary" href="/login">
-                                    ابدأ الآن
-                                </a>
+            <div className="dl-hero-actions">
+                <a
+                    className="dl-btn dl-btn-primary"
+                    href="/login"
+                >
+                    ابدأ الآن
+                </a>
 
-                                <a className="dl-btn dl-btn-secondary" href="#features">
-                                    استعرض المزايا
-                                </a>
-                            </div>
+                <a
+                    className="dl-btn dl-btn-secondary"
+                    href="#features"
+                >
+                    استعرض المزايا
+                </a>
+            </div>
 
-                            <div className="dl-hero-note">
-                                <span>✓ بدون ربط بنكي</span>
-                                <span>✓ تنبيهات مسبقة</span>
-                                <span>✓ تجربة عربية واضحة</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+            <div className="dl-hero-note">
+                <span>✓ بدون ربط بنكي</span>
+                <span>✓ تنبيهات مسبقة</span>
+                <span>✓ تجربة عربية واضحة</span>
+            </div>
+        </div>
+    </div>
+</section>
 
                 <section className="dl-feature-strip" id="features">
                     <div className="dl-container">
