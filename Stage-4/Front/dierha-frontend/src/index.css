@@ -1620,13 +1620,12 @@ a { text-decoration: none; color: inherit; }
   font-weight: 900;
 }
 
-/* # ADD SUBSCRIPTION */
 .add-subscription-header-v2 {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 1rem;
-  padding: 1.2rem 0.4rem;
+  padding: 1.2rem 1.8rem 1.2rem 0.4rem;
 }
 
 .add-header-icon {
