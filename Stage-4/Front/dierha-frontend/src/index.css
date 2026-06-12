@@ -868,7 +868,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 .metric-card:hover:not(.highlighted) {
-  background: linear-gradient(135deg, var(--logo-blue), var(--logo-navy));
+   background: var(--logo-blue);
 }
 
 .metric-card:hover:not(.highlighted) strong,
