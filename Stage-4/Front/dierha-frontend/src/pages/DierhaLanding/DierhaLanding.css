@@ -1412,8 +1412,8 @@
     height: 100% !important;
     padding: 0 !important;
     object-fit: cover !important;
-    object-position: center 3% !important;
-    transform: scale(0.4) !important;
+    object-position: center 0.1% !important;
+    transform: scale(0.1) !important;
 }
 
 
@@ -1422,6 +1422,6 @@
     height: 100% !important;
     padding: 0 !important;
     object-fit: cover !important;
-    object-position: center 3% !important;
-    transform: scale(0.4) !important;
+    object-position: center 1% !important;
+    transform: scale(0.1) !important;
 }
