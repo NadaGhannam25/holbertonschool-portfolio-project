@@ -98,7 +98,7 @@ const team: TeamMember[] = [
     },
     {
         name: "سندس الربيش",
-        major: "هندسة كهرباء واتصالات",
+        major: "هندسة كهرباء",
         description:
             "دعم بناء الأنظمة واختبار التجربة وتدفق البيانات بشكل موثوق.",
         tags: ["Systems", "Backend", "Testing"],
