@@ -174,7 +174,31 @@ function DashboardPreview() {
 
       <div className="dl-dashboard-card">
         <aside className="dl-dashboard-sidebar">
-          <span className="dl-mini-brand">ديرها</span>
+          <span
+  className="dl-mini-brand dl-sidebar-bell"
+  aria-label="التنبيهات"
+>
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path
+      d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10 21h4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
+  </svg>
+</span>
 
           <span className="active">الرئيسية</span>
 
@@ -188,7 +212,7 @@ function DashboardPreview() {
         <div className="dl-dashboard-content">
           <div className="dl-dashboard-heading">
             <div>
-              <strong>مرحباً محمد</strong>
+              <strong>مرحباً لين</strong>
 
               <small>إجمالي مصاريف الشهر الحالي</small>
             </div>
