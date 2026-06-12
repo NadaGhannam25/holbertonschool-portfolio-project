@@ -318,11 +318,12 @@ export default function DierhaLanding() {
                         <DashboardPreview />
 
                         <div className="dl-hero-copy">
-                            <h1>
-                                اشتراكاتك أوضح
-                                <br />
-                                ومصاريفك <span>أذكى</span>
-                            </h1>
+                                <h1>
+                                    جاهز تدير اشتراكاتك
+                            <br />
+                                بشكل <span>صحيح؟</span>
+                                </h1>
+                            </div>
 
                             <p>
                                 اجمع اشتراكاتك في مكان واحد، تابع مواعيد التجديد،
