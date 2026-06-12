@@ -202,43 +202,121 @@ function InstagramIcon() {
 }
 
 function FeatureIcon({ type }: { type: string }) {
-    if (type === "dashboard") {
-        return (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                <rect x="14" y="14" width="7" height="7" rx="1.5" />
-            </svg>
-        );
-    }
+    switch (type) {
+        case "dashboard":
+            return (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect
+                        x="3.5"
+                        y="3.5"
+                        width="6.5"
+                        height="6.5"
+                        rx="1.8"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                    />
+                    <rect
+                        x="14"
+                        y="3.5"
+                        width="6.5"
+                        height="6.5"
+                        rx="1.8"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                    />
+                    <rect
+                        x="3.5"
+                        y="14"
+                        width="6.5"
+                        height="6.5"
+                        rx="1.8"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                    />
+                    <rect
+                        x="14"
+                        y="14"
+                        width="6.5"
+                        height="6.5"
+                        rx="1.8"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                    />
+                </svg>
+            );
 
-    if (type === "bell") {
-        return (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-                <path d="M10 21h4" />
-            </svg>
-        );
-    }
+        case "bell":
+            return (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                        d="M18 9A6 6 0 0 0 6 9C6 14.2 4 15.8 3.5 17.5H20.5C20 15.8 18 14.2 18 9Z"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                    <path
+                        d="M9.8 20H14.2"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                    />
+                </svg>
+            );
 
-    if (type === "chart") {
-        return (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 19V9" />
-                <path d="M10 19V5" />
-                <path d="M16 19v-7" />
-                <path d="M22 19H2" />
-            </svg>
-        );
-    }
+        case "chart":
+            return (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                        d="M4 19V14"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                    />
+                    <path
+                        d="M10 19V10"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                    />
+                    <path
+                        d="M16 19V6"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                    />
+                    <path
+                        d="M3 19.5H21"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                    />
+                </svg>
+            );
 
-    return (
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z" />
-            <path d="M9.5 12l1.7 1.7L15 10" />
-        </svg>
-    );
+        case "shield":
+            return (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                        d="M12 3.5L19 6.5V11.2C19 15.5 16.3 18.9 12 21C7.7 18.9 5 15.5 5 11.2V6.5L12 3.5Z"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                    <path
+                        d="M9.3 12.2L11.2 14.1L15 10.3"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                </svg>
+            );
+
+        default:
+            return null;
+    }
 }
 
 function DashboardPreview() {
@@ -403,11 +481,17 @@ export default function DierhaLanding() {
 
                         <div className="dl-feature-grid">
                             {features.map((feature) => (
-                                <article className="dl-feature-card" key={feature.title}>
-                                    <span className={`dl-feature-icon ${feature.tone}`}>
+                                <article
+                                    className="dl-feature-card"
+                                    key={feature.title}
+                                >
+                                    <span
+                                        className={`dl-feature-icon ${feature.tone}`}
+                                    >
                                         <FeatureIcon type={feature.icon} />
                                     </span>
-                                    <div>
+
+                                    <div className="dl-feature-content">
                                         <h3>{feature.title}</h3>
                                         <p>{feature.description}</p>
                                     </div>
