@@ -854,7 +854,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 .metric-card.highlighted {
-  background: linear-gradient(135deg, var(--logo-blue), var(--logo-navy));
+ background: var(--logo-blue);
   border-color: rgba(29, 71, 218, 0.25);
   box-shadow: 0 12px 28px rgba(29, 71, 218, 0.16);
   padding-left: 0.95rem;
