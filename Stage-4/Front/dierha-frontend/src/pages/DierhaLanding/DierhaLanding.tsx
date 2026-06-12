@@ -174,10 +174,6 @@ function DashboardPreview() {
 
       <div className="dl-dashboard-card">
         <aside className="dl-dashboard-sidebar">
-          <span
-  className="dl-mini-brand dl-sidebar-bell"
-  aria-label="التنبيهات"
->
   <svg
     viewBox="0 0 24 24"
     aria-hidden="true"
