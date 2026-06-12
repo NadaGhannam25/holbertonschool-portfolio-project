@@ -636,29 +636,76 @@ a { text-decoration: none; color: inherit; }
 
 /* # LOADING */
 .loading-state-card {
-  min-width: min(420px, 92vw);
-  padding: 1.35rem 1.5rem;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-card);
+  min-width: 0;
+  width: max-content;
+  max-width: 92vw;
+  padding: 1.25rem;
+  border-radius: 24px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  color: var(--logo-blue);
+  gap: 1rem;
+  color: var(--logo-navy);
   font-weight: 900;
+  text-align: center;
   margin: min(24vh, 180px) auto;
 }
 
 .loading-spinner {
-  width: 22px;
-  height: 22px;
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
-  border: 3px solid rgba(29, 71, 218, 0.18);
-  border-top-color: var(--logo-blue);
-  animation: dierha-spin 0.85s linear infinite;
+
+  background: conic-gradient(
+    var(--logo-light-blue) 0deg 35deg,
+    #D9DEE8 35deg 45deg,
+
+    var(--logo-blue) 45deg 80deg,
+    #D9DEE8 80deg 90deg,
+
+    var(--logo-navy) 90deg 125deg,
+    #D9DEE8 125deg 135deg,
+
+    var(--logo-pink) 135deg 170deg,
+    #D9DEE8 170deg 180deg,
+
+    var(--logo-light-blue) 180deg 215deg,
+    #D9DEE8 215deg 225deg,
+
+    var(--logo-blue) 225deg 260deg,
+    #D9DEE8 260deg 270deg,
+
+    var(--logo-navy) 270deg 305deg,
+    #D9DEE8 305deg 315deg,
+
+    var(--logo-pink) 315deg 350deg,
+    #D9DEE8 350deg 360deg
+  );
+
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 11px),
+    #000 0
+  );
+
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 11px),
+    #000 0
+  );
+
+  animation: dierha-spin 1s linear infinite;
   flex-shrink: 0;
+}
+
+@keyframes dierha-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes dierha-spin {
