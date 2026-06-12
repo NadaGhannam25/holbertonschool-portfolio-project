@@ -986,8 +986,8 @@
     height: 100%;
     padding: 0;
     object-fit: cover;
-    object-position: center 22%;
-    transform: scale(1.9);
+    object-position: center 20%;
+    transform: scale(1.28);
     transform-origin: center center;
 }
 
