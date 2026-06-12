@@ -716,7 +716,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 .overview-date-card {
-  background: linear-gradient(135deg, var(--logo-navy), var(--logo-blue));
+  background: var(--logo-blue);
   color: var(--white);
   padding: 1rem 1.1rem;
   display: flex;
