@@ -2886,3 +2886,91 @@ a { text-decoration: none; color: inherit; }
   width: 100%;
   text-align: right;
 }
+
+/* ===== FINAL DIERHA PAGE LOADER ===== */
+.dierha-page-loader {
+  width: 100%;
+  min-height: calc(100vh - 165px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: transparent;
+  text-align: center;
+}
+
+.dierha-page-loader-ring {
+  display: block;
+  width: 92px;
+  height: 92px;
+  flex-shrink: 0;
+  border-radius: 50%;
+
+  background-color: #D9DEE8;
+
+  background-image: conic-gradient(
+    var(--logo-light-blue) 0deg 18deg,
+    transparent 18deg 30deg,
+
+    #58A7F1 30deg 48deg,
+    transparent 48deg 60deg,
+
+    var(--logo-blue) 60deg 78deg,
+    transparent 78deg 90deg,
+
+    #667EEA 90deg 108deg,
+    transparent 108deg 120deg,
+
+    #7C83F6 120deg 138deg,
+    transparent 138deg 150deg,
+
+    #9472ED 150deg 168deg,
+    transparent 168deg 180deg,
+
+    var(--logo-pink) 180deg 198deg,
+    transparent 198deg 210deg,
+
+    #9472ED 210deg 228deg,
+    transparent 228deg 240deg,
+
+    #7C83F6 240deg 258deg,
+    transparent 258deg 270deg,
+
+    #667EEA 270deg 288deg,
+    transparent 288deg 300deg,
+
+    var(--logo-blue) 300deg 318deg,
+    transparent 318deg 330deg,
+
+    var(--logo-light-blue) 330deg 348deg,
+    transparent 348deg 360deg
+  );
+
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 12px),
+    #000 calc(100% - 11px)
+  );
+
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 12px),
+    #000 calc(100% - 11px)
+  );
+
+  animation: dierha-page-loader-spin 1.1s linear infinite;
+}
+
+.dierha-page-loader-text {
+  color: #667085;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.7;
+}
+
+@keyframes dierha-page-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
