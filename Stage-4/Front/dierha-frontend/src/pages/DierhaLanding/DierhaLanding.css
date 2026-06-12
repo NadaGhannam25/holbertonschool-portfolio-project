@@ -1,4 +1,3 @@
-
 @import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap");
 
 .dierha-landing-page {
@@ -596,6 +595,17 @@
     font-weight: 900;
 }
 
+.dl-feature-icon svg {
+    width: 23px;
+    height: 23px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 .dl-feature-icon.blue {
     color: var(--dl-blue);
     background: #edf3ff;
@@ -976,8 +986,8 @@
     height: 100%;
     padding: 0;
     object-fit: cover;
-    object-position: center 10%;
-    transform: scale(1.0);
+    object-position: center 24%;
+    transform: scale(1.9);
     transform-origin: center center;
 }
 
@@ -986,8 +996,8 @@
     height: 100%;
     padding: 0;
     object-fit: cover;
-    object-position: center 10%;
-    transform: scale(1.0);
+    object-position: center 22%;
+    transform: scale(1.95);
     transform-origin: center center;
 }
 
