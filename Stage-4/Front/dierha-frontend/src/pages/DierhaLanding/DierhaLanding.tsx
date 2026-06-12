@@ -201,6 +201,46 @@ function InstagramIcon() {
     );
 }
 
+function FeatureIcon({ type }: { type: string }) {
+    if (type === "dashboard") {
+        return (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                <rect x="14" y="14" width="7" height="7" rx="1.5" />
+            </svg>
+        );
+    }
+
+    if (type === "bell") {
+        return (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+                <path d="M10 21h4" />
+            </svg>
+        );
+    }
+
+    if (type === "chart") {
+        return (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 19V9" />
+                <path d="M10 19V5" />
+                <path d="M16 19v-7" />
+                <path d="M22 19H2" />
+            </svg>
+        );
+    }
+
+    return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z" />
+            <path d="M9.5 12l1.7 1.7L15 10" />
+        </svg>
+    );
+}
+
 function DashboardPreview() {
     return (
         <div className="dl-preview-wrap" aria-label="معاينة لوحة تحكم ديرها">
