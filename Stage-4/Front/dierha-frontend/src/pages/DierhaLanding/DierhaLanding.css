@@ -998,7 +998,7 @@
     padding: 0;
     object-fit: cover;
     object-position: center 5%;
-    transform: scale(1);
+    transform: scale(0.7);
     transform-origin: center center;
 }
 
@@ -1008,7 +1008,7 @@
     padding: 0;
     object-fit: cover;
     object-position: center 5%;
-    transform: scale(1);
+    transform: scale(0.7);
     transform-origin: center center;
 }
 
