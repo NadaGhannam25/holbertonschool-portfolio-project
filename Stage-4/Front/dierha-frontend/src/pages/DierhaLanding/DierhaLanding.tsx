@@ -358,7 +358,6 @@ export default function DierhaLanding() {
                 <section className="dl-feature-strip" id="features">
                     <div className="dl-container">
                         <div className="dl-section-heading compact">
-                            <span>كل شيء أمامك بوضوح</span>
                             <h2>مزايا ديرها</h2>
                         </div>
 
