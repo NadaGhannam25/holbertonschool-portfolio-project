@@ -258,18 +258,24 @@ function SubscriptionDetails({
         loadSubscription();
     }, [subscriptionId]);
 
-    if (loading) {
-        return (
-            <div className="home-page">
-                <main className="dashboard-wrapper loading-page-center">
-                   <div className="dierha-page-loader">
-  <span className="dierha-page-loader-ring" aria-hidden="true" />
-  <strong className="dierha-page-loader-text">
-    جاري تحميل بيانات الاشتراك...
-  </strong>
-</div>
-        );
-    }
+  if (loading) {
+  return (
+    <div className="home-page">
+      <main className="dashboard-wrapper loading-page-center">
+        <div className="dierha-page-loader">
+          <span
+            className="dierha-page-loader-ring"
+            aria-hidden="true"
+          />
+
+          <strong className="dierha-page-loader-text">
+            جاري تحميل بيانات الاشتراك...
+          </strong>
+        </div>
+      </main>
+    </div>
+  );
+}
 
     if (error || !subscription) {
         return (
