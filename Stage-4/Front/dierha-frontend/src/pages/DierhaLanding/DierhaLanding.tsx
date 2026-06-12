@@ -292,9 +292,6 @@ export default function DierhaLanding() {
             <DashboardPreview />
 
             <div className="dl-hero-copy">
-              <span className="dl-eyebrow">
-                إدارة أذكى لاشتراكاتك
-              </span>
 
               <h1>
                 اشتراكاتك أوضح
@@ -371,10 +368,8 @@ export default function DierhaLanding() {
         >
           <div className="dl-container dl-story-grid">
             <div className="dl-story-copy">
-              <span className="dl-section-kicker">
-                قصة المشروع
-              </span>
-
+             
+              <h2>قصة المشروع</h2>
               <h2>ليش بدأنا ديرها؟</h2>
 
               <p>
@@ -425,9 +420,6 @@ export default function DierhaLanding() {
         >
           <div className="dl-container">
             <div className="dl-section-heading">
-              <span className="dl-section-kicker">
-                تجربة بسيطة
-              </span>
 
               <h2>كيف تعمل ديرها؟</h2>
 
@@ -459,9 +451,6 @@ export default function DierhaLanding() {
         <section className="dl-section dl-insight-section">
           <div className="dl-container dl-insight-grid">
             <div className="dl-insight-copy">
-              <span className="dl-section-kicker">
-                قرارات مالية أوضح
-              </span>
 
               <h2>رؤية واضحة لقرارات أفضل</h2>
 
@@ -523,9 +512,7 @@ export default function DierhaLanding() {
             </div>
 
             <div>
-              <span className="dl-section-kicker">
-                ليش تحتاج ديرها؟
-              </span>
+  
 
               <h2>لماذا ديرها؟</h2>
 
@@ -545,9 +532,6 @@ export default function DierhaLanding() {
         >
           <div className="dl-container">
             <div className="dl-section-heading">
-              <span className="dl-section-kicker">
-                من صنع التجربة
-              </span>
 
               <h2>فريق العمل</h2>
 
