@@ -32,25 +32,25 @@ const features: Feature[] = [
     {
         title: "لوحة تحكم موحدة",
         description: "جميع اشتراكاتك في مكان واحد لمتابعة أسهل وأسرع.",
-        icon: "▦",
+        icon: "dashboard",
         tone: "blue",
     },
     {
         title: "تنبيهات قبل التجديد",
         description: "لن تفاجئك أي عملية تجديد بعد الآن.",
-        icon: "◴",
+        icon: "bell",
         tone: "pink",
     },
     {
         title: "تحليل المصروفات",
         description: "تقارير شهرية ورسوم واضحة لفهم إنفاقك.",
-        icon: "↗",
+        icon: "chart",
         tone: "purple",
     },
     {
         title: "خصوصية أعلى",
         description: "بياناتك آمنة ولا تحتاجين لربط حسابك البنكي.",
-        icon: "◇",
+        icon: "shield",
         tone: "navy",
     },
 ];
