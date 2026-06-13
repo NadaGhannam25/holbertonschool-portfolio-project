@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import "./DierhaLanding.css";
 
 import dierhaLogo from "./assets/dierha-logo.png";
@@ -408,20 +410,75 @@ function DashboardPreview() {
 }
 
 export default function DierhaLanding() {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const closeMobileMenu = () => {
+        setMobileMenuOpen(false);
+    };
+
     return (
         <div className="dierha-landing-page" dir="rtl">
             <header className="dl-header">
                 <div className="dl-container dl-nav-wrap">
-                    <a className="dl-brand" href="#home" aria-label="ديرها - الرئيسية">
+                    <a
+                        className="dl-brand"
+                        href="#home"
+                        aria-label="ديرها - الرئيسية"
+                        onClick={closeMobileMenu}
+                    >
                         <img src={dierhaLogo} alt="ديرها" />
                     </a>
 
-                    <nav className="dl-nav" aria-label="روابط الصفحة الرئيسية">
-                        <a className="active" href="#home">الرئيسية</a>
-                        <a href="#features">المزايا</a>
-                        <a href="#how">كيف تعمل</a>
-                        <a href="#story">القصة</a>
-                        <a href="#team">الفريق</a>
+                    <button
+                        type="button"
+                        className={`dl-mobile-menu-button ${
+                            mobileMenuOpen ? "is-open" : ""
+                        }`}
+                        aria-label="فتح وإغلاق القائمة"
+                        aria-expanded={mobileMenuOpen}
+                        aria-controls="dierha-mobile-menu"
+                        onClick={() =>
+                            setMobileMenuOpen((current) => !current)
+                        }
+                    >
+                        <span />
+                        <span />
+                        <span />
+                    </button>
+
+                    <nav
+                        id="dierha-mobile-menu"
+                        className={`dl-nav ${
+                            mobileMenuOpen ? "dl-nav-mobile-open" : ""
+                        }`}
+                        aria-label="روابط الصفحة الرئيسية"
+                    >
+                        <a
+                            className="active"
+                            href="#home"
+                            onClick={closeMobileMenu}
+                        >
+                            الرئيسية
+                        </a>
+                        <a href="#features" onClick={closeMobileMenu}>
+                            المزايا
+                        </a>
+                        <a href="#how" onClick={closeMobileMenu}>
+                            كيف تعمل
+                        </a>
+                        <a href="#story" onClick={closeMobileMenu}>
+                            القصة
+                        </a>
+                        <a href="#team" onClick={closeMobileMenu}>
+                            الفريق
+                        </a>
+                        <a
+                            className="dl-mobile-menu-cta"
+                            href="/login"
+                            onClick={closeMobileMenu}
+                        >
+                            ابدأ الآن
+                        </a>
                     </nav>
 
                     <a className="dl-header-cta" href="/login">
