@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import logo from "../assets/dierha-logo.png";
+import AuthenticatedHeader from "../components/AuthenticatedHeader";
 import Footer from "../components/Footer";
 import CancelSubscriptionModal from "../components/CancelSubscriptionModal";
-import SettingsDropdown from "../components/SettingsDropdown";
 import ToastMessage from "../components/ToastMessage";
 import EditSubscriptionModal from "../components/EditSubscriptionModal";
 import { 
@@ -340,18 +339,12 @@ function SubscriptionDetails({
 
     return (
         <div className="home-page">
-            <header className="top-navigation">
-                <div className="nav-brand">
-                    <img src={logo} alt="Dierha Logo" />
-                </div>
-                <nav className="nav-menu" aria-label="Main navigation">
-                    <button type="button" className="nav-link" onClick={goToHome}>الرئيسية</button>
-                    <button type="button" className="nav-link active" onClick={goToSubscriptions}>الاشتراكات</button>
-                </nav>
-                <div className="nav-user-area">
-                    <SettingsDropdown onLogout={onLogout} />
-                </div>
-            </header>
+            <AuthenticatedHeader
+                activePage="subscriptions"
+                onLogout={onLogout}
+                goToHome={goToHome}
+                goToSubscriptions={goToSubscriptions}
+            />
 
             <main className="dashboard-wrapper">
                 <ToastMessage message={toastMessage} type={toastType} />
