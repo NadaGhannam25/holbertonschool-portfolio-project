@@ -1554,7 +1554,7 @@
     padding: 0 !important;
     object-fit: cover !important;
     object-position: center 28% !important;
-    transform: scale(1.0) !important;
+    transform: scale(1.10) !important;
 }
 
 
@@ -1564,5 +1564,5 @@
     padding: 0 !important;
     object-fit: cover !important;
     object-position: center 24% !important;
-    transform: scale(1.0) !important;
+    transform: scale(1.10) !important;
 }
