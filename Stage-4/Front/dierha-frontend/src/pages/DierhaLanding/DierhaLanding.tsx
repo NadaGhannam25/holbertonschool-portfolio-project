@@ -28,6 +28,8 @@ type TeamMember = {
     tags: string[];
     image: string;
     imageClass?: string;
+    linkedin: string;
+    github: string;
 };
 
 const features: Feature[] = [
@@ -88,6 +90,8 @@ const team: TeamMember[] = [
             "تصميم تجربة المستخدم وربط الواجهة بفكرة المنتج واحتياج المستخدم.",
         tags: ["Product", "Frontend", "UX/UI"],
         image: nadaPhoto,
+        linkedin: "https://www.linkedin.com/in/nada-al-mutairi-77102325b",
+        github: "https://github.com/NadaGhannam25",
     },
     {
         name: "شادن العلواني",
@@ -97,6 +101,8 @@ const team: TeamMember[] = [
         tags: ["Finance", "Backend", "Analysis"],
         image: shadenPhoto,
         imageClass: "dl-team-photo-cover dl-team-photo-zoom-shaden",
+        linkedin: "https://www.linkedin.com/in/shadenal-alwani/?locale=en",
+        github: "https://github.com/Shadenm-404",
     },
     {
         name: "سندس الربيش",
@@ -106,6 +112,8 @@ const team: TeamMember[] = [
         tags: ["Systems", "Backend", "Testing"],
         image: sondosPhoto,
         imageClass: "dl-team-photo-cover dl-team-photo-zoom-sondos",
+        linkedin: "https://www.linkedin.com/in/sondosalrubaish/",
+        github: "https://github.com/sondos04",
     },
     {
         name: "رهف الحارثي",
@@ -114,6 +122,8 @@ const team: TeamMember[] = [
             "البحث والتوثيق وتنظيم تفاصيل المشروع وصياغة المحتوى بدقة.",
         tags: ["Research", "Frontend", "Docs"],
         image: rahafPhoto,
+        linkedin: "https://www.linkedin.com/in/rahaf-alharthi-573531354/",
+        github: "https://github.com/rahafalharthi1111-png",
     },
     {
         name: "ريناد الزعيبر",
@@ -122,6 +132,8 @@ const team: TeamMember[] = [
             "بناء قاعدة البيانات وربط الخدمات التقنية وتحسين منطق النظام.",
         tags: ["Backend", "DB", "API"],
         image: renadPhoto,
+        linkedin: "https://www.linkedin.com/in/rinad-fahad-735a3830a",
+        github: "https://github.com/Rinadfahadz",
     },
 ];
 
@@ -319,6 +331,29 @@ function FeatureIcon({ type }: { type: string }) {
         default:
             return null;
     }
+}
+
+
+function LinkedInIcon() {
+    return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+                fill="currentColor"
+                d="M6.5 8.4H3.2V20.8H6.5V8.4ZM4.9 3.2C3.8 3.2 3 4 3 5C3 6.1 3.8 6.9 4.9 6.9C6 6.9 6.8 6.1 6.8 5C6.8 4 6 3.2 4.9 3.2ZM13 8.4H9.8V20.8H13V14.7C13 13.1 13.3 11.5 15.3 11.5C17.2 11.5 17.2 13.3 17.2 14.8V20.8H20.5V14C20.5 10.7 19.8 8.1 15.9 8.1C14.1 8.1 12.9 9.1 12.4 10H12.3V8.4H13Z"
+            />
+        </svg>
+    );
+}
+
+function GitHubIcon() {
+    return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+                fill="currentColor"
+                d="M12 2.5C6.5 2.5 2 7 2 12.6C2 17 4.9 20.7 8.9 22C9.4 22.1 9.6 21.8 9.6 21.5V19.6C6.8 20.2 6.2 18.4 6.2 18.4C5.7 17.2 5.1 16.9 5.1 16.9C4.2 16.3 5.2 16.3 5.2 16.3C6.2 16.4 6.7 17.3 6.7 17.3C7.6 18.8 9 18.4 9.6 18.1C9.7 17.5 10 17 10.3 16.8C8.1 16.5 5.8 15.7 5.8 11.8C5.8 10.7 6.2 9.8 6.8 9.1C6.7 8.8 6.4 7.8 6.9 6.4C6.9 6.4 7.7 6.1 9.6 7.4C10.4 7.2 11.2 7.1 12 7.1C12.8 7.1 13.6 7.2 14.4 7.4C16.3 6.1 17.1 6.4 17.1 6.4C17.6 7.8 17.3 8.8 17.2 9.1C17.8 9.8 18.2 10.7 18.2 11.8C18.2 15.7 15.9 16.5 13.7 16.8C14.1 17.1 14.4 17.7 14.4 18.6V21.5C14.4 21.8 14.6 22.1 15.1 22C19.1 20.7 22 17 22 12.6C22 7 17.5 2.5 12 2.5Z"
+            />
+        </svg>
+    );
 }
 
 function DashboardPreview() {
@@ -709,6 +744,28 @@ export default function DierhaLanding() {
                                         {member.tags.map((tag) => (
                                             <span key={tag}>{tag}</span>
                                         ))}
+                                    </div>
+
+                                    <div className="dl-team-socials">
+                                        <a
+                                            href={member.linkedin}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            aria-label={`LinkedIn - ${member.name}`}
+                                            title={`LinkedIn - ${member.name}`}
+                                        >
+                                            <LinkedInIcon />
+                                        </a>
+
+                                        <a
+                                            href={member.github}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            aria-label={`GitHub - ${member.name}`}
+                                            title={`GitHub - ${member.name}`}
+                                        >
+                                            <GitHubIcon />
+                                        </a>
                                     </div>
                                 </article>
                             ))}
