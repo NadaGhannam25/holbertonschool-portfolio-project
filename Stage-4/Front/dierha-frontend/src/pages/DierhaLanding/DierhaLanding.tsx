@@ -106,10 +106,10 @@ const team: TeamMember[] = [
     },
     {
         name: "سندس الربيش",
-        major: "هندسة كهرباء",
+        major: "هندسة كهربائية واتصالات",
         description:
             "دعم بناء الأنظمة واختبار التجربة وتدفق البيانات بشكل موثوق.",
-        tags: ["Systems", "Backend", "Testing"],
+        tags: ["DB", "Backend", "Testing"],
         image: sondosPhoto,
         imageClass: "dl-team-photo-cover dl-team-photo-zoom-sondos",
         linkedin: "https://www.linkedin.com/in/sondosalrubaish/",
@@ -120,7 +120,7 @@ const team: TeamMember[] = [
         major: "كيمياء",
         description:
             "البحث والتوثيق وتنظيم تفاصيل المشروع وصياغة المحتوى بدقة.",
-        tags: ["Research", "Frontend", "Docs"],
+        tags: ["Research", "Frontend", "UX/UI"],
         image: rahafPhoto,
         linkedin: "https://www.linkedin.com/in/rahaf-alharthi-573531354/",
         github: "https://github.com/rahafalharthi1111-png",
@@ -130,7 +130,7 @@ const team: TeamMember[] = [
         major: "علوم حاسب",
         description:
             "بناء قاعدة البيانات وربط الخدمات التقنية وتحسين منطق النظام.",
-        tags: ["Frontend", "DB", "Testing"],
+        tags: ["Frontend", "UX/UI", "Testing"],
         image: renadPhoto,
         linkedin: "https://www.linkedin.com/in/rinad-fahad-735a3830a",
         github: "https://github.com/Rinadfahadz",
