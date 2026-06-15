@@ -109,7 +109,9 @@ function Login({
                     </div>
 
                     <button type="submit" className="primary-btn" disabled={isLoading}>
-                        {isLoading ? "جاري تسجيل الدخول..." : "دخول"}
+                        {isLoading ? (
+                            <><span className="btn-spinner" />جاري تسجيل الدخول</>
+                        ) : "دخول"}
                     </button>
                 </form>
 
