@@ -552,6 +552,23 @@ a { text-decoration: none; color: inherit; }
   cursor: not-allowed;
 }
 
+.btn-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  animation: btn-spin 0.75s linear infinite;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+}
+
 .auth-switch {
   margin-top: 20px;
   text-align: center;
@@ -1561,7 +1578,6 @@ a { text-decoration: none; color: inherit; }
   transform: translateX(-2px);
 }
 
-/* List view */
 .subscriptions-list-view {
   display: flex;
   flex-direction: column;
@@ -2755,7 +2771,7 @@ a { text-decoration: none; color: inherit; }
 
 .notifications-bell { display: none !important; }
 
-.pdf-info-modal { max-width: 420px; }
+=.pdf-info-modal { max-width: 420px; }
 .pdf-info-modal .edit-modal-header { text-align: right; }
 .pdf-info-modal .single-action { grid-template-columns: 1fr !important; }
 
