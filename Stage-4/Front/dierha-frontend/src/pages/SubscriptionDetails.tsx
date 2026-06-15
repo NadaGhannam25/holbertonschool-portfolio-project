@@ -288,11 +288,17 @@ function SubscriptionDetails({
         );
     }
 
-    const sortedPayments = [...paymentsData].sort((a, b) => {
-        if (a.status === "upcoming" && b.status !== "upcoming") return -1;
-        if (a.status !== "upcoming" && b.status === "upcoming") return 1;
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
+    const sortedPayments = [...paymentsData]
+        .filter((payment) => {
+            // الاشتراك الغير نشط لا يملك دفعات قادمة
+            if (subscription.status === "inactive" && payment.status === "upcoming") return false;
+            return true;
+        })
+        .sort((a, b) => {
+            if (a.status === "upcoming" && b.status !== "upcoming") return -1;
+            if (a.status !== "upcoming" && b.status === "upcoming") return 1;
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
 
     const logoPath = getLogoPath(subscription.provider?.name || subscription.name);
     const categoryName = subscription.category?.name ?? "أخرى";
