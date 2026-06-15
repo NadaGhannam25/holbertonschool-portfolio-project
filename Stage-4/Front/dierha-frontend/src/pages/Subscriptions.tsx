@@ -272,9 +272,6 @@ function Subscriptions({
                         <strong className="dierha-page-loader-text">
                             جاري تحميل الاشتراكات...
                         </strong>
-                        <p style={{ color: "#6E87C0", fontSize: "14px", marginTop: "12px", textAlign: "center" }}>
-                            قد يستغرق الاتصال الأول دقيقة واحدة بسبب إيقاظ الخادم
-                        </p>
                     </div>
                 )}
 
