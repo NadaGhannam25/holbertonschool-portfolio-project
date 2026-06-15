@@ -268,11 +268,14 @@ function Subscriptions({
             <main className="dashboard-wrapper">
                 {loading && (
                     <div className="dierha-page-loader">
-  <span className="dierha-page-loader-ring" aria-hidden="true" />
-  <strong className="dierha-page-loader-text">
-    جاري تحميل الاشتراكات...
-  </strong>
-</div>
+                        <span className="dierha-page-loader-ring" aria-hidden="true" />
+                        <strong className="dierha-page-loader-text">
+                            جاري تحميل الاشتراكات...
+                        </strong>
+                        <p style={{ color: "#6E87C0", fontSize: "14px", marginTop: "12px", textAlign: "center" }}>
+                            قد يستغرق الاتصال الأول دقيقة واحدة بسبب إيقاظ الخادم
+                        </p>
+                    </div>
                 )}
 
                 {!loading && (
