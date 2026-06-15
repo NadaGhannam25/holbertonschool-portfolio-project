@@ -93,7 +93,10 @@ function SettingsDropdown({ onLogout }: SettingsDropdownProps) {
         aria-label="فتح إعدادات الحساب"
       >
         <span className="profile-icon" aria-hidden="true">
-          {userInitial}
+          <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" />
+          </svg>
         </span>
 
         <strong>{user?.name || "مستخدم"}</strong>
@@ -255,6 +258,7 @@ function SettingsDropdown({ onLogout }: SettingsDropdownProps) {
           >
             <span>الدعم والمساعدة</span>
             <span className={`support-left-arrow ${isSupportOpen ? "open" : ""}`}>
+              ‹
             </span>
           </button>
 
@@ -274,6 +278,11 @@ function SettingsDropdown({ onLogout }: SettingsDropdownProps) {
               >
                 support@dierha.com
               </a>
+
+              <div>
+                <span>رقم التواصل</span>
+                <strong>+966 00 000 0000</strong>
+              </div>
             </div>
           )}
 
