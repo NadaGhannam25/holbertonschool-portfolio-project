@@ -495,12 +495,13 @@ export default function DierhaLanding() {
                         <a href="#features" onClick={closeMobileMenu}>
                             المزايا
                         </a>
-                        <a href="#how" onClick={closeMobileMenu}>
-                            كيف تعمل
-                        </a>
-                        <a href="#story" onClick={closeMobileMenu}>
+                         <a href="#story" onClick={closeMobileMenu}>
                             القصة
                         </a>
+                        <a href="#how" onClick={closeMobileMenu}>
+                            كيف تبدأ
+                        </a>
+                       
                         <a href="#team" onClick={closeMobileMenu}>
                             الفريق
                         </a>
@@ -534,7 +535,7 @@ export default function DierhaLanding() {
 
             <p>
                 اجمع اشتراكاتك في مكان واحد، تابع مواعيد التجديد،
-                وافهم مصروفاتك الشهرية بوضوح وهدوء.
+                وافهم مصاريفك الشهرية بوضوح وهدوء.
             </p>
 
             <div className="dl-hero-actions">
@@ -614,9 +615,9 @@ export default function DierhaLanding() {
                             </div>
 
                             <div className="dl-floating-saving">
-                                <small>وفّرت هذا الشهر</small>
+                                <small>اشتراكاتك لهذا الشهر</small>
                                 <strong>127 ريال</strong>
-                                <span>بإلغاء اشتراكين غير مستخدمين</span>
+                                <span>أكثر اشتراك تم الانفاق عليه هو Netflix</span>
                             </div>
                         </div>
                     </div>
@@ -625,7 +626,7 @@ export default function DierhaLanding() {
                 <section className="dl-section dl-how-section" id="how">
                     <div className="dl-container">
                         <div className="dl-section-heading">
-                            <h2>كيف تعمل ديرها؟</h2>
+                            <h2>كيف تبدأ مع ديرها؟</h2>
                             <p>
                                 أربع خطوات واضحة تساعدك تفهم اشتراكاتك وتتحكم فيها.
                             </p>
@@ -650,7 +651,7 @@ export default function DierhaLanding() {
 
                             <p>
                                 نمنحك أرقامًا سهلة القراءة تساعدك على إدارة اشتراكاتك
-                                بثقة، ومعرفة مصروفاتك الشهرية أفضل.
+                                بثقة، ومعرفة مصاريفك الشهرية أفضل.
                             </p>
 
                             <div className="dl-insight-checks">
@@ -683,7 +684,7 @@ export default function DierhaLanding() {
                 <section className="dl-section dl-team-section" id="team">
                     <div className="dl-container">
                         <div className="dl-section-heading">
-                            <h2>فريق العمل والتطوير</h2>
+                            <h2>فريق العمل</h2>
                             <p>
                                 فريق جمع بين التصميم والتطوير والتحليل لتحويل ديرها
                                 إلى تجربة رقمية واضحة.
@@ -742,9 +743,6 @@ export default function DierhaLanding() {
                     <div className="dl-container dl-cta-box">
                         <div>
                             <h2>جاهز تدير اشتراكاتك صح؟</h2>
-                            <p>
-                                تابع التجديدات والمصروفات والتنبيهات من مكان واحد.
-                            </p>
                         </div>
 
                         <a href="/login">ابدأ الآن</a>
@@ -757,7 +755,7 @@ export default function DierhaLanding() {
                     <div className="dl-footer-brand">
                         <img src={dierhaLogo} alt="ديرها" />
                         <p>
-                            ديرها يساعدك على تنظيم اشتراكاتك ومتابعة مصروفاتك
+                            ديرها يساعدك على تنظيم اشتراكاتك ومتابعة مصاريفك
                             ومواعيد التجديد بسهولة.
                         </p>
                     </div>
@@ -767,7 +765,7 @@ export default function DierhaLanding() {
                         <a href="#home">الرئيسية</a>
                         <a href="#features">المزايا</a>
                         <a href="#story">قصتنا</a>
-                        <a href="#how">الفريق</a>
+                        <a href="#team">الفريق</a>
                     </div>
 
                     <div>
