@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap");
 
 .dierha-landing-page {
     --dl-navy: #07145f;
@@ -21,8 +21,7 @@
     overflow-x: hidden;
     color: var(--dl-text);
     font-family:
-        "IBM Plex Sans Arabic",
-        "Alexandria",
+        "Tajawal",
         system-ui,
         sans-serif;
     line-height: 1.7;
