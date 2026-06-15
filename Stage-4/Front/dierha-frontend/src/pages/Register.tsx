@@ -145,7 +145,9 @@ function Register({
                     </div>
 
                     <button type="submit" className="primary-btn" disabled={isLoading}>
-                        {isLoading ? "جاري إنشاء الحساب..." : "إنشاء الحساب"}
+                        {isLoading ? (
+                            <><span className="btn-spinner" />جاري إنشاء الحساب</>
+                        ) : "إنشاء الحساب"}
                     </button>
                 </form>
 
