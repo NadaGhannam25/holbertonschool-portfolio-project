@@ -1,14 +1,11 @@
-/* # FONTS */
 @import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap");
 
-/* # RESET */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* # THEME VARIABLES */
 :root {
   --logo-navy: #020B5C;
   --logo-blue: #1D47DA;
@@ -32,7 +29,6 @@
   --radius-medium: 16px;
 }
 
-/* # BASE */
 html { scroll-behavior: smooth; }
 
 body {
@@ -56,7 +52,6 @@ button, input, select, textarea {
 
 a { text-decoration: none; color: inherit; }
 
-/* # SHARED LAYOUT */
 .home-page {
   min-height: 100vh;
   display: flex;
@@ -97,7 +92,6 @@ a { text-decoration: none; color: inherit; }
   justify-content: flex-start;
 }
 
-/* # NAVIGATION */
 .top-navigation {
   position: sticky;
   top: 0;
@@ -246,13 +240,11 @@ a { text-decoration: none; color: inherit; }
 
 
 
-/* Mobile authenticated navigation */
 .app-mobile-menu-button,
 .app-mobile-menu {
   display: none;
 }
 
-/* # TABLES + BADGES */
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -342,7 +334,6 @@ a { text-decoration: none; color: inherit; }
   flex-shrink: 0;
 }
 
-/* # FOOTER */
 .main-footer {
   background: rgba(255, 255, 255, 0.92);
   border-top: 1px solid var(--border);
@@ -448,7 +439,6 @@ a { text-decoration: none; color: inherit; }
   color: var(--grey);
 }
 
-/* # AUTH PAGES */
 .top-logo {
   width: 100%;
   display: flex;
@@ -580,7 +570,6 @@ a { text-decoration: none; color: inherit; }
 
 .auth-switch button:hover { color: var(--logo-pink); }
 
-/* Password field */
 .password-input-wrapper {
   position: relative;
   width: 100%;
@@ -591,7 +580,6 @@ a { text-decoration: none; color: inherit; }
   padding-left: 2.75rem;
 }
 
-/* Hide the browser's default password reveal icon */
 .password-input-wrapper input::-ms-reveal,
 .password-input-wrapper input::-ms-clear {
   display: none;
@@ -653,7 +641,6 @@ a { text-decoration: none; color: inherit; }
   text-decoration: underline;
 }
 
-/* # LOADING */
 .loading-state-card {
   min-width: 0;
   width: max-content;
@@ -731,7 +718,6 @@ a { text-decoration: none; color: inherit; }
   to { transform: rotate(360deg); }
 }
 
-/* # TOAST */
 .toast-message {
   width: 100%;
   margin: 0 0 1rem;
@@ -760,7 +746,6 @@ a { text-decoration: none; color: inherit; }
 .toast-message.error { border-color: rgba(245, 111, 150, 0.28); }
 .toast-message.error .toast-dot { background: var(--logo-pink); }
 
-/* # HOME PAGE */
 .overview-strip {
   display: grid;
   grid-template-columns: 270px minmax(0, 1fr) 270px;
@@ -890,7 +875,6 @@ a { text-decoration: none; color: inherit; }
 .analysis-bar-fill.light { background: linear-gradient(90deg, var(--logo-light-blue), #6BA9F0); }
 .analysis-bar-fill.pink { background: linear-gradient(90deg, var(--logo-pink), #FF8CAE); }
 
-/* # METRIC CARDS */
 .metrics-section {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -977,7 +961,6 @@ a { text-decoration: none; color: inherit; }
   text-align: right;
 }
 
-/* # DASHBOARD GRID */
 .dashboard-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) 340px;
@@ -1062,12 +1045,11 @@ a { text-decoration: none; color: inherit; }
 }
 
 .upcoming-payment {
-  background: #fff3e6;
-  color: #ea580c;
-  border: 1px solid #fdba74;
+  background: #fefce8;
+  color: #a16207;
+  border: 1px solid #fde047;
 }
 
-/* # SUBSCRIPTIONS PAGE */
 .subscriptions-alt-hero {
   background:
     linear-gradient(135deg, rgba(255,255,255,0.96), rgba(242,246,255,0.96)),
@@ -1119,7 +1101,6 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 12px 24px rgba(29, 71, 218, 0.14);
 }
 
-/* Toolbar */
 .subscriptions-alt-toolbar {
   direction: rtl;
   background: rgba(255,255,255,0.96);
@@ -1176,7 +1157,6 @@ a { text-decoration: none; color: inherit; }
   margin-top: 0.25rem;
 }
 
-/* View toggle */
 .view-mode-toggle {
   width: 118px;
   min-width: 118px;
@@ -1213,7 +1193,6 @@ a { text-decoration: none; color: inherit; }
 
 .view-mode-toggle button svg rect { fill: currentColor; }
 
-/* Month/year filter */
 .month-year-filter-wrapper { position: relative; width: 190px; min-width: 190px; }
 
 .month-year-filter-button {
@@ -1336,7 +1315,6 @@ a { text-decoration: none; color: inherit; }
   font-family: inherit;
 }
 
-/* Clear filters button */
 .clear-all-filters-btn {
   width: 140px;
   min-width: 140px;
@@ -1362,7 +1340,6 @@ a { text-decoration: none; color: inherit; }
   transform: translateY(-1px);
 }
 
-/* Category filter */
 .category-filter-wrapper { position: relative; }
 
 .compact-filter-btn {
@@ -1425,7 +1402,6 @@ a { text-decoration: none; color: inherit; }
   color: var(--logo-blue);
 }
 
-/* Export button */
 .subscriptions-export-btn,
 .export-pdf-btn {
   height: 50px;
@@ -1442,7 +1418,6 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 10px 22px rgba(29, 71, 218, 0.14);
 }
 
-/* # SUBSCRIPTION CARDS */
 .subscriptions-cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1950,7 +1925,6 @@ a { text-decoration: none; color: inherit; }
 .save-subscription-btn:disabled,
 .cancel-subscription-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* # SETTINGS DROPDOWN */
 .settings-dropdown-wrapper {
   position: relative;
   display: inline-flex;
@@ -2005,7 +1979,6 @@ a { text-decoration: none; color: inherit; }
   transform: translateX(-50%) rotate(45deg);
 }
 
-/* Person settings variant */
 .person-settings-wrapper { position: relative; }
 
 .profile-settings-trigger {
@@ -2045,7 +2018,6 @@ a { text-decoration: none; color: inherit; }
   right: auto !important;
 }
 
-/* Dropdown content */
 .settings-dropdown-profile {
   display: flex;
   align-items: center;
@@ -2171,7 +2143,6 @@ a { text-decoration: none; color: inherit; }
   font-family: inherit;
 }
 
-/* Account info */
 .settings-account-info {
   background: #fbfcff;
   border: 1px solid var(--border);
@@ -2214,7 +2185,6 @@ a { text-decoration: none; color: inherit; }
   font-size: 0.72rem !important;
 }
 
-/* # SUBSCRIPTION DETAILS */
 .subscription-details-header {
   display: flex;
   align-items: center;
@@ -2405,7 +2375,6 @@ a { text-decoration: none; color: inherit; }
   border-color: rgba(245, 111, 150, 0.14);
 }
 
-/* # MODALS */
 .edit-modal-overlay,
 .delete-confirm-overlay {
   position: fixed;
@@ -2577,7 +2546,6 @@ a { text-decoration: none; color: inherit; }
 .edit-save-btn:hover { background: #163CC0; }
 .edit-cancel-btn { border: 1px solid var(--border); color: var(--grey); background: var(--white); }
 
-/* Delete confirm */
 .delete-confirm-card {
   width: 100%;
   max-width: 430px;
@@ -2626,7 +2594,6 @@ a { text-decoration: none; color: inherit; }
 .delete-confirm-primary:hover { background: #e4517e; }
 .delete-confirm-secondary { border: 1px solid var(--border); color: var(--logo-blue); background: var(--white); }
 
-/* Arabic date picker */
 .arabic-date-picker,
 .edit-arabic-date-picker {
   display: grid;
@@ -2665,7 +2632,6 @@ a { text-decoration: none; color: inherit; }
   filter: invert(31%) sepia(93%) saturate(2276%) hue-rotate(223deg) brightness(88%) contrast(93%);
 }
 
-/* Arabic calendar display */
 .arabic-calendar-field { position: relative; width: 100%; }
 
 .arabic-calendar-display {
@@ -2702,7 +2668,6 @@ a { text-decoration: none; color: inherit; }
   pointer-events: none;
 }
 
-/* Analytics */
 .chart-filter-actions select {
   appearance: none;
   -webkit-appearance: none;
@@ -2757,7 +2722,6 @@ a { text-decoration: none; color: inherit; }
 
 .category-pie-legend-color { width: 16px; height: 16px; border-radius: 5px; border: 1px solid rgba(2, 11, 92, 0.08); }
 
-/* Forgot password */
 .back-to-login-btn {
   width: 100%;
   height: 46px;
@@ -2785,20 +2749,16 @@ a { text-decoration: none; color: inherit; }
 .forgot-success-box p { color: var(--grey); font-size: 0.82rem; line-height: 1.7; margin: 0; }
 .forgot-success-box span { color: var(--logo-blue); font-weight: 900; }
 
-/* Confirm modal variant */
 .compact-confirm-card { max-width: 460px; }
 .confirm-actions { grid-template-columns: 1.2fr 0.8fr; }
 .nested-confirm-overlay { background: rgba(2, 11, 79, 0.26) !important; backdrop-filter: blur(4px) !important; }
 
-/* Notifications bell (hidden per design decision) */
 .notifications-bell { display: none !important; }
 
-/* PDF info modal */
 .pdf-info-modal { max-width: 420px; }
 .pdf-info-modal .edit-modal-header { text-align: right; }
 .pdf-info-modal .single-action { grid-template-columns: 1fr !important; }
 
-/* # RESPONSIVE */
 @media (max-width: 1200px) {
   .overview-strip,
   .subscription-list-row,
@@ -3060,7 +3020,6 @@ a { text-decoration: none; color: inherit; }
   text-align: right;
 }
 
-/* ===== FINAL DIERHA PAGE LOADER ===== */
 .dierha-page-loader {
   width: 100%;
   min-height: calc(100vh - 165px);
