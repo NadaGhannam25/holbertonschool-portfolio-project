@@ -49,7 +49,7 @@ export async function apiRequest<T>(
         return response.json();
     } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
-            throw new Error("السيرفر يستيقظ، حاولي مرة أخرى خلال لحظات.");
+            throw new Error("");
         }
         throw error;
     } finally {
