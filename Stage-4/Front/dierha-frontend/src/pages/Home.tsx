@@ -564,7 +564,7 @@ function Home({
                     <div className="metric-card">
                         <span>إجمالي الاشتراكات</span>
                         <strong>{subscriptions.length}</strong>
-                        <p>كل الاشتراكات النشطة</p>
+                        <p> اشــتـــراكات</p>
                     </div>
 
                     <div className="metric-card">
