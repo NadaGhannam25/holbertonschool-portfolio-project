@@ -309,6 +309,7 @@ function Home({
         }));
     }, [subscriptions]);
 
+    // نعتمد على analytics data دائماً (تشمل المحذوفة) — الـ fallback فقط لو فشل الطلب كلياً
     const visibleCategoryChartData = categoryChartData.length > 0
         ? categoryChartData
         : fallbackCategoryChartData;
