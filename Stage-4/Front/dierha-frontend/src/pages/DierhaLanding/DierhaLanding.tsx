@@ -130,7 +130,7 @@ const team: TeamMember[] = [
         major: "علوم حاسب",
         description:
             "بناء قاعدة البيانات وربط الخدمات التقنية وتحسين منطق النظام.",
-        tags: ["Frontend", "DB", "API"],
+        tags: ["Frontend", "DB", "Testing"],
         image: renadPhoto,
         linkedin: "https://www.linkedin.com/in/rinad-fahad-735a3830a",
         github: "https://github.com/Rinadfahadz",
