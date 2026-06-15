@@ -51,15 +51,18 @@ function Footer({ goToHome, goToSubscriptions, goToAddSubscription }: FooterProp
         </div>
 
         <div className="footer-col">
-          <h4>تابعنا</h4>
-          <div className="social-icons">
-            <span className="social-link" aria-label="Instagram">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="4" y="4" width="16" height="16" rx="5" stroke="currentColor" strokeWidth="2" />
-                <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
-                <circle cx="17" cy="7" r="1.2" fill="currentColor" />
-              </svg>
-            </span>
+
+                        <div>
+                        <h4>تابعنا</h4>
+                        <div className="dl-socials">
+                            <span aria-label="X">𝕏</span>
+                            <span aria-label="LinkedIn">in</span>
+                            <span className="dl-instagram-icon" aria-label="Instagram">
+                                <InstagramIcon />
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
             <span className="social-link" aria-label="LinkedIn">in</span>
             <span className="social-link" aria-label="X">𝕏</span>
