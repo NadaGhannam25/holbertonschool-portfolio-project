@@ -339,6 +339,12 @@ function Home({
     if (loading) {
         return (
             <div className="home-page">
+                <AuthenticatedHeader
+                    activePage="home"
+                    onLogout={onLogout}
+                    goToHome={goToHome}
+                    goToSubscriptions={goToSubscriptions}
+                />
                 <main className="dashboard-wrapper">
                     <div className="dierha-page-loader">
                         <span className="dierha-page-loader-ring" aria-hidden="true" />
@@ -347,6 +353,7 @@ function Home({
                         </strong>
                     </div>
                 </main>
+                <Footer goToHome={goToHome} goToSubscriptions={goToSubscriptions} goToAddSubscription={goToAddSubscription} />
             </div>
         );
     }
