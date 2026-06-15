@@ -255,7 +255,6 @@ function SettingsDropdown({ onLogout }: SettingsDropdownProps) {
           >
             <span>الدعم والمساعدة</span>
             <span className={`support-left-arrow ${isSupportOpen ? "open" : ""}`}>
-              ‹
             </span>
           </button>
 
