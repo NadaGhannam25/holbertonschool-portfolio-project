@@ -564,7 +564,7 @@ function Home({
                     <div className="metric-card">
                         <span>إجمالي الاشتراكات</span>
                         <strong>{subscriptions.length}</strong>
-                        <p> اشــتـــراكات</p>
+                        <p>إجمالي الاشتراكات المسجلة</p>
                     </div>
 
                     <div className="metric-card">
@@ -590,7 +590,7 @@ function Home({
                     <div className="metric-card">
                         <span>الاشتراكات النشطة</span>
                         <strong>{activeSubscriptions.length}</strong>
-                        <p>اشتراكات حالتها نشطة</p>
+                        <p>إجمالي الاشتراكات النشطة</p>
                     </div>
                 </section>
 
