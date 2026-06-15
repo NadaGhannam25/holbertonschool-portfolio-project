@@ -309,7 +309,6 @@ function Home({
         }));
     }, [subscriptions]);
 
-    // نعتمد على analytics data دائماً (تشمل المحذوفة) — الـ fallback فقط لو فشل الطلب كلياً
     const visibleCategoryChartData = categoryChartData.length > 0
         ? categoryChartData
         : fallbackCategoryChartData;
@@ -345,9 +344,6 @@ function Home({
                         <strong className="dierha-page-loader-text">
                             جاري تحميل البيانات...
                         </strong>
-                        <p style={{ color: "#6E87C0", fontSize: "14px", marginTop: "12px", textAlign: "center" }}>
-                            قد يستغرق الاتصال الأول دقيقة واحدة بسبب إيقاظ الخادم
-                        </p>
                     </div>
                 </main>
             </div>
