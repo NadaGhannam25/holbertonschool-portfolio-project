@@ -8,16 +8,16 @@ type FooterProps = {
 
 function Footer({ goToHome, goToSubscriptions, goToAddSubscription }: FooterProps) {
   return (
-    <footer className="main-footer">
+    <footer className="main-footer app-footer-landing-style">
       <div className="footer-container">
-        <div className="footer-col">
+        <div className="footer-col footer-brand-col">
           <div className="footer-logo">
             <img src={logo} alt="Dierha Logo" />
           </div>
 
           <p>
-            ديرها يساعدك على تنظيم اشتراكاتك ، متابعة مصروفاتك، ومعرفة
-            مواعيد التجديد بسهولة.
+            ديرها يساعدك على تنظيم اشتراكاتك ومتابعة مصاريفك ومعرفة مواعيد
+            التجديد بسهولة من مكان واحد.
           </p>
         </div>
 
@@ -33,21 +33,20 @@ function Footer({ goToHome, goToSubscriptions, goToAddSubscription }: FooterProp
         <div className="footer-col">
           <h4>تواصل معنا</h4>
           <ul>
-            <a
+            <li>
+              <a
                 href="https://mail.google.com/mail/?view=cm&fs=1&to=support@dierha.com&su=طلب%20دعم%20-%20ديرها"
                 target="_blank"
                 rel="noreferrer"
-                style={{
-                   color: "#667085",
-                   textDecoration: "none",
-                   fontWeight: 600,
-                   fontSize: "13px",
-                }}
-                >
-               support@dierha.com
-            </a>
-            <li>+966 00 000 0000</li>
-            <li>www.dierha.com</li>
+              >
+                support@dierha.com
+              </a>
+            </li>
+            <li>
+              <a href="https://www.dierha.com" target="_blank" rel="noreferrer">
+                www.dierha.com
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -61,13 +60,16 @@ function Footer({ goToHome, goToSubscriptions, goToAddSubscription }: FooterProp
                 <circle cx="17" cy="7" r="1.2" fill="currentColor" />
               </svg>
             </span>
+
             <span className="social-link" aria-label="LinkedIn">in</span>
             <span className="social-link" aria-label="X">𝕏</span>
           </div>
         </div>
       </div>
 
-      <div className="footer-bottom">©2026 ديرها - جميع الحقوق محفوظة</div>
+      <div className="footer-bottom">
+        © 2026 ديرها-جميع الحقوق محفوظة
+      </div>
     </footer>
   );
 }
