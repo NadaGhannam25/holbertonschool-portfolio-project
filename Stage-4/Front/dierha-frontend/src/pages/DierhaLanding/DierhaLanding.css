@@ -592,7 +592,7 @@
 }
 
 .dl-feature-card:hover {
-    transform: none;
+    transform: translateY(-5px);
     border-color: rgba(29, 71, 218, 0.18);
     box-shadow: 0 18px 38px rgba(2, 11, 92, 0.08);
 }
@@ -970,7 +970,7 @@
 }
 
 .dl-team-card:hover {
-    transform: none;
+    transform: translateY(-6px);
     box-shadow: var(--dl-soft-shadow);
 }
 
@@ -1079,6 +1079,7 @@
         color 0.22s ease,
         border-color 0.22s ease,
         background 0.22s ease,
+        transform 0.22s ease,
         box-shadow 0.22s ease;
 }
 
@@ -1086,8 +1087,8 @@
     color: #ffffff;
     border-color: var(--dl-pink);
     background: var(--dl-pink);
-    transform: none;
-    box-shadow: 0 8px 18px rgba(245, 111, 150, 0.16);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(245, 111, 150, 0.24);
 }
 
 .dl-team-socials svg {
@@ -1573,9 +1574,50 @@
     transform: scale(1.20) !important;
 }
 
-.dl-team-socials a,
-.dl-team-socials a:hover,
-.dl-team-socials a:focus,
-.dl-team-socials a:active {
+/* Final fixed overrides: no flying movement */
+.dierha-landing-page .dl-feature-card,
+.dierha-landing-page .dl-feature-card:hover,
+.dierha-landing-page .dl-team-card,
+.dierha-landing-page .dl-team-card:hover,
+.dierha-landing-page .dl-step-card,
+.dierha-landing-page .dl-step-card:hover {
     transform: none !important;
+}
+
+/* Feature cards: color/shadow only, no movement */
+.dierha-landing-page .dl-feature-card:hover {
+    border-color: rgba(29, 71, 218, 0.18) !important;
+    box-shadow: 0 18px 38px rgba(2, 11, 92, 0.08) !important;
+}
+
+/* Team cards: shadow only, no movement */
+.dierha-landing-page .dl-team-card:hover {
+    box-shadow: var(--dl-soft-shadow) !important;
+}
+
+/* GitHub + LinkedIn: only turn pink on hover, no movement */
+.dierha-landing-page .dl-team-socials a,
+.dierha-landing-page .dl-team-socials a:hover,
+.dierha-landing-page .dl-team-socials a:focus,
+.dierha-landing-page .dl-team-socials a:active {
+    transform: none !important;
+}
+
+.dierha-landing-page .dl-team-socials a:hover {
+    color: #ffffff !important;
+    border-color: var(--dl-pink) !important;
+    background: var(--dl-pink) !important;
+    box-shadow: 0 8px 18px rgba(245, 111, 150, 0.16) !important;
+}
+
+/* Bell is decorative only */
+.dierha-landing-page .dl-hero-bell {
+    pointer-events: none !important;
+    cursor: default !important;
+}
+
+.dierha-landing-page .dl-hero-bell:hover {
+    color: var(--dl-blue) !important;
+    background: #ffffff !important;
+    border-color: rgba(29, 71, 218, 0.16) !important;
 }
