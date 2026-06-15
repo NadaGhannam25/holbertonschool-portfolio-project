@@ -567,7 +567,6 @@ a { text-decoration: none; color: inherit; }
 @keyframes btn-spin {
   to { transform: rotate(360deg); }
 }
-}
 
 .auth-switch {
   margin-top: 20px;
