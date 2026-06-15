@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap");
 
 .dierha-landing-page {
     --dl-navy: #07145f;
@@ -20,11 +20,7 @@
     min-height: 100vh;
     overflow-x: hidden;
     color: var(--dl-text);
-    font-family:
-        "IBM Plex Sans Arabic",
-        "Alexandria",
-        system-ui,
-        sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     line-height: 1.7;
     background:
         radial-gradient(circle at 8% 3%, rgba(245, 111, 150, 0.11), transparent 25%),
@@ -35,6 +31,15 @@
 .dierha-landing-page,
 .dierha-landing-page * {
     box-sizing: border-box;
+}
+
+.dierha-landing-page,
+.dierha-landing-page *,
+.dierha-landing-page button,
+.dierha-landing-page input,
+.dierha-landing-page textarea,
+.dierha-landing-page select {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .dierha-landing-page * {
@@ -173,7 +178,7 @@
 .dl-hero-copy h1 {
     margin-top: 0;
     color: var(--dl-navy);
-    font-family: "Alexandria", sans-serif;
+    font-family: inherit;
     font-size: clamp(26px, 2.7vw, 38px);
     font-weight: 500;
     line-height: 1.55;
@@ -553,7 +558,7 @@
 .dl-why-box h2 {
     margin-top: 0;
     color: var(--dl-navy);
-    font-family: "Alexandria", sans-serif;
+    font-family: inherit;
     font-size: clamp(28px, 3.5vw, 45px);
     font-weight: 700;
     line-height: 1.35;
@@ -1122,7 +1127,7 @@
 
 .dl-cta-box h2 {
     margin-top: 4px;
-    font-family: "Alexandria", sans-serif;
+    font-family: inherit;
     font-size: clamp(25px, 3vw, 38px);
 }
 
