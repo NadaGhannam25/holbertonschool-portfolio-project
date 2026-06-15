@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { startCronJobs } from './services/cron';
 import { syncDatabaseSchema } from './db/sync-schema';
+import { initBrowser, initLogo } from './services/pdf';
 
 function validateEnvironment() {
   if (!process.env.JWT_SECRET) {
@@ -43,6 +44,9 @@ async function bootstrap() {
   await app.listen(port);
 
   startCronJobs();
+
+  // تحميل Chrome واللوقو مرة واحدة عند البدء — الـ PDF request أول ما يجي يكون جاهز
+  void Promise.all([initBrowser(), initLogo()]);
 
   console.log(`Server running on port ${port}`);
 }
