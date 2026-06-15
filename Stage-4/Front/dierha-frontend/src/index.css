@@ -2770,7 +2770,7 @@ a { text-decoration: none; color: inherit; }
 
 .notifications-bell { display: none !important; }
 
-=.pdf-info-modal { max-width: 420px; }
+.pdf-info-modal { max-width: 420px; }
 .pdf-info-modal .edit-modal-header { text-align: right; }
 .pdf-info-modal .single-action { grid-template-columns: 1fr !important; }
 
