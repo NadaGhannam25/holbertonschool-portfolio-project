@@ -58,6 +58,53 @@ type UpcomingRenewalItem = {
 
 const categoryChartColors = ["#1D47DA", "#F56F96", "#020B5C", "#8EC2F5", "#7A8194"];
 
+// ─── Logo helpers (مشترك مع Subscriptions) ─────────────────────────────────
+const logoModules = import.meta.glob("../assets/*-logo.png", {
+    eager: true,
+    query: "?url",
+    import: "default",
+}) as Record<string, string>;
+
+const getLogoPath = (fileName?: string) => {
+    if (!fileName) return undefined;
+    return logoModules[`../assets/${fileName}`];
+};
+
+const logoFileNameMap: Record<string, string> = {
+    Netflix: "netflix-logo.png",
+    Spotify: "spotify-logo.png",
+    "YouTube Premium": "youtube-premium-logo.png",
+    Canva: "canva-pro-logo.png",
+    "Canva Pro": "canva-pro-logo.png",
+    "Adobe Creative Cloud": "adobe-creative-cloud-logo.png",
+    "Microsoft 365": "microsoft-365-logo.png",
+    "Google One": "google-one-logo.png",
+    Dropbox: "dropbox-logo.png",
+    Notion: "notion-plus-logo.png",
+    "Notion Plus": "notion-plus-logo.png",
+    ChatGPT: "chatgpt-logo.png",
+    Shahid: "shahid-logo.png",
+    "OSN+": "osn-plus-logo.png",
+    STARZPLAY: "starzplay-logo.png",
+    "Amazon Prime": "amazon-prime-logo.png",
+};
+
+function renderSubscriptionLogo(item: BackendSubscription) {
+    const localLogoFileName = logoFileNameMap[item.provider?.name ?? item.name];
+    const localLogoPath     = getLogoPath(localLogoFileName);
+    const providerLogoPath  = getLogoPath(item.provider?.logoUrl ?? undefined);
+
+    if (localLogoPath)    return <img src={localLogoPath}    alt={item.name} />;
+    if (providerLogoPath) return <img src={providerLogoPath} alt={item.name} />;
+    if (item.provider?.logoUrl) return <img src={item.provider.logoUrl} alt={item.name} />;
+
+    return (
+        <span className="default-app-logo-small">
+            {item.name.charAt(0).toUpperCase()}
+        </span>
+    );
+}
+
 const formatBillingCycle = (cycle: BackendSubscription["billingCycle"]) => {
     if (cycle === "weekly") return "أسبوعي";
     if (cycle === "monthly") return "شهري";
@@ -654,7 +701,7 @@ function Home({
                                                     <td>
                                                         <div className="service-cell">
                                                             <div className="service-icon">
-                                                                {item.name.charAt(0).toUpperCase()}
+                                                                {renderSubscriptionLogo(item)}
                                                             </div>
                                                             <strong>{item.name}</strong>
                                                         </div>
