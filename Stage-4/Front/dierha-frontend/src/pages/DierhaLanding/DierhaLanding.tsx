@@ -63,22 +63,22 @@ const steps = [
     {
         number: "01",
         title: "أضيفي اشتراكاتك",
-        description: "أضيفي الخدمة والمبلغ وتاريخ التجديد.",
+        description: "أضيف الخدمة والمبلغ وتاريخ التجديد.",
     },
     {
         number: "02",
         title: "نراقب وننبهك",
-        description: "تنبيهات قبل التجديد لتبقين بالصورة.",
+        description: "تنبيهات قبل التجديد لتبقى بالصورة.",
     },
     {
         number: "03",
-        title: "حللي ووفري",
-        description: "اكتشفي فرص التوفير وافهمي صرفك.",
+        title: "حلل ووفر",
+        description: "اكتشف فرص التوفير وافهم صرفك.",
     },
     {
         number: "04",
-        title: "تحكمي بذكاء",
-        description: "اتخذي قرارات مالية أفضل بهدوء.",
+        title: "تحكم بذكاء",
+        description: "اتخذ قرارات مالية أفضل بهدوء.",
     },
 ];
 
@@ -130,7 +130,7 @@ const team: TeamMember[] = [
         major: "علوم حاسب",
         description:
             "بناء قاعدة البيانات وربط الخدمات التقنية وتحسين منطق النظام.",
-        tags: ["Backend", "DB", "API"],
+        tags: ["Frontend", "DB", "API"],
         image: renadPhoto,
         linkedin: "https://www.linkedin.com/in/rinad-fahad-735a3830a",
         github: "https://github.com/Rinadfahadz",
@@ -384,8 +384,6 @@ function DashboardPreview() {
                     <span className="dl-sidebar-spacer" />
                     <span className="active">الرئيسية</span>
                     <span>اشتراكاتي</span>
-                    <span>التنبيهات</span>
-                    <span>التقارير</span>
                 </aside>
 
                 <div className="dl-dashboard-content">
@@ -517,7 +515,7 @@ export default function DierhaLanding() {
                     </nav>
 
                     <a className="dl-header-cta" href="/login">
-                        ابدأ الآن ←
+                        ابدأ الآن
                     </a>
                 </div>
             </header>
@@ -556,11 +554,6 @@ export default function DierhaLanding() {
                 </a>
             </div>
 
-            <div className="dl-hero-note">
-                <span>✓ بدون ربط بنكي</span>
-                <span>✓ تنبيهات مسبقة</span>
-                <span>✓ تجربة عربية واضحة</span>
-            </div>
         </div>
     </div>
 </section>
@@ -605,14 +598,10 @@ export default function DierhaLanding() {
                             </p>
 
                             <p>
-                                الفكرة بسيطة: تضيفين الاشتراك يدويًا، تحددين تاريخ
-                                التجديد، وتتابعين المصروفات والتنبيهات بدون مشاركة
+                                الفكرة بسيطة: تضيف الاشتراك يدويًا، تحدد تاريخ
+                                التجديد، وتتابع المصروفات والتنبيهات بدون مشاركة
                                 بياناتك البنكية.
                             </p>
-
-                            <a href="/login" className="dl-text-link">
-                                جرّب ديرها الآن ←
-                            </a>
                         </div>
 
                         <div className="dl-story-visual">
@@ -639,7 +628,7 @@ export default function DierhaLanding() {
                         <div className="dl-section-heading">
                             <h2>كيف تعمل ديرها؟</h2>
                             <p>
-                                أربع خطوات واضحة تساعدك تفهمين اشتراكاتك وتتحكمين فيها.
+                                أربع خطوات واضحة تساعدك تفهم اشتراكاتك وتتحكم فيها.
                             </p>
                         </div>
 
@@ -662,13 +651,10 @@ export default function DierhaLanding() {
 
                             <p>
                                 نمنحك أرقامًا سهلة القراءة تساعدك على إدارة اشتراكاتك
-                                بثقة، ومعرفة أين تذهب مصروفاتك كل شهر.
+                                بثقة، ومعرفة مصروفاتك الشهرية أفضل.
                             </p>
 
                             <div className="dl-insight-checks">
-                                <span>✓ مقارنة شهرية للمصروفات</span>
-                                <span>✓ معرفة أكثر الخدمات تكلفة</span>
-                                <span>✓ تنبيه قبل أي تجديد قادم</span>
                             </div>
                         </div>
 
@@ -691,26 +677,6 @@ export default function DierhaLanding() {
                                 <small>الأكثر استخدامًا</small>
                                 <strong>Netflix</strong>
                             </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section className="dl-section dl-why-section">
-                    <div className="dl-container dl-why-box">
-                        <div className="dl-why-icon" aria-hidden="true">
-                            <span />
-                            <span />
-                            <span />
-                            <span />
-                        </div>
-
-                        <div>
-                            <h2>لماذا ديرها؟</h2>
-                            <p>
-                                كثير من الاشتراكات تتجدد تلقائيًا دون أن نلاحظ،
-                                وتسبب مصاريف غير ضرورية. ديرها تمنحك الوضوح والتنبيهات
-                                والتحكم الكامل حتى تكون قراراتك المالية أوضح.
-                            </p>
                         </div>
                     </div>
                 </section>
@@ -776,8 +742,7 @@ export default function DierhaLanding() {
                 <section className="dl-section dl-cta-section">
                     <div className="dl-container dl-cta-box">
                         <div>
-                            <span>جاهز تدير اشتراكاتك صح؟</span>
-                            <h2>ابدأ تنظيم اشتراكاتك اليوم</h2>
+                            <h2>جاهز تدير اشتراكاتك صح؟</h2>
                             <p>
                                 تابع التجديدات والمصروفات والتنبيهات من مكان واحد.
                             </p>
@@ -803,7 +768,7 @@ export default function DierhaLanding() {
                         <a href="#home">الرئيسية</a>
                         <a href="#features">المزايا</a>
                         <a href="#story">قصتنا</a>
-                        <a href="#how">كيف تعمل</a>
+                        <a href="#how">الفريق</a>
                     </div>
 
                     <div>
@@ -825,7 +790,7 @@ export default function DierhaLanding() {
                 </div>
 
                 <div className="dl-container dl-copyright">
-                    © 2026 ديرها — جميع الحقوق محفوظة
+                    © 2026 ديرها-جميع الحقوق محفوظة
                 </div>
             </footer>
         </div>
