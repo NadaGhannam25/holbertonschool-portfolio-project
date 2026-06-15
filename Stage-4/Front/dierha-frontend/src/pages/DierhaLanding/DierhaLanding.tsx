@@ -372,13 +372,12 @@ function DashboardPreview() {
             </div>
 
             <div className="dl-dashboard-card">
-                <button
-                    type="button"
+                <div
                     className="dl-hero-bell"
-                    aria-label="التنبيهات"
+                    aria-hidden="true"
                 >
                     <BellIcon />
-                </button>
+                </div>
 
                 <aside className="dl-dashboard-sidebar">
                     <span className="dl-sidebar-spacer" />
