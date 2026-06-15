@@ -7,8 +7,8 @@ import {
     getMonthlyAnalytics, 
     getSubscriptions, 
     getUpcomingRenewals,
-    exportSubscriptionsPdf,
 } from "../services/subscriptionService";
+import { generatePdfClient } from "../services/pdfGenerator";
 import {
     Area,
     AreaChart,
@@ -612,7 +612,12 @@ function Home({
                                     onClick={async () => {
                                         try {
                                             setPdfLoading(true);
-                                            await exportSubscriptionsPdf();
+                                            const storedUser = JSON.parse(localStorage.getItem("dierha_user") ?? "{}") as { name?: string; email?: string };
+                                            await generatePdfClient(
+                                                subscriptions,
+                                                storedUser.name ?? "مستخدم",
+                                                storedUser.email ?? ""
+                                            );
                                         } catch (error) {
                                             console.error(error);
                                             setPdfMessage(
@@ -625,7 +630,7 @@ function Home({
                                         }
                                     }}
                                 >
-                                    {pdfLoading ? "جاري التصدير..." : "تصدير PDF"}
+                                    {pdfLoading ? <><span className="btn-spinner" />جاري التصدير</> : "تصدير PDF"}
                                 </button>
                             </div>
 
