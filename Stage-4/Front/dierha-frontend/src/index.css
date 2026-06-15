@@ -1,12 +1,14 @@
-
+/* # FONTS */
 @import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap");
 
+/* # RESET */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* # THEME VARIABLES */
 :root {
   --logo-navy: #020B5C;
   --logo-blue: #1D47DA;
@@ -328,16 +330,30 @@ a { text-decoration: none; color: inherit; }
 .service-icon {
   width: 38px;
   height: 38px;
-  background: linear-gradient(135deg, var(--logo-blue), var(--logo-navy));
-  color: var(--white);
+  background: var(--white);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 13px;
   font-weight: 900;
   font-size: 0.92rem;
-  box-shadow: 0 7px 16px rgba(29, 71, 218, 0.14);
+  box-shadow: 0 4px 10px rgba(2, 11, 92, 0.06);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.service-icon img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+}
+
+.service-icon .default-app-logo-small {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
 }
 
 /* # FOOTER */
@@ -428,11 +444,10 @@ a { text-decoration: none; color: inherit; }
 }
 
 .social-link:hover {
-  background: var(--logo-pink);
+  background: linear-gradient(135deg, var(--logo-blue), var(--logo-navy));
   color: var(--white);
-  border-color: var(--logo-pink);
-  transform: none;
-  box-shadow: 0 8px 18px rgba(245, 111, 150, 0.16);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(29, 71, 218, 0.16);
 }
 
 .social-link svg { display: block; width: 17px; height: 17px; }
@@ -1514,7 +1529,7 @@ a { text-decoration: none; color: inherit; }
   width: 25px;
   height: 25px;
   border-radius: 9px;
-  background: linear-gradient(135deg, var(--logo-blue), var(--logo-navy));
+  background: var(--logo-blue);
   color: var(--white);
   display: inline-flex;
   align-items: center;
