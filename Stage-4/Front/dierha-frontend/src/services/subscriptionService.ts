@@ -223,7 +223,15 @@ export const getSubscriptionById = (id: number | string) => {
   return subscriptionsService.findOne(id);
 };
 
+export const getSubscription = (id: number | string) => {
+  return subscriptionsService.findOne(id);
+};
+
 export const createSubscription = (data: CreateSubscriptionDto) => {
+  return subscriptionsService.create(data);
+};
+
+export const addSubscription = (data: CreateSubscriptionDto) => {
   return subscriptionsService.create(data);
 };
 
@@ -235,6 +243,10 @@ export const updateSubscription = (
 };
 
 export const deleteSubscription = (id: number | string) => {
+  return subscriptionsService.remove(id);
+};
+
+export const removeSubscription = (id: number | string) => {
   return subscriptionsService.remove(id);
 };
 
@@ -251,6 +263,10 @@ export const getPriceHistory = (id: number | string) => {
 };
 
 export const exportSubscriptionsPdf = () => {
+  return subscriptionsService.exportPdf();
+};
+
+export const exportSubscriptionsPDF = () => {
   return subscriptionsService.exportPdf();
 };
 
