@@ -24,12 +24,15 @@ async function bootstrap() {
 
   app.enableCors({
   origin: [
+    'http://localhost:5173',
     'https://dierha.com',
     'https://www.dierha.com',
+    'https://dierha-frontend.onrender.com',
     'https://holbertonschool-portfolio.nada-ghannam19.workers.dev',
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 });
   app.useGlobalPipes(
     new ValidationPipe({
