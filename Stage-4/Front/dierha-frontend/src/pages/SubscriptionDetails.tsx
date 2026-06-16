@@ -693,7 +693,7 @@ function SubscriptionDetails({
                                 undefined,
                             billingCycle:
                                 billingCycleMap[selectedDuration] ?? subscription.billingCycle,
-                            startDate: normalizeDateForApi(updatedValues.renewalDate),
+                            renewalDate: normalizeDateForApi(updatedValues.renewalDate),
                             status:
                                 selectedStatus === "نشط" || selectedStatus === "active"
                                     ? "active"
