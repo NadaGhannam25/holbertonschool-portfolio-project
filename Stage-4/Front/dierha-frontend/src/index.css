@@ -1093,9 +1093,9 @@ a { text-decoration: none; color: inherit; }
 }
 
 .upcoming-payment {
-  background: #fefce8;
-  color: #a16207;
-  border: 1px solid #fde047;
+  background: rgba(245, 111, 150, 0.10);
+  color: var(--logo-pink);
+  border: 1px solid rgba(245, 111, 150, 0.28);
 }
 
 /* # SUBSCRIPTIONS PAGE */
