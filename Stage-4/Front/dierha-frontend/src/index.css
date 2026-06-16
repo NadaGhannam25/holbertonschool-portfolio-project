@@ -3890,3 +3890,54 @@ a { text-decoration: none; color: inherit; }
   padding-top: 0.8rem !important;
   resize: none !important;
 }
+
+.edit-select-wrapper {
+  position: relative !important;
+}
+
+.edit-select-wrapper select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: none !important;
+  padding-left: 2.8rem !important;
+  padding-right: 0.9rem !important;
+  cursor: pointer !important;
+}
+
+.edit-select-arrow {
+  display: none !important;
+}
+
+.edit-select-wrapper::after {
+  content: "⌄" !important;
+  position: absolute !important;
+  left: 18px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: var(--logo-blue) !important;
+  font-size: 1.15rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
+
+.edit-price-input span {
+  border-right: none !important;
+  border-left: none !important;
+  border-inline-start: none !important;
+  border-inline-end: none !important;
+  background: #fbfcff !important;
+}
+
+.edit-price-input {
+  border: 1px solid var(--border) !important;
+  overflow: hidden !important;
+  background: #fbfcff !important;
+}
+
+.edit-price-input input {
+  background: #fbfcff !important;
+  border: none !important;
+  outline: none !important;
+}
