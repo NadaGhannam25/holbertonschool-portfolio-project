@@ -1,53 +1,54 @@
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap");
 
-.main-footer {
+.dierha-app-footer {
   --footer-navy: #07145f;
   --footer-blue: #1d47da;
   --footer-muted: #687188;
   --footer-line: #e5eaf5;
-  --footer-pink: #f56f96;
 
   width: 100%;
   margin-top: 56px;
   padding: 52px 0 18px;
   border-top: 1px solid var(--footer-line);
   background: #ffffff;
-  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
 }
 
-.main-footer,
-.main-footer * {
+.dierha-app-footer,
+.dierha-app-footer * {
   box-sizing: border-box;
 }
 
-.footer-container {
+.dierha-app-footer-container {
   width: min(1180px, calc(100% - 48px));
   margin-inline: auto;
 }
 
-.footer-grid {
+.dierha-app-footer-grid {
   display: grid;
   grid-template-columns: 1.6fr repeat(3, 1fr);
   gap: 45px;
   align-items: start;
 }
 
-.footer-brand img {
+.dierha-app-footer-brand img {
   width: 145px;
   height: 65px;
   object-fit: contain;
   object-position: right center;
 }
 
-.footer-brand p {
+.dierha-app-footer-brand p {
   max-width: 340px;
   margin: 12px 0 0;
   color: var(--footer-muted);
   font-size: 14px;
+  font-weight: 500;
   line-height: 2;
 }
 
-.footer-col {
+.dierha-app-footer-col {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -56,40 +57,45 @@
   font-size: 13px;
 }
 
-.footer-col h4 {
+.dierha-app-footer-col h4 {
   margin: 0 0 13px;
   color: var(--footer-navy);
   font-size: 15px;
   font-weight: 800;
+  line-height: 1.4;
 }
 
-.footer-col button {
+.dierha-app-footer-col button {
   padding: 0;
   border: 0;
   color: var(--footer-muted);
   background: transparent;
   font: inherit;
   font-size: 13px;
+  font-weight: 500;
+  line-height: 1.9;
   cursor: pointer;
   transition: color 0.22s ease;
 }
 
-.footer-col button:hover {
+.dierha-app-footer-col button:hover {
   color: var(--footer-blue);
 }
 
-.footer-col span {
+.dierha-app-footer-col span {
   color: var(--footer-muted);
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.9;
 }
 
-.footer-socials {
+.dierha-app-footer-socials {
   display: flex;
   flex-direction: row;
   gap: 7px;
 }
 
-.footer-socials > span {
+.dierha-app-footer-socials > span {
   width: 34px;
   height: 34px;
   display: grid;
@@ -98,43 +104,44 @@
   border-radius: 10px;
   color: var(--footer-navy);
   background: #ffffff;
+  font-size: 14px;
   font-weight: 800;
 }
 
-.footer-instagram-icon svg {
+.dierha-app-footer-socials svg {
   width: 19px;
   height: 19px;
   display: block;
 }
 
-.footer-copyright {
+.dierha-app-footer-copyright {
   margin-top: 34px;
   padding-top: 17px;
   border-top: 1px solid var(--footer-line);
   color: #939bad;
   text-align: center;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 @media (max-width: 850px) {
-  .footer-grid {
+  .dierha-app-footer-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 32px;
   }
 }
 
 @media (max-width: 650px) {
-  .main-footer {
+  .dierha-app-footer {
     margin-top: 40px;
     padding-top: 40px;
   }
 
-  .footer-container {
+  .dierha-app-footer-container {
     width: min(100% - 28px, 1180px);
   }
 
-  .footer-grid {
+  .dierha-app-footer-grid {
     grid-template-columns: 1fr;
     gap: 28px;
   }
