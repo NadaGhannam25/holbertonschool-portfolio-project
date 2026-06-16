@@ -535,7 +535,7 @@ export default function DierhaLanding() {
 
             <p>
                 اجمع اشتراكاتك في مكان واحد، تابع مواعيد التجديد،
-                وافهم مصاريفك الشهرية بوضوح وهدوء.
+                وافهم مصاريفك الشهرية بوضوح 
             </p>
 
             <div className="dl-hero-actions">
