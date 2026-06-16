@@ -93,6 +93,14 @@ export async function generatePdfClient(
 </style>
 </head>
 <body>
+  <div class="no-print" style="text-align:center; padding: 20px; background: #F6F8FF; border-bottom: 1px solid #E7ECF6;">
+    <button onclick="window.print()" style="background: linear-gradient(135deg, #1D47DA, #315BE6); color: white; border: none; padding: 12px 32px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: Tahoma, Arial, sans-serif;">
+      ⬇ تحميل PDF
+    </button>
+  </div>
+  <style>
+    @media print { .no-print { display: none !important; } }
+  </style>
   <div class="header">
     <h1>ديرها</h1>
     <p>تقرير إدارة الاشتراكات</p>
@@ -113,11 +121,6 @@ export async function generatePdfClient(
     </table>
     <div class="footer">ديرها | منصة إدارة الاشتراكات</div>
   </div>
-  <script>
-    window.onload = function() {
-      setTimeout(function() { window.print(); }, 300);
-    };
-  </script>
 </body>
 </html>`;
 
