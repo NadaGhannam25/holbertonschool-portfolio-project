@@ -384,8 +384,27 @@ export const getMonthlyAnalytics = () => {
   return request("/analytics/monthly");
 };
 
-export const getUpcomingRenewals = () => {
-  return request("/upcoming-renewals");
+export const getUpcomingRenewals = async () => {
+  const subscriptions = await subscriptionsService.findAll();
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return subscriptions
+    .filter((subscription) => {
+      if (!subscription.renewalDate) return false;
+
+      const renewalDate = new Date(subscription.renewalDate);
+      renewalDate.setHours(0, 0, 0, 0);
+
+      return renewalDate >= today && subscription.status !== "inactive";
+    })
+    .sort((a, b) => {
+      return (
+        new Date(a.renewalDate).getTime() -
+        new Date(b.renewalDate).getTime()
+      );
+    });
 };
 
 export default subscriptionsService;
