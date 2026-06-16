@@ -3951,3 +3951,129 @@ a { text-decoration: none; color: inherit; }
 .edit-modal-card .edit-modal-grid {
   align-items: end !important;
 }
+
+/* Final profile dropdown name edit fix */
+.settings-profile-edit-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.72rem !important;
+  padding: 0.75rem !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.settings-profile-edit-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.65rem !important;
+  color: var(--logo-blue) !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
+}
+
+.settings-profile-edit-title svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+}
+
+.settings-profile-edit-form label {
+  color: var(--logo-blue) !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
+}
+
+.settings-profile-edit-form input {
+  width: 100% !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  padding: 0 0.9rem !important;
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
+  text-align: right !important;
+  outline: none !important;
+}
+
+.settings-profile-edit-form input:focus {
+  border-color: rgba(29, 71, 218, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(29, 71, 218, 0.08) !important;
+}
+
+.settings-profile-edit-error {
+  margin: -0.25rem 0 0 !important;
+  color: var(--logo-pink) !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+  text-align: right !important;
+}
+
+.settings-profile-edit-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.6rem !important;
+  margin-top: 0.1rem !important;
+}
+
+.settings-profile-edit-actions button,
+.settings-profile-save-btn,
+.settings-profile-cancel-btn {
+  width: 108px !important;
+  min-width: 108px !important;
+  max-width: 108px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 !important;
+  border-radius: 13px !important;
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 0.86rem !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  flex: 0 0 108px !important;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease !important;
+  transform: none !important;
+}
+
+.settings-profile-save-btn {
+  border: 1px solid var(--logo-blue) !important;
+  background: var(--logo-blue) !important;
+  color: #ffffff !important;
+}
+
+.settings-profile-save-btn:hover {
+  background: var(--logo-navy) !important;
+  border-color: var(--logo-navy) !important;
+  transform: none !important;
+}
+
+.settings-profile-cancel-btn {
+  border: 1px solid var(--border) !important;
+  background: #ffffff !important;
+  color: var(--grey) !important;
+}
+
+.settings-profile-cancel-btn:hover {
+  color: var(--logo-pink) !important;
+  border-color: rgba(245, 111, 150, 0.35) !important;
+  background: #fff7fa !important;
+  transform: none !important;
+}
+
+.settings-dropdown-logout {
+  color: var(--logo-pink) !important;
+}
+
+.support-left-arrow svg {
+  width: 18px !important;
+  height: 18px !important;
+}
