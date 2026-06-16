@@ -69,3 +69,4 @@ function Footer({ goToHome, goToSubscriptions, goToAddSubscription }: FooterProp
 }
 
 export default Footer;
+
