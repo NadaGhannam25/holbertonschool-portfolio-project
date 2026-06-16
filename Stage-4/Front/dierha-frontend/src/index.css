@@ -212,7 +212,7 @@ a { text-decoration: none; color: inherit; }
   min-width: 34px;
   min-height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--logo-blue), var(--logo-navy));
+  background: var(--logo-blue);
   color: var(--white);
   display: inline-flex;
   align-items: center;
@@ -2959,7 +2959,7 @@ a { text-decoration: none; color: inherit; }
     flex-shrink: 0;
     border-radius: 50%;
     color: var(--white);
-    background: linear-gradient(135deg, var(--logo-blue), var(--logo-navy));
+    background: var(--logo-blue);
     font-weight: 900;
     box-shadow: 0 8px 18px rgba(29, 71, 218, 0.2);
   }
