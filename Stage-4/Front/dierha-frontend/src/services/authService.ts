@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://dierha-backend.onrender.com/api";
+  import.meta.env.VITE_API_BASE_URL || "https://dierha-backend.onrender.com";
 
 type AuthUser = {
     id?: number;
