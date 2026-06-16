@@ -1,4 +1,4 @@
-// rebuild by the cloudflare
+// rebuild
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://dierha-backend.onrender.com/api";
 
@@ -75,6 +75,53 @@ type RequestOptions = RequestInit & {
   skipJson?: boolean;
 };
 
+function cleanToken(token: string) {
+  return token.replace(/^Bearer\s+/i, "").trim();
+}
+
+function extractToken(value: unknown): string | null {
+  if (!value) return null;
+
+  if (typeof value === "string") {
+    return cleanToken(value);
+  }
+
+  if (typeof value !== "object") {
+    return null;
+  }
+
+  const data = value as Record<string, unknown>;
+
+  const directToken =
+    data.token ||
+    data.accessToken ||
+    data.authToken ||
+    data.access_token ||
+    data.jwt ||
+    data.jwtToken;
+
+  if (typeof directToken === "string" && directToken.trim()) {
+    return cleanToken(directToken);
+  }
+
+  const nestedSources = [
+    data.data,
+    data.user,
+    data.auth,
+    data.currentUser,
+    data.session,
+  ];
+
+  for (const source of nestedSources) {
+    const nestedToken = extractToken(source);
+    if (nestedToken) {
+      return nestedToken;
+    }
+  }
+
+  return null;
+}
+
 function getToken() {
   const directKeys = [
     "token",
@@ -83,47 +130,54 @@ function getToken() {
     "jwt",
     "jwtToken",
     "access_token",
+    "dierha_token",
+    "dierhaToken",
   ];
 
-  for (const key of directKeys) {
-    const value = localStorage.getItem(key);
+  const objectKeys = [
+    "user",
+    "currentUser",
+    "auth",
+    "authUser",
+    "dierhaUser",
+    "userData",
+    "session",
+    "dierha-auth",
+    "auth-storage",
+  ];
 
-    if (value) {
-      return value.replace(/^Bearer\s+/i, "");
+  const storages = [localStorage, sessionStorage];
+
+  for (const storage of storages) {
+    for (const key of directKeys) {
+      const value = storage.getItem(key);
+
+      if (value) {
+        return cleanToken(value);
+      }
     }
   }
 
-  const objectKeys = ["user", "currentUser", "auth", "authUser", "dierhaUser"];
+  for (const storage of storages) {
+    for (const key of objectKeys) {
+      const value = storage.getItem(key);
 
-  for (const key of objectKeys) {
-    const value = localStorage.getItem(key);
+      if (!value) continue;
 
-    if (!value) continue;
+      try {
+        const parsed = JSON.parse(value);
+        const token = extractToken(parsed);
 
-    try {
-      const parsed = JSON.parse(value);
+        if (token) {
+          return token;
+        }
+      } catch {
+        const token = extractToken(value);
 
-      const token =
-        parsed?.token ||
-        parsed?.accessToken ||
-        parsed?.authToken ||
-        parsed?.access_token ||
-        parsed?.jwt ||
-        parsed?.jwtToken ||
-        parsed?.data?.token ||
-        parsed?.data?.accessToken ||
-        parsed?.data?.authToken ||
-        parsed?.data?.access_token ||
-        parsed?.user?.token ||
-        parsed?.user?.accessToken ||
-        parsed?.user?.authToken ||
-        parsed?.user?.access_token;
-
-      if (token) {
-        return String(token).replace(/^Bearer\s+/i, "");
+        if (token) {
+          return token;
+        }
       }
-    } catch {
-      // Ignore invalid JSON values in localStorage.
     }
   }
 
@@ -155,19 +209,28 @@ function buildQuery(filters?: FilterSubscriptionsDto) {
   return query ? `?${query}` : "";
 }
 
+function buildHeaders(options?: RequestOptions) {
+  const token = getToken();
+  const headers = new Headers(options?.headers);
+
+  if (!headers.has("Content-Type") && options?.body) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  return headers;
+}
+
 async function request<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const token = getToken();
-
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
+    headers: buildHeaders(options),
   });
 
   if (!response.ok) {
@@ -242,13 +305,9 @@ export class SubscriptionsService {
   }
 
   async exportPdf() {
-    const token = getToken();
-
     const response = await fetch(`${API_BASE_URL}/subscriptions/export/pdf`, {
       method: "GET",
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: buildHeaders(),
     });
 
     if (!response.ok) {
