@@ -3973,3 +3973,18 @@ a { text-decoration: none; color: inherit; }
 .edit-select-arrow {
   display: none !important;
 }
+
+.edit-modal-card,
+.edit-modal-card *,
+.edit-modal-card input,
+.edit-modal-card select,
+.edit-modal-card textarea,
+.edit-modal-card button,
+.edit-modal-card option {
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+.edit-modal-card input::placeholder,
+.edit-modal-card textarea::placeholder {
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
