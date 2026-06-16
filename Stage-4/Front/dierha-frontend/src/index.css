@@ -3591,6 +3591,7 @@ a { text-decoration: none; color: inherit; }
   font-size: 0.8rem !important;
 }
 
+/* Remove the extra decorative dropdown arrows from the edit modal. */
 .edit-select-arrow {
   display: none !important;
 }
@@ -3604,8 +3605,11 @@ a { text-decoration: none; color: inherit; }
   background-size: 0 !important;
   padding-left: 0.74rem !important;
 }
+/* =========================================================
+   FINAL FIXES - Dierha details/edit modals and spending UI
+   ========================================================= */
 
-
+/* اجعل تمويه المودالات يغطي كامل الصفحة وليس الكرت فقط */
 .edit-modal-overlay,
 .delete-confirm-overlay {
   position: fixed !important;
@@ -3625,6 +3629,7 @@ a { text-decoration: none; color: inherit; }
   direction: rtl !important;
 }
 
+/* خلي مربع تعديل الاشتراك بنفس الحجم تقريبًا ومنزّل شوي */
 .edit-modal-card {
   width: min(500px, calc(100vw - 2rem)) !important;
   max-width: 500px !important;
@@ -3636,6 +3641,7 @@ a { text-decoration: none; color: inherit; }
   padding: 1rem !important;
 }
 
+/* مربع تأكيد الحذف في المنتصف تمامًا */
 .delete-confirm-card {
   width: min(430px, calc(100vw - 2rem)) !important;
   max-width: 430px !important;
@@ -3643,6 +3649,7 @@ a { text-decoration: none; color: inherit; }
   transform: none !important;
 }
 
+/* Cairo داخل مودال التعديل كامل */
 .edit-modal-card,
 .edit-modal-card *,
 .edit-modal-card input,
@@ -3658,6 +3665,7 @@ a { text-decoration: none; color: inherit; }
   font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 }
 
+/* ضبط مقاسات الحقول بدون سكرول داخلي */
 .edit-modal-header {
   padding-bottom: 0.7rem !important;
   margin-bottom: 0.75rem !important;
@@ -3710,6 +3718,7 @@ a { text-decoration: none; color: inherit; }
   font-size: 0.8rem !important;
 }
 
+/* أسهم القوائم المنسدلة رمادية وموزونة */
 .edit-select-wrapper {
   position: relative !important;
 }
@@ -3744,6 +3753,7 @@ a { text-decoration: none; color: inherit; }
   z-index: 3 !important;
 }
 
+/* خانة السعر وكلمة ريال بدون خط فاصل وبمحاذاة صحيحة */
 .edit-price-input {
   display: flex !important;
   align-items: stretch !important;
@@ -3788,6 +3798,7 @@ a { text-decoration: none; color: inherit; }
   font-weight: 900 !important;
 }
 
+/* شكل تطبيق آخر / التطبيق المخصص مثل التطبيقات المسجلة */
 .details-service-logo {
   background: #f1f3f9 !important;
   border: 1px solid var(--border) !important;
@@ -3827,6 +3838,7 @@ a { text-decoration: none; color: inherit; }
   opacity: 1 !important;
 }
 
+/* لون الدفعة القادمة أصفر واضح */
 .payment-status.upcoming-payment,
 .upcoming-payment {
   background: rgba(234, 179, 8, 0.14) !important;
@@ -3847,31 +3859,95 @@ a { text-decoration: none; color: inherit; }
   }
 }
 
-/* Final: smaller subscription details arrow button */
-.arrow-details-btn {
-  width: 38px !important;
-  height: 38px !important;
-  min-width: 38px !important;
-  border-radius: 13px !important;
+
+/* =========================================================
+   Final requested fixes: small details arrows + profile edit popup
+   ========================================================= */
+
+/* تصغير أسهم الدخول لتفاصيل الاشتراك في المكعبات والشريط */
+.arrow-details-btn,
+.subscription-card-v2-footer .arrow-details-btn,
+.subscription-list-actions .arrow-details-btn {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 12px !important;
   padding: 0 !important;
   font-size: 0 !important;
+  line-height: 1 !important;
 }
 
-.arrow-details-btn svg {
-  width: 18px !important;
-  height: 18px !important;
-  min-width: 18px !important;
-  min-height: 18px !important;
+.arrow-details-btn svg,
+.subscription-card-v2-footer .arrow-details-btn svg,
+.subscription-list-actions .arrow-details-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
 }
 
-.subscription-list-actions .arrow-details-btn {
-  width: 38px !important;
-  height: 38px !important;
-  min-width: 38px !important;
+.arrow-details-btn:hover,
+.arrow-details-btn:active,
+.arrow-details-btn:focus {
+  transform: none !important;
 }
 
-.subscription-card-v2-footer .arrow-details-btn {
-  width: 38px !important;
-  height: 38px !important;
-  min-width: 38px !important;
+/* تصغير أزرار تعديل الاسم في قائمة البروفايل */
+.person-settings-menu,
+.settings-dropdown-menu.person-settings-menu {
+  width: 340px !important;
+  min-width: 340px !important;
+  max-width: calc(100vw - 28px) !important;
+  padding: 12px !important;
+  border-radius: 18px !important;
+}
+
+.person-settings-menu input,
+.person-settings-menu textarea {
+  min-height: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  padding: 0 14px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+.person-settings-menu .app-mobile-name-actions,
+.person-settings-menu [class*="name-actions"],
+.person-settings-menu [class*="edit-actions"] {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  margin-top: 10px !important;
+}
+
+.person-settings-menu .app-mobile-save-btn,
+.person-settings-menu .app-mobile-cancel-btn,
+.person-settings-menu button[class*="save"],
+.person-settings-menu button[class*="cancel"] {
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  padding: 0 16px !important;
+  border-radius: 14px !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  flex: unset !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.person-settings-menu .app-mobile-name-error,
+.person-settings-menu [class*="name-error"],
+.person-settings-menu [class*="error"] {
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  margin: 6px 0 0 !important;
+}
+
+.edit-modal-card .edit-modal-grid {
+  align-items: end !important;
 }
