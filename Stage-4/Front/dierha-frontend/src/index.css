@@ -1593,14 +1593,14 @@ a { text-decoration: none; color: inherit; }
 }
 
 .arrow-details-btn {
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  border: 1px solid rgba(29, 71, 218, 0.16);
-  background: rgba(29, 71, 218, 0.06);
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  border: 1px solid rgba(29, 71, 218, 0.18);
+  background: #f8faff;
   color: var(--logo-blue);
-  border-radius: 14px;
-  font-size: 1.15rem;
+  border-radius: 16px;
+  font-size: 1.2rem;
   font-weight: 900;
   cursor: pointer;
   padding: 0;
@@ -1608,13 +1608,43 @@ a { text-decoration: none; color: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: 0.2s ease;
+  box-shadow: 0 8px 18px rgba(2, 11, 92, 0.055);
+  transition:
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.arrow-details-icon {
+  display: block;
+  line-height: 1;
+  transform: none !important;
 }
 
 .arrow-details-btn:hover {
-  background: linear-gradient(135deg, var(--logo-blue), var(--logo-blue-2));
+  background: var(--logo-pink);
+  border-color: var(--logo-pink);
   color: var(--white);
-  transform: translateX(-2px);
+  box-shadow: 0 8px 18px rgba(245, 111, 150, 0.18);
+  transform: none !important;
+}
+
+.arrow-details-btn:hover .arrow-details-icon,
+.arrow-details-btn:active .arrow-details-icon,
+.arrow-details-btn:focus .arrow-details-icon {
+  transform: none !important;
+}
+
+.arrow-details-btn:active,
+.arrow-details-btn:focus,
+.arrow-details-btn:focus-visible {
+  transform: none !important;
+}
+
+.arrow-details-btn:focus-visible {
+  outline: 3px solid rgba(245, 111, 150, 0.2);
+  outline-offset: 3px;
 }
 
 /* List view */
