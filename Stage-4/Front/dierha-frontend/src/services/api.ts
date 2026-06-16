@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://dierha-backend.onrender.com";
+const API_BASE_URL = "https://dierha-backend.onrender.com/api";
 
 type RequestOptions = RequestInit;
 
