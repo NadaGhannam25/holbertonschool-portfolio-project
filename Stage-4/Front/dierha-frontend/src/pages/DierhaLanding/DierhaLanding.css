@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap");
 
 .dierha-landing-page {
     --dl-navy: #07145f;
@@ -20,7 +20,7 @@
     min-height: 100vh;
     overflow-x: hidden;
     color: var(--dl-text);
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     line-height: 1.7;
     background:
         radial-gradient(circle at 8% 3%, rgba(245, 111, 150, 0.11), transparent 25%),
@@ -39,7 +39,7 @@
 .dierha-landing-page input,
 .dierha-landing-page textarea,
 .dierha-landing-page select {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .dierha-landing-page * {
