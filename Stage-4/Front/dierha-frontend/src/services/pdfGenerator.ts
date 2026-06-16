@@ -54,9 +54,10 @@ export async function generatePdfClient(
 <head>
 <meta charset="UTF-8" />
 <title>تقرير ديرها</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: Tahoma, Arial, sans-serif; direction: rtl; background: #F6F8FF; color: #1F2940; }
+  body { font-family: "Cairo", Tahoma, Arial, sans-serif; direction: rtl; background: #F6F8FF; color: #1F2940; }
   .header {
     background: linear-gradient(135deg, #666CC0 0%, #6E87C0 50%, #F3B0B9 100%);
     padding: 40px; text-align: center; color: white;
@@ -94,7 +95,7 @@ export async function generatePdfClient(
 </head>
 <body>
   <div class="no-print" style="text-align:center; padding: 20px; background: #F6F8FF; border-bottom: 1px solid #E7ECF6;">
-    <button onclick="window.print()" style="background: linear-gradient(135deg, #1D47DA, #315BE6); color: white; border: none; padding: 12px 32px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: Tahoma, Arial, sans-serif;">
+    <button onclick="window.print()" style="background: linear-gradient(135deg, #1D47DA, #315BE6); color: white; border: none; padding: 12px 32px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: Cairo, Tahoma, Arial, sans-serif;">
       ⬇ تحميل PDF
     </button>
   </div>
