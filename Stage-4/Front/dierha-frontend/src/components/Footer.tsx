@@ -14,7 +14,6 @@ function Footer({ goToHome, goToSubscriptions, goToAddSubscription }: FooterProp
           <div className="footer-logo">
             <img src={logo} alt="Dierha Logo" />
           </div>
-
           <p>
             ديرها يساعدك على تنظيم اشتراكاتك ، متابعة مصروفاتك، ومعرفة
             مواعيد التجديد بسهولة.
@@ -33,19 +32,16 @@ function Footer({ goToHome, goToSubscriptions, goToAddSubscription }: FooterProp
         <div className="footer-col">
           <h4>تواصل معنا</h4>
           <ul>
-            <a
+            <li>
+              <a
                 href="https://mail.google.com/mail/?view=cm&fs=1&to=support@dierha.com&su=طلب%20دعم%20-%20ديرها"
                 target="_blank"
                 rel="noreferrer"
-                style={{
-                   color: "#667085",
-                   textDecoration: "none",
-                   fontWeight: 600,
-                   fontSize: "13px",
-                }}
-                >
-               support@dierha.com
-            </a>
+                style={{ color: "#667085", textDecoration: "none", fontWeight: 600, fontSize: "13px" }}
+              >
+                support@dierha.com
+              </a>
+            </li>
             <li>+966 00 000 0000</li>
             <li>www.dierha.com</li>
           </ul>
