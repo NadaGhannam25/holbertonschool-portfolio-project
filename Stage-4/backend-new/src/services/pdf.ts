@@ -4,7 +4,7 @@
 import puppeteer, { type Browser } from 'puppeteer';
 import { eq } from 'drizzle-orm';
 import { db } from '../db';
-import { categories, subscriptions, users } from '../db/schema';
+import { categories, subscriptionProviders, subscriptions, users } from '../db/schema';
 
 let browserInstance: Browser | null = null;
 let browserStarting = false;
@@ -110,9 +110,11 @@ export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> 
       status: subscriptions.status,
       deletedAt: subscriptions.deletedAt,
       categoryName: categories.name,
+      providerLogoUrl: subscriptionProviders.logoUrl,
     })
     .from(subscriptions)
     .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
+    .leftJoin(subscriptionProviders, eq(subscriptions.providerId, subscriptionProviders.id))
     .where(eq(subscriptions.userId, userId));
 
   const activeSubscriptions = rows.filter(
@@ -129,7 +131,12 @@ export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> 
     .map(
       (s) => `
       <tr class="${s.deletedAt ? 'deleted-row' : ''}">
-        <td>${s.name}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${s.providerLogoUrl ? `<img src="${s.providerLogoUrl}" style="width:24px;height:24px;border-radius:6px;object-fit:contain;" onerror="this.style.display='none'" />` : ''}
+            ${s.name}
+          </div>
+        </td>
         <td>${s.categoryName ?? 'أخرى'}</td>
         <td>${s.price} ريال</td>
         <td>${formatBillingCycle(s.billingCycle)}</td>
