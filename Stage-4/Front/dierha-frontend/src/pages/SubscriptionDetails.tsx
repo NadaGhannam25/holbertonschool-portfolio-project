@@ -581,35 +581,135 @@ function SubscriptionDetails({
                 onClose={() => setIsEditModalOpen(false)}
                 onSave={async (updatedValues) => {
                     try {
-                        const reminderMap: Record<string, { reminderDays: number; remindersEnabled: boolean }> = {
+                        const toEnglishDigits = (value: unknown) => {
+                            return String(value ?? "")
+                                .replace(/[٠-٩]/g, (digit) =>
+                                    String("٠١٢٣٤٥٦٧٨٩".indexOf(digit))
+                                )
+                                .replace(/[۰-۹]/g, (digit) =>
+                                    String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit))
+                                )
+                                .replace(",", ".")
+                                .trim();
+                        };
+
+                        const normalizeDateForApi = (value?: string) => {
+                            const fallbackDate = subscription.startDate || subscription.renewalDate;
+
+                            if (!value) return fallbackDate;
+
+                            const normalizedValue = toEnglishDigits(value);
+
+                            if (/^\d{4}-\d{2}-\d{2}$/.test(normalizedValue)) {
+                                return normalizedValue;
+                            }
+
+                            const arabicMonths: Record<string, number> = {
+                                يناير: 0,
+                                فبراير: 1,
+                                مارس: 2,
+                                أبريل: 3,
+                                ابريل: 3,
+                                مايو: 4,
+                                يونيو: 5,
+                                يوليو: 6,
+                                أغسطس: 7,
+                                اغسطس: 7,
+                                سبتمبر: 8,
+                                أكتوبر: 9,
+                                اكتوبر: 9,
+                                نوفمبر: 10,
+                                ديسمبر: 11,
+                            };
+
+                            const arabicDateMatch = normalizedValue.match(
+                                /^(\d{1,2})\s+([^\s]+)\s+(\d{4})$/
+                            );
+
+                            if (arabicDateMatch) {
+                                const [, day, monthName, year] = arabicDateMatch;
+                                const monthIndex = arabicMonths[monthName];
+
+                                if (monthIndex !== undefined) {
+                                    const parsedArabicDate = new Date(
+                                        Number(year),
+                                        monthIndex,
+                                        Number(day)
+                                    );
+
+                                    if (!Number.isNaN(parsedArabicDate.getTime())) {
+                                        return parsedArabicDate.toISOString().slice(0, 10);
+                                    }
+                                }
+                            }
+
+                            const parsedDate = new Date(normalizedValue);
+
+                            if (Number.isNaN(parsedDate.getTime())) {
+                                return fallbackDate;
+                            }
+
+                            return parsedDate.toISOString().slice(0, 10);
+                        };
+
+                        const parsedPrice = Number(toEnglishDigits(updatedValues.price));
+
+                        if (!Number.isFinite(parsedPrice) || parsedPrice <= 0) {
+                            setToastType("error");
+                            setToastMessage("تأكدي من كتابة السعر بشكل صحيح.");
+                            return;
+                        }
+
+                        const reminderMap: Record<
+                            string,
+                            { reminderDays: number; remindersEnabled: boolean }
+                        > = {
                             "قبل بيوم": { reminderDays: 1, remindersEnabled: true },
                             "قبل بثلاث أيام": { reminderDays: 3, remindersEnabled: true },
                             "قبل بأسبوع": { reminderDays: 7, remindersEnabled: true },
-                            "إيقاف التذكير": { reminderDays: subscription.reminderDays ?? 3, remindersEnabled: false },
+                            "إيقاف التذكير": {
+                                reminderDays: subscription.reminderDays ?? 3,
+                                remindersEnabled: false,
+                            },
                         };
 
-                        const reminderSettings = reminderMap[updatedValues.reminderPreference || "قبل بيوم"] ?? {
+                        const selectedReminder =
+                            updatedValues.reminderPreference || reminderPreferenceLabel;
+
+                        const reminderSettings = reminderMap[selectedReminder] ?? {
                             reminderDays: subscription.reminderDays ?? 3,
                             remindersEnabled: subscription.remindersEnabled ?? true,
                         };
 
+                        const selectedCategoryName = updatedValues.category || categoryName;
+                        const selectedDuration = updatedValues.duration || billingCycleLabel;
+                        const selectedStatus = updatedValues.status || statusLabel;
+
                         await updateSubscription(subscription.id, {
-                            name: !subscription.provider?.id
-                                ? updatedValues.name?.trim() || subscription.name
-                                : subscription.name,
-                            cancelUrl: !subscription.provider?.id
-                                ? normalizeOptionalCancelUrl(updatedValues.cancelUrl)
-                                : subscription.cancelUrl || undefined,
-                            categoryId: subscription.provider?.id
-                                ? subscription.categoryId
-                                : categoryIdMap[updatedValues.category] ?? subscription.categoryId,
-                            price: Number(updatedValues.price),
-                            billingCycle: billingCycleMap[updatedValues.duration] ?? subscription.billingCycle,
-                            renewalDate: updatedValues.renewalDate,
-                            status: updatedValues.status === "نشط" ? "active" : "inactive",
-                            notes: updatedValues.notes,
+                            price: parsedPrice,
+                            categoryId:
+                                categoryIdMap[selectedCategoryName] ??
+                                subscription.categoryId ??
+                                undefined,
+                            billingCycle:
+                                billingCycleMap[selectedDuration] ?? subscription.billingCycle,
+                            startDate: normalizeDateForApi(updatedValues.renewalDate),
+                            status:
+                                selectedStatus === "نشط" || selectedStatus === "active"
+                                    ? "active"
+                                    : "inactive",
+                            notes: updatedValues.notes ?? "",
                             reminderDays: reminderSettings.reminderDays,
                             remindersEnabled: reminderSettings.remindersEnabled,
+                            ...(!subscription.provider?.id
+                                ? {
+                                      name:
+                                          updatedValues.name?.trim() || subscription.name,
+                                      cancelUrl: normalizeOptionalCancelUrl(
+                                          updatedValues.cancelUrl
+                                      ),
+                                  }
+                                : {}),
                         });
 
                         setToastType("success");
@@ -617,12 +717,15 @@ function SubscriptionDetails({
                         setIsEditModalOpen(false);
                         await loadSubscription();
                     } catch (error) {
-                        console.error(error);
+                        console.error("Update subscription failed:", error);
                         setToastType("error");
-                        setToastMessage("حدث خطأ أثناء تحديث الاشتراك.");
+                        setToastMessage(
+                            error instanceof Error
+                                ? error.message
+                                : "حدث خطأ أثناء تحديث الاشتراك."
+                        );
                     }
-                }}
-            />
+                }}            />
 
             <CancelSubscriptionModal
                 isOpen={isCancelModalOpen}
