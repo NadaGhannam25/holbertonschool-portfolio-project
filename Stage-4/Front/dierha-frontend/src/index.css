@@ -3941,3 +3941,35 @@ a { text-decoration: none; color: inherit; }
   border: none !important;
   outline: none !important;
 }
+
+.edit-select-wrapper::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 24px !important;
+  top: 50% !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-right: 2px solid #667085 !important;
+  border-bottom: 2px solid #667085 !important;
+  transform: translateY(-65%) rotate(45deg) !important;
+  pointer-events: none !important;
+  z-index: 3 !important;
+}
+
+.edit-select-wrapper select {
+  padding-left: 3.2rem !important;
+  padding-right: 1rem !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+.edit-modal-field select {
+  display: flex !important;
+  align-items: center !important;
+  color: var(--dark) !important;
+  font-weight: 900 !important;
+}
+
+.edit-select-arrow {
+  display: none !important;
+}
