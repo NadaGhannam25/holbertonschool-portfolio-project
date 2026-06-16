@@ -62,7 +62,7 @@ const features: Feature[] = [
 const steps = [
     {
         number: "01",
-        title: "أضيفي اشتراكاتك",
+        title: "أضيف اشتراكاتك",
         description: "أضيف الخدمة والمبلغ وتاريخ التجديد.",
     },
     {
