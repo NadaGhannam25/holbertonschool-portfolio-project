@@ -518,7 +518,9 @@ function Subscriptions({
                                                     aria-label="فتح تفاصيل الاشتراك"
                                                     title="تفاصيل الاشتراك"
                                                 >
-                                                    ←
+                                                    <span className="arrow-details-icon" aria-hidden="true">
+                                                        ←
+                                                    </span>
                                                 </button>
                                             </div>
                                         </article>
@@ -589,7 +591,9 @@ function Subscriptions({
                                                     aria-label="فتح تفاصيل الاشتراك"
                                                     title="تفاصيل الاشتراك"
                                                 >
-                                                    ←
+                                                    <span className="arrow-details-icon" aria-hidden="true">
+                                                        ←
+                                                    </span>
                                                 </button>
                                             </div>
                                         </article>
