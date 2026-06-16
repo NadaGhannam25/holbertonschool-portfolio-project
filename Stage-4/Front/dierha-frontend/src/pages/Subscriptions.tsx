@@ -512,16 +512,26 @@ function Subscriptions({
                                                 </span>
 
                                                 <button
-                                                    type="button"
-                                                    className="arrow-details-btn"
-                                                    onClick={() => handleDetailsClick(item.id)}
-                                                    aria-label="فتح تفاصيل الاشتراك"
-                                                    title="تفاصيل الاشتراك"
-                                                >
-                                                    <span className="arrow-details-icon" aria-hidden="true">
-                                                        ←
-                                                    </span>
-                                                </button>
+  type="button"
+  className="arrow-details-btn"
+  onClick={() => handleDetailsClick(item.id)}
+  aria-label="فتح تفاصيل الاشتراك"
+  title="تفاصيل الاشتراك"
+>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M15 6L9 12L15 18"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+</button>
                                             </div>
                                         </article>
                                     ))
