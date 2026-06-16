@@ -163,12 +163,25 @@ export class SubscriptionsService {
   async getSubscriptionSpending(userId: number, id: number) {
     const subscription = await this.getOwnedSubscription(userId, id);
 
+    const history = await db
+      .select({
+        newPrice: priceHistory.newPrice,
+        effectiveFrom: priceHistory.effectiveFrom,
+      })
+      .from(priceHistory)
+      .where(eq(priceHistory.subscriptionId, subscription.id))
+      .orderBy(priceHistory.effectiveFrom);
+
     const payments = this.generatePaymentTimeline({
       service: subscription.name,
-      amount: Number(subscription.price),
+      currentPrice: Number(subscription.price),
       startDate: subscription.startDate,
       renewalDate: subscription.renewalDate,
       billingCycle: subscription.billingCycle as BillingCycle,
+      priceHistory: history.map((h) => ({
+        effectiveFrom: h.effectiveFrom,
+        price: Number(h.newPrice),
+      })),
     });
 
     return {
@@ -410,10 +423,11 @@ export class SubscriptionsService {
 
   private generatePaymentTimeline(params: {
     service: string;
-    amount: number;
+    currentPrice: number;
     startDate: string;
     renewalDate: string;
     billingCycle: BillingCycle;
+    priceHistory: { effectiveFrom: string; price: number }[];
   }) {
     const payments: {
       service: string;
@@ -426,15 +440,42 @@ export class SubscriptionsService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Build sorted price segments: earliest first
+    const segments = [...params.priceHistory].sort(
+      (a, b) => new Date(a.effectiveFrom).getTime() - new Date(b.effectiveFrom).getTime(),
+    );
+
+    // Resolve the correct price for a given payment date
+    const getPriceForDate = (date: Date): number => {
+      let resolved = params.currentPrice;
+      // Walk segments in reverse (latest first); use the first segment whose
+      // effectiveFrom is AFTER the payment date — the price BEFORE that change
+      // is the one that applies to this payment.
+      for (let i = segments.length - 1; i >= 0; i--) {
+        const segDate = new Date(segments[i].effectiveFrom);
+        segDate.setHours(0, 0, 0, 0);
+        if (date >= segDate) {
+          resolved = segments[i].price;
+          break;
+        }
+        // If date is before all segments, fall back to currentPrice
+        // (no history entry covers that period — edge case)
+        resolved = params.currentPrice;
+      }
+      // If there are no segments at all, use currentPrice
+      return segments.length === 0 ? params.currentPrice : resolved;
+    };
+
     const currentDate = this.parseDate(params.startDate);
     currentDate.setHours(0, 0, 0, 0);
 
     while (currentDate <= today) {
+      const snapshot = new Date(currentDate);
       payments.push({
         service: params.service,
-        amount: params.amount,
-        date: this.formatDate(currentDate),
-        month: this.getArabicMonthName(currentDate),
+        amount: getPriceForDate(snapshot),
+        date: this.formatDate(snapshot),
+        month: this.getArabicMonthName(snapshot),
         status: 'paid',
       });
 
@@ -451,11 +492,12 @@ export class SubscriptionsService {
     let upcomingCount = 0;
 
     while (upcomingCount < 2) {
+      const snapshot = new Date(upcomingDate);
       payments.push({
         service: params.service,
-        amount: params.amount,
-        date: this.formatDate(upcomingDate),
-        month: this.getArabicMonthName(upcomingDate),
+        amount: params.currentPrice,
+        date: this.formatDate(snapshot),
+        month: this.getArabicMonthName(snapshot),
         status: 'upcoming',
       });
 
