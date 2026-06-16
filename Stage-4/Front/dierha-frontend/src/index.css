@@ -3405,3 +3405,173 @@ a { text-decoration: none; color: inherit; }
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== Dierha requested UI refinements - 2026-06-16 ===== */
+/* Person icon: remove black/blue ombre, keep a clean blue background, and enlarge the icon so the lower edge is hidden. */
+.profile-icon,
+.settings-dropdown-avatar {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1d47da 0%, #4367f2 100%) !important;
+  box-shadow: 0 10px 22px rgba(29, 71, 218, 0.22) !important;
+}
+
+.profile-icon::before,
+.profile-icon::after,
+.settings-dropdown-avatar::before,
+.settings-dropdown-avatar::after {
+  display: none !important;
+  content: none !important;
+  background: transparent !important;
+}
+
+.profile-icon svg,
+.settings-dropdown-avatar svg {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  transform: scale(1.36) translateY(4px);
+  transform-origin: center center;
+}
+
+/* Footer social accounts: match the clean landing-footer style across the internal pages. */
+.social-icons {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.social-link {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(29, 71, 218, 0.07) !important;
+  border: 1px solid rgba(29, 71, 218, 0.12) !important;
+  color: var(--logo-blue) !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  transform: none !important;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease !important;
+}
+
+.social-link:hover {
+  background: var(--logo-blue) !important;
+  border-color: var(--logo-blue) !important;
+  color: var(--white) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 24px rgba(29, 71, 218, 0.18) !important;
+}
+
+.social-link svg {
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+}
+
+/* Edit subscription modal: smaller, tighter, and easier to read. */
+.edit-modal-overlay {
+  align-items: flex-start !important;
+  padding: 0.85rem !important;
+}
+
+.edit-modal-card {
+  max-width: 500px !important;
+  max-height: 86vh !important;
+  border-radius: 22px !important;
+  padding: 1rem !important;
+}
+
+.edit-modal-header {
+  padding-bottom: 0.75rem !important;
+  margin-bottom: 0.8rem !important;
+}
+
+.edit-modal-header h2 {
+  font-size: 1rem !important;
+}
+
+.edit-modal-header p {
+  font-size: 0.76rem !important;
+}
+
+.edit-modal-form {
+  gap: 0.78rem !important;
+}
+
+.edit-modal-grid {
+  gap: 0.7rem !important;
+}
+
+.edit-modal-field {
+  gap: 0.32rem !important;
+}
+
+.edit-modal-field label {
+  font-size: 0.73rem !important;
+}
+
+.edit-modal-field input,
+.edit-modal-field textarea,
+.edit-select-wrapper select,
+.fixed-reminder-edit div {
+  min-height: 42px !important;
+  height: 42px !important;
+  border-radius: 12px !important;
+  padding: 0.62rem 0.74rem !important;
+  font-size: 0.78rem !important;
+}
+
+.edit-modal-field textarea {
+  min-height: 72px !important;
+  height: auto !important;
+}
+
+.edit-price-input {
+  border-radius: 12px !important;
+}
+
+.edit-price-input span {
+  min-width: 50px !important;
+  font-size: 0.74rem !important;
+}
+
+.edit-modal-close {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 10px !important;
+  font-size: 1.15rem !important;
+}
+
+.edit-modal-actions {
+  gap: 0.6rem !important;
+  margin-top: 0 !important;
+}
+
+.edit-modal-actions button {
+  height: 42px !important;
+  border-radius: 12px !important;
+  font-size: 0.8rem !important;
+}
+
+/* Remove the extra decorative dropdown arrows from the edit modal. */
+.edit-select-arrow {
+  display: none !important;
+}
+
+.edit-select-wrapper select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: none !important;
+  background-position: initial !important;
+  background-size: 0 !important;
+  padding-left: 0.74rem !important;
+}
