@@ -659,12 +659,7 @@ function Home({
                                     onClick={async () => {
                                         try {
                                             setPdfLoading(true);
-                                            const storedUser = JSON.parse(localStorage.getItem("dierha_user") ?? "{}") as { name?: string; email?: string };
-                                            await generatePdfClient(
-                                                subscriptions,
-                                                storedUser.name ?? "مستخدم",
-                                                storedUser.email ?? ""
-                                            );
+                                            await generatePdfClient();
                                         } catch (error) {
                                             console.error(error);
                                             setPdfMessage(
