@@ -482,7 +482,7 @@ function SubscriptionDetails({
 
                         <div className="details-chart-card">
                             <div className="panel-title no-action">
-                                <h2 className="section-blue-title">الإنفاق على هذا الاشتراك</h2>
+                                <h2 className="section-blue-title">سجل الإنفاق الشهري</h2>
                             </div>
                             <div className="details-chart-wrapper">
                                 {spendingData.length > 0 ? (
