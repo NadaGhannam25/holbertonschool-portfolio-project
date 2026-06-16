@@ -663,7 +663,7 @@ function SubscriptionDetails({
                     name: subscription.name,
                     cancelUrl: subscription.cancelUrl || "",
                 }}
-                isCustomSubscription={!subscription.provider?.id}
+                isCustomSubscription={false}
                 onClose={() => setIsEditModalOpen(false)}
                 onSave={async (updatedValues) => {
                     try {
@@ -793,9 +793,10 @@ function SubscriptionDetails({
                                 ? {
                                       name:
                                           updatedValues.name?.trim() || subscription.name,
-                                      cancelUrl: normalizeOptionalCancelUrl(
-                                          updatedValues.cancelUrl
-                                      ),
+                                      cancelUrl:
+                                          normalizeOptionalCancelUrl(updatedValues.cancelUrl) ||
+                                          subscription.cancelUrl ||
+                                          undefined,
                                   }
                                 : {}),
                         });
@@ -813,7 +814,8 @@ function SubscriptionDetails({
                                 : "حدث خطأ أثناء تحديث الاشتراك."
                         );
                     }
-                }}            />
+                }}
+            />
 
             <CancelSubscriptionModal
                 isOpen={isCancelModalOpen}
