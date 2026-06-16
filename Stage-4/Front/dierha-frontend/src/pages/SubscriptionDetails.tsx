@@ -10,7 +10,6 @@ import {
     updateSubscription,
     deleteSubscription, 
     getSubscriptionSpending,
-    getPriceHistory,
     type SubscriptionSpending,
 } from "../services/subscriptionService";
 import {
@@ -34,6 +33,8 @@ type ChartItem = {
     month: string;
     amount: number;
 };
+
+type PaymentItem = SubscriptionSpending["payments"][number];
 
 const logoModules = import.meta.glob("../assets/*-logo.png", {
     eager: true,
@@ -211,6 +212,88 @@ const formatReminderPreference = (
     return "قبل بثلاث أيام";
 };
 
+const getPaidPaymentsStorageKey = (subscriptionId: number | string) => {
+    return `dierha_paid_payments_${subscriptionId}`;
+};
+
+const getPaymentSnapshotKey = (payment: PaymentItem) => {
+    return `${payment.date || "no-date"}|${payment.month || "no-month"}|${
+        payment.service || "no-service"
+    }`;
+};
+
+const readPaidPaymentsSnapshot = (subscriptionId: number | string) => {
+    try {
+        const storedValue = localStorage.getItem(getPaidPaymentsStorageKey(subscriptionId));
+        if (!storedValue) return {};
+
+        const parsed = JSON.parse(storedValue);
+        return typeof parsed === "object" && parsed !== null
+            ? (parsed as Record<string, number>)
+            : {};
+    } catch {
+        return {};
+    }
+};
+
+const savePaidPaymentsSnapshot = (
+    subscriptionId: number | string,
+    payments: PaymentItem[]
+) => {
+    try {
+        const currentSnapshot = readPaidPaymentsSnapshot(subscriptionId);
+
+        payments
+            .filter((payment) => payment.status === "paid")
+            .forEach((payment) => {
+                const amount = Number(payment.amount);
+
+                if (Number.isFinite(amount)) {
+                    currentSnapshot[getPaymentSnapshotKey(payment)] = amount;
+                }
+            });
+
+        localStorage.setItem(
+            getPaidPaymentsStorageKey(subscriptionId),
+            JSON.stringify(currentSnapshot)
+        );
+    } catch {
+        // Local storage is only used to protect the UI from changing old paid amounts.
+    }
+};
+
+const applyPaidPaymentsSnapshot = (
+    subscriptionId: number | string,
+    payments: PaymentItem[]
+) => {
+    const snapshot = readPaidPaymentsSnapshot(subscriptionId);
+
+    return payments.map((payment) => {
+        if (payment.status !== "paid") return payment;
+
+        const savedAmount = snapshot[getPaymentSnapshotKey(payment)];
+
+        if (typeof savedAmount === "number" && Number.isFinite(savedAmount)) {
+            return {
+                ...payment,
+                amount: savedAmount,
+            };
+        }
+
+        return payment;
+    });
+};
+
+const paymentsToChartData = (payments: PaymentItem[]): ChartItem[] => {
+    return payments
+        .filter((payment) => payment.status === "paid")
+        .map((payment) => ({
+            month: payment.month,
+            amount: Number(payment.amount),
+        }))
+        .filter((item) => Number.isFinite(item.amount));
+};
+
 function SubscriptionDetails({
     onLogout,
     goToHome,
@@ -235,29 +318,14 @@ function SubscriptionDetails({
 
             const data = await getSubscriptionById(subscriptionId);
             const spending = await getSubscriptionSpending(subscriptionId);
-
-            setSubscription(data);
-            setPaymentsData(spending.payments);
-            setSpendingData(
+            const stablePayments = applyPaidPaymentsSnapshot(
+                subscriptionId,
                 spending.payments
-                    .filter((payment) => payment.status === "paid")
-                    .map((payment) => ({
-                        month: payment.month,
-                        amount: Number(payment.amount),
-                    }))
             );
 
-            try {
-                const priceHistory = await getPriceHistory(subscriptionId);
-                console.log("PRICE HISTORY:", priceHistory);
-                console.log("SPENDING:", spending);
-            } catch (priceHistoryError) {
-                console.warn(
-                    "Price history request failed, details page still loaded.",
-                    priceHistoryError
-                );
-                console.log("SPENDING:", spending);
-            }
+            setSubscription(data);
+            setPaymentsData(stablePayments);
+            setSpendingData(paymentsToChartData(stablePayments));
         } catch (err) {
             console.error(err);
             setError("فشل تحميل تفاصيل الاشتراك.");
@@ -367,7 +435,11 @@ function SubscriptionDetails({
     );
     const logoContainerStyle = hasLogo
         ? { background: "#f1f3f9" }
-        : { background: "linear-gradient(135deg, #1D47DA, #020B5C)", color: "#fff" };
+        : {
+              background: "#f1f3f9",
+              color: "#1D47DA",
+              border: "1px solid #E7ECF6",
+          };
 
     return (
         <div className="home-page">
@@ -495,7 +567,7 @@ function SubscriptionDetails({
 
                         <div className="details-chart-card">
                             <div className="panel-title no-action">
-                                <h2 className="section-blue-title">تاريخ الإنفاق على الاشتراك</h2>
+                                <h2 className="section-blue-title">سجل الانفاق الشهري</h2>
                             </div>
                             <div className="details-chart-wrapper">
                                 {spendingData.length > 0 ? (
@@ -698,6 +770,8 @@ function SubscriptionDetails({
                         const selectedCategoryName = updatedValues.category || categoryName;
                         const selectedDuration = updatedValues.duration || billingCycleLabel;
                         const selectedStatus = updatedValues.status || statusLabel;
+
+                        savePaidPaymentsSnapshot(subscription.id, paymentsData);
 
                         await updateSubscription(subscription.id, {
                             price: parsedPrice,
