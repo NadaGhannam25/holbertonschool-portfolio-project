@@ -3652,3 +3652,10 @@ a { text-decoration: none; color: inherit; }
 .arrow-details-btn:active svg {
   transform: none !important;
 }
+
+.arrow-details-btn svg {
+  width: 22px !important;
+  height: 22px !important;
+  display: block !important;
+  transform: none !important;
+}
