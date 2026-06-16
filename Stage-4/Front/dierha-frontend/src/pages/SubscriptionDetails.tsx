@@ -303,7 +303,6 @@ function SubscriptionDetails({
 
     const sortedPayments = [...paymentsData]
         .filter((payment) => {
-            // الاشتراك الغير نشط لا يملك دفعات قادمة
             if (subscription.status === "inactive" && payment.status === "upcoming") return false;
             return true;
         })
@@ -376,7 +375,7 @@ function SubscriptionDetails({
                         </div>
                     </div>
                     <button type="button" className="details-back-btn" onClick={goToSubscriptions}>
-                        ← العودة إلى الاشتراكات
+                         العودة إلى الاشتراكات
                     </button>
                 </section>
 
