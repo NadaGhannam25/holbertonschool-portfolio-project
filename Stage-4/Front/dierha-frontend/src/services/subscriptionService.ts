@@ -298,11 +298,11 @@ export class SubscriptionsService {
   }
 
   update(id: number | string, dto: UpdateSubscriptionDto) {
-  return request<Subscription>(`/subscriptions/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(dto),
-  });
-}
+    return request<Subscription>(`/subscriptions/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(dto),
+    });
+  }
 
   remove(id: number | string) {
     return request<{ message: string; subscription: Subscription }>(
