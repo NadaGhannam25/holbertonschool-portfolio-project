@@ -1,6 +1,13 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://dierha-backend.onrender.com/api";
 
+const response = await fetch(`${API_BASE_URL}/subscriptions/export/pdf`, {
+  method: "GET",
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+
 export async function generatePdfClient(): Promise<void> {
     const token = localStorage.getItem("dierha_token");
     if (!token) throw new Error("يرجى تسجيل الدخول أولاً");
