@@ -1,4 +1,5 @@
-const API_BASE_URL = "https://dierha-backend.onrender.com";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://dierha-backend.onrender.com/api";
 
 type AuthUser = {
     id?: number;
