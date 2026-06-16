@@ -1,6 +1,6 @@
 // rebuild by the cloudflare
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://dierha-backend.onrender.com";
+  import.meta.env.VITE_API_BASE_URL || "https://dierha-backend.onrender.com/api";
 
 export type BillingCycle =
   | "weekly"
