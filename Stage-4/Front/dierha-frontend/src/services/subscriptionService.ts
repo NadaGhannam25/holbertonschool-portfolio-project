@@ -76,11 +76,58 @@ type RequestOptions = RequestInit & {
 };
 
 function getToken() {
-  return (
-    localStorage.getItem("token") ||
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("authToken")
-  );
+  const directKeys = [
+    "token",
+    "accessToken",
+    "authToken",
+    "jwt",
+    "jwtToken",
+    "access_token",
+  ];
+
+  for (const key of directKeys) {
+    const value = localStorage.getItem(key);
+
+    if (value) {
+      return value.replace(/^Bearer\s+/i, "");
+    }
+  }
+
+  const objectKeys = ["user", "currentUser", "auth", "authUser", "dierhaUser"];
+
+  for (const key of objectKeys) {
+    const value = localStorage.getItem(key);
+
+    if (!value) continue;
+
+    try {
+      const parsed = JSON.parse(value);
+
+      const token =
+        parsed?.token ||
+        parsed?.accessToken ||
+        parsed?.authToken ||
+        parsed?.access_token ||
+        parsed?.jwt ||
+        parsed?.jwtToken ||
+        parsed?.data?.token ||
+        parsed?.data?.accessToken ||
+        parsed?.data?.authToken ||
+        parsed?.data?.access_token ||
+        parsed?.user?.token ||
+        parsed?.user?.accessToken ||
+        parsed?.user?.authToken ||
+        parsed?.user?.access_token;
+
+      if (token) {
+        return String(token).replace(/^Bearer\s+/i, "");
+      }
+    } catch {
+      // Ignore invalid JSON values in localStorage.
+    }
+  }
+
+  return null;
 }
 
 function buildQuery(filters?: FilterSubscriptionsDto) {
