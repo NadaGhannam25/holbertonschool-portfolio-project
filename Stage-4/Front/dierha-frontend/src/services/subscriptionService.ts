@@ -215,6 +215,55 @@ export class SubscriptionsService {
 export const subscriptionsService = new SubscriptionsService();
 export const subscriptionService = subscriptionsService;
 
+export const getSubscriptions = (filters?: FilterSubscriptionsDto) => {
+  return subscriptionsService.findAll(filters);
+};
+
+export const getSubscriptionById = (id: number | string) => {
+  return subscriptionsService.findOne(id);
+};
+
+export const createSubscription = (data: CreateSubscriptionDto) => {
+  return subscriptionsService.create(data);
+};
+
+export const updateSubscription = (
+  id: number | string,
+  data: UpdateSubscriptionDto
+) => {
+  return subscriptionsService.update(id, data);
+};
+
+export const deleteSubscription = (id: number | string) => {
+  return subscriptionsService.remove(id);
+};
+
+export const toggleSubscription = (id: number | string) => {
+  return subscriptionsService.toggle(id);
+};
+
+export const getSubscriptionSpending = (id: number | string) => {
+  return subscriptionsService.getSubscriptionSpending(id);
+};
+
+export const getPriceHistory = (id: number | string) => {
+  return subscriptionsService.findPriceHistory(id);
+};
+
+export const exportSubscriptionsPdf = () => {
+  return subscriptionsService.exportPdf();
+};
+
+export const getCategoryAnalytics = () => {
+  return request("/analytics/categories");
+};
+
+export const getMonthlyAnalytics = () => {
+  return request("/analytics/monthly");
+};
+
+export const getUpcomingRenewals = () => {
+  return request("/subscriptions/upcoming-renewals");
+};
+
 export default subscriptionsService;
-
-
