@@ -1,14 +1,9 @@
-import { jsPDF } from "jspdf";
 import type { BackendSubscription } from "./subscriptionService";
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
 function formatBillingCycle(cycle: string): string {
     const map: Record<string, string> = {
-        weekly: "أسبوعي",
-        monthly: "شهري",
-        quarterly: "كل 3 أشهر",
-        semi_annual: "كل 6 أشهر",
-        yearly: "سنوي",
+        weekly: "أسبوعي", monthly: "شهري", quarterly: "كل 3 أشهر",
+        semi_annual: "كل 6 أشهر", yearly: "سنوي",
     };
     return map[cycle] ?? cycle;
 }
@@ -16,9 +11,7 @@ function formatBillingCycle(cycle: string): string {
 function formatDate(val: string | null | undefined): string {
     if (!val) return "—";
     return new Date(val).toLocaleDateString("ar-SA", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        year: "numeric", month: "long", day: "numeric",
     });
 }
 
@@ -31,298 +24,105 @@ function getMonthlyEquivalent(price: string, cycle: string): number {
     return n;
 }
 
-// ─── Canvas helpers ───────────────────────────────────────────────────────
-const PAGE_W = 794;
-const PAGE_H = 1123;
-const MARGIN = 44;
-const COL_W  = PAGE_W - MARGIN * 2;
-
-const C = {
-    blue:      "#1D47DA",
-    navy:      "#020B5C",
-    pink:      "#F56F96",
-    lightBlue: "#8EC2F5",
-    white:     "#FFFFFF",
-    bg:        "#F6F8FF",
-    border:    "#E7ECF6",
-    grey:      "#667085",
-    dark:      "#1F2940",
-    green:     "#25A96A",
-    softBlue:  "#F2F6FF",
-};
-
-function makeCanvas(): HTMLCanvasElement {
-    const c = document.createElement("canvas");
-    c.width  = PAGE_W;
-    c.height = PAGE_H;
-    return c;
-}
-
-function roundRect(
-    ctx: CanvasRenderingContext2D,
-    x: number, y: number, w: number, h: number, r: number
-) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-}
-
-function drawHeader(ctx: CanvasRenderingContext2D, userName: string, userEmail: string) {
-    const grad = ctx.createLinearGradient(0, 0, PAGE_W, 160);
-    grad.addColorStop(0,   "#666CC0");
-    grad.addColorStop(0.5, "#6E87C0");
-    grad.addColorStop(1,   "#F3B0B9");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, PAGE_W, 160);
-
-    ctx.fillStyle  = C.white;
-    ctx.font       = "bold 32px Tahoma, Arial";
-    ctx.textAlign  = "center";
-    ctx.textBaseline = "top";
-    ctx.direction  = "rtl";
-    ctx.fillText("ديرها", PAGE_W / 2, 42);
-
-    ctx.font = "16px Tahoma, Arial";
-    ctx.fillText("تقرير إدارة الاشتراكات", PAGE_W / 2, 84);
-
-    ctx.font      = "13px Tahoma, Arial";
-    ctx.fillStyle = "rgba(255,255,255,0.9)";
-    ctx.fillText(
-        `${userName}  |  ${userEmail}  |  ${new Date().toLocaleDateString("ar-SA")}`,
-        PAGE_W / 2, 116
-    );
-    ctx.textAlign = "right";
-}
-
-function drawSummaryCards(
-    ctx: CanvasRenderingContext2D,
-    total: number, monthly: number, yearly: number, y: number
-): number {
-    const cardW = (COL_W - 24) / 3;
-    const cardH = 82;
-    const cards = [
-        { label: "إجمالي الاشتراكات",         value: String(total) },
-        { label: "الإجمالي الشهري (النشطة)",  value: `${monthly.toFixed(2)} ريال` },
-        { label: "الإجمالي السنوي (النشطة)",  value: `${yearly.toFixed(2)} ريال` },
-    ];
-    cards.forEach((card, i) => {
-        const x = MARGIN + i * (cardW + 12);
-        ctx.shadowColor = "rgba(2,11,92,0.08)";
-        ctx.shadowBlur  = 14;
-        ctx.fillStyle   = C.white;
-        roundRect(ctx, x, y, cardW, cardH, 16);
-        ctx.fill();
-        ctx.shadowBlur  = 0;
-        ctx.strokeStyle = C.border;
-        ctx.lineWidth   = 1;
-        roundRect(ctx, x, y, cardW, cardH, 16);
-        ctx.stroke();
-        ctx.fillStyle  = C.blue;
-        ctx.font       = "bold 11px Tahoma, Arial";
-        ctx.textAlign  = "center";
-        ctx.fillText(card.label, x + cardW / 2, y + 14);
-        ctx.fillStyle  = C.dark;
-        ctx.font       = "bold 20px Tahoma, Arial";
-        ctx.fillText(card.value, x + cardW / 2, y + 38);
-        ctx.textAlign  = "right";
-    });
-    return y + cardH + 20;
-}
-
-function getColDefs() {
-    const x0 = PAGE_W - MARGIN;
-    return [
-        { label: "الخدمة",     x: x0 - 0,   width: 130 },
-        { label: "التصنيف",    x: x0 - 135, width: 90  },
-        { label: "السعر",      x: x0 - 230, width: 90  },
-        { label: "دورة الدفع", x: x0 - 325, width: 100 },
-        { label: "التجديد",    x: x0 - 430, width: 120 },
-        { label: "الحالة",     x: x0 - 555, width: 80  },
-    ];
-}
-
-function drawTableHeader(ctx: CanvasRenderingContext2D, y: number): number {
-    const cols    = getColDefs();
-    const headerH = 38;
-    const grad = ctx.createLinearGradient(MARGIN, y, MARGIN, y + headerH);
-    grad.addColorStop(0, "#1D47DA");
-    grad.addColorStop(1, "#315BE6");
-    ctx.fillStyle = grad;
-    roundRect(ctx, MARGIN, y, COL_W, headerH, 10);
-    ctx.fill();
-    ctx.fillStyle = C.white;
-    ctx.font      = "bold 12px Tahoma, Arial";
-    cols.forEach(col => { ctx.fillText(col.label, col.x, y + 13); });
-    return y + headerH;
-}
-
-function drawRow(
-    ctx: CanvasRenderingContext2D,
-    sub: BackendSubscription,
-    y: number,
-    even: boolean
-): number {
-    const rowH = 42;
-    const cols = getColDefs();
-    ctx.fillStyle = even ? C.softBlue : C.white;
-    ctx.fillRect(MARGIN, y, COL_W, rowH);
-    ctx.strokeStyle = C.border;
-    ctx.lineWidth   = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(MARGIN, y + rowH);
-    ctx.lineTo(MARGIN + COL_W, y + rowH);
-    ctx.stroke();
-
-    ctx.globalAlpha = sub.status === "inactive" ? 0.65 : 1;
-    ctx.font        = "13px Tahoma, Arial";
-    ctx.textAlign   = "right";
-
-    const values = [
-        sub.name,
-        sub.category?.name ?? "أخرى",
-        `${Number(sub.price).toFixed(2)} ريال`,
-        formatBillingCycle(sub.billingCycle),
-        formatDate(sub.renewalDate),
-        sub.status === "active" ? "نشط" : "غير نشط",
-    ];
-
-    cols.forEach((col, i) => {
-        if (i === 5) {
-            const badgeW = 60, badgeH = 22;
-            const badgeX = col.x - badgeW;
-            const badgeY = y + (rowH - badgeH) / 2;
-            ctx.fillStyle = sub.status === "active"
-                ? "rgba(37,169,106,0.12)" : "rgba(102,112,133,0.1)";
-            roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 11);
-            ctx.fill();
-            ctx.fillStyle = sub.status === "active" ? C.green : C.grey;
-            ctx.font      = "bold 11px Tahoma, Arial";
-            ctx.textAlign = "center";
-            ctx.fillText(values[i], badgeX + badgeW / 2, badgeY + 5);
-            ctx.textAlign = "right";
-            ctx.font      = "13px Tahoma, Arial";
-        } else {
-            const maxW = col.width - 8;
-            let t = values[i];
-            while (ctx.measureText(t).width > maxW && t.length > 1) t = t.slice(0, -1);
-            if (t !== values[i]) t += "…";
-            ctx.fillStyle = i === 0 ? C.navy : C.grey;
-            if (i === 0) ctx.font = "bold 13px Tahoma, Arial";
-            ctx.fillText(t, col.x, y + 14);
-            ctx.font = "13px Tahoma, Arial";
-        }
-    });
-    ctx.globalAlpha = 1;
-    return y + rowH;
-}
-
-function drawFooter(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = C.grey;
-    ctx.font      = "12px Tahoma, Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("ديرها | منصة إدارة الاشتراكات", PAGE_W / 2, PAGE_H - 28);
-}
-
-// ─── Main export ─────────────────────────────────────────────────────────────
 export async function generatePdfClient(
     subscriptions: BackendSubscription[],
     userName: string,
     userEmail: string
 ): Promise<void> {
-    const activeOnes   = subscriptions.filter(s => s.status === "active");
+    const activeOnes = subscriptions.filter(s => s.status === "active");
     const monthlyTotal = activeOnes.reduce(
         (sum, s) => sum + getMonthlyEquivalent(s.price, s.billingCycle), 0
     );
     const yearlyTotal = monthlyTotal * 12;
 
-    const ROW_H        = 42;
-    const HEADER_H     = 160;
-    const CARDS_H      = 82 + 20;
-    const TITLE_H      = 40;
-    const TABLE_HEAD_H = 38;
-    const FOOTER_H     = 40;
+    const rows = subscriptions.map(s => `
+        <tr>
+            <td>${s.name}</td>
+            <td>${s.category?.name ?? "أخرى"}</td>
+            <td>${Number(s.price).toFixed(2)} ريال</td>
+            <td>${formatBillingCycle(s.billingCycle)}</td>
+            <td>${formatDate(s.renewalDate)}</td>
+            <td>
+                <span class="badge ${s.status === "active" ? "active" : "inactive"}">
+                    ${s.status === "active" ? "نشط" : "غير نشط"}
+                </span>
+            </td>
+        </tr>`).join("");
 
-    const firstPageRows = Math.floor(
-        (PAGE_H - HEADER_H - CARDS_H - TITLE_H - TABLE_HEAD_H - FOOTER_H - 20) / ROW_H
-    );
-    const extraPageRows = Math.floor(
-        (PAGE_H - TABLE_HEAD_H - FOOTER_H - 60) / ROW_H
-    );
+    const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>تقرير ديرها</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Tahoma, Arial, sans-serif; direction: rtl; background: #F6F8FF; color: #1F2940; }
+  .header {
+    background: linear-gradient(135deg, #666CC0 0%, #6E87C0 50%, #F3B0B9 100%);
+    padding: 40px; text-align: center; color: white;
+  }
+  .header h1 { font-size: 36px; font-weight: 900; margin-bottom: 8px; }
+  .header p { font-size: 15px; opacity: 0.9; }
+  .header .meta { margin-top: 12px; font-size: 13px; opacity: 0.85; }
+  .content { padding: 32px 40px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+  .card {
+    background: white; border: 1px solid #E7ECF6; border-radius: 16px;
+    padding: 20px; text-align: center;
+    box-shadow: 0 4px 12px rgba(2,11,92,0.06);
+  }
+  .card .label { color: #1D47DA; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+  .card .value { color: #1F2940; font-size: 22px; font-weight: 900; }
+  h2 { color: #1D47DA; font-size: 20px; font-weight: 900; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+  th { background: linear-gradient(135deg, #1D47DA, #315BE6); color: white; padding: 14px 16px; text-align: right; font-size: 13px; }
+  td { padding: 13px 16px; border-bottom: 1px solid #E7ECF6; font-size: 13px; color: #1F2940; }
+  tr:nth-child(even) td { background: #F2F6FF; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .badge.active { background: #E8F5E9; color: #2E7D32; }
+  .badge.inactive { background: #FFF8E1; color: #F57F17; }
+  .footer { margin-top: 32px; text-align: center; color: #667085; font-size: 13px; }
+  @media print {
+    @page { size: A4; margin: 0; }
+    body { background: white; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>ديرها</h1>
+    <p>تقرير إدارة الاشتراكات</p>
+    <div class="meta">${userName} | ${userEmail} | ${new Date().toLocaleDateString("ar-SA")}</div>
+  </div>
+  <div class="content">
+    <div class="cards">
+      <div class="card"><div class="label">إجمالي الاشتراكات</div><div class="value">${subscriptions.length}</div></div>
+      <div class="card"><div class="label">الإجمالي الشهري (النشطة)</div><div class="value">${monthlyTotal.toFixed(2)} ريال</div></div>
+      <div class="card"><div class="label">الإجمالي السنوي (النشطة)</div><div class="value">${yearlyTotal.toFixed(2)} ريال</div></div>
+    </div>
+    <h2>جدول الاشتراكات</h2>
+    <table>
+      <thead>
+        <tr><th>الخدمة</th><th>التصنيف</th><th>السعر</th><th>دورة الدفع</th><th>تاريخ التجديد</th><th>الحالة</th></tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="footer">ديرها | منصة إدارة الاشتراكات</div>
+  </div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() { window.print(); }, 300);
+    };
+  </script>
+</body>
+</html>`;
 
-    const totalPages = subscriptions.length <= firstPageRows
-        ? 1
-        : 1 + Math.ceil((subscriptions.length - firstPageRows) / extraPageRows);
-
-    // ─── jsPDF: A4 بالـ pixel dimensions ─────────────────────────────────
-    const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "px",
-        format: [PAGE_W, PAGE_H],
-        hotfixes: ["px_scaling"],
-    });
-
-    for (let p = 0; p < totalPages; p++) {
-        const canvas = makeCanvas();
-        const ctx    = canvas.getContext("2d")!;
-        ctx.textBaseline = "top";
-        ctx.textAlign    = "right";
-        ctx.direction    = "rtl";
-
-        // خلفية
-        ctx.fillStyle = C.bg;
-        ctx.fillRect(0, 0, PAGE_W, PAGE_H);
-
-        let y: number;
-
-        if (p === 0) {
-            drawHeader(ctx, userName, userEmail);
-            y = HEADER_H + 16;
-            y = drawSummaryCards(ctx, subscriptions.length, monthlyTotal, yearlyTotal, y);
-
-            ctx.fillStyle = C.blue;
-            ctx.font      = "bold 18px Tahoma, Arial";
-            ctx.textAlign = "right";
-            ctx.fillText("جدول الاشتراكات", PAGE_W - MARGIN, y);
-            y += TITLE_H;
-
-            const tableTop = y;
-            y = drawTableHeader(ctx, y);
-            subscriptions.slice(0, firstPageRows).forEach((sub, i) => {
-                y = drawRow(ctx, sub, y, i % 2 === 0);
-            });
-            ctx.strokeStyle = C.border;
-            ctx.lineWidth   = 1;
-            ctx.strokeRect(MARGIN, tableTop, COL_W, y - tableTop);
-        } else {
-            const startIdx = firstPageRows + (p - 1) * extraPageRows;
-            const slice    = subscriptions.slice(startIdx, startIdx + extraPageRows);
-            ctx.fillStyle  = C.blue;
-            ctx.font       = "bold 14px Tahoma, Arial";
-            ctx.textAlign  = "right";
-            ctx.fillText(`تابع — جدول الاشتراكات (صفحة ${p + 1})`, PAGE_W - MARGIN, 20);
-            const tableTop = 50;
-            y = drawTableHeader(ctx, tableTop);
-            slice.forEach((sub, i) => { y = drawRow(ctx, sub, y, i % 2 === 0); });
-            ctx.strokeStyle = C.border;
-            ctx.lineWidth   = 1;
-            ctx.strokeRect(MARGIN, tableTop, COL_W, y - tableTop);
-        }
-
-        drawFooter(ctx);
-
-        // إضافة الـ canvas كصفحة في الـ PDF
-        const imgData = canvas.toDataURL("image/jpeg", 0.92);
-        if (p > 0) pdf.addPage([PAGE_W, PAGE_H], "portrait");
-        pdf.addImage(imgData, "JPEG", 0, 0, PAGE_W, PAGE_H);
-    }
-
-    pdf.save(`dierha-${new Date().toISOString().slice(0, 10)}.pdf`);
+    const win = window.open("", "_blank");
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
 }
