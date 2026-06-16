@@ -39,48 +39,55 @@ function Footer({
   goToAddSubscription,
 }: FooterProps) {
   return (
-    <footer className="main-footer" dir="rtl">
-      <div className="footer-container footer-grid">
-        <div className="footer-brand">
+    <footer className="dierha-app-footer" dir="rtl">
+      <div className="dierha-app-footer-container dierha-app-footer-grid">
+        <div className="dierha-app-footer-brand">
           <img src={logo} alt="ديرها" />
+
           <p>
             ديرها يساعدك على تنظيم اشتراكاتك ومتابعة مصاريفك ومواعيد التجديد
             بسهولة.
           </p>
         </div>
 
-        <div className="footer-col">
+        <div className="dierha-app-footer-col">
           <h4>روابط سريعة</h4>
+
           <button type="button" onClick={goToHome}>
             الرئيسية
           </button>
+
           <button type="button" onClick={goToSubscriptions}>
             الاشتراكات
           </button>
+
           <button type="button" onClick={goToAddSubscription}>
             إضافة اشتراك
           </button>
         </div>
 
-        <div className="footer-col">
+        <div className="dierha-app-footer-col">
           <h4>تواصل معنا</h4>
           <span>support@dierha.com</span>
           <span>www.dierha.com</span>
         </div>
 
-        <div className="footer-col">
+        <div className="dierha-app-footer-col">
           <h4>تابعنا</h4>
-          <div className="footer-socials">
-            <span aria-label="X">𝕏</span>
-            <span aria-label="LinkedIn">in</span>
-            <span className="footer-instagram-icon" aria-label="Instagram">
+
+          <div className="dierha-app-footer-socials">
+            <span aria-label="Instagram">
               <InstagramIcon />
             </span>
+
+            <span aria-label="LinkedIn">in</span>
+
+            <span aria-label="X">𝕏</span>
           </div>
         </div>
       </div>
 
-      <div className="footer-container footer-copyright">
+      <div className="dierha-app-footer-container dierha-app-footer-copyright">
         © 2026 ديرها - جميع الحقوق محفوظة
       </div>
     </footer>
