@@ -3561,6 +3561,7 @@ a { text-decoration: none; color: inherit; }
   font-size: 0.8rem !important;
 }
 
+/* Remove the extra decorative dropdown arrows from the edit modal. */
 .edit-select-arrow {
   display: none !important;
 }
