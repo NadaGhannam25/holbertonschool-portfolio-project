@@ -10,6 +10,7 @@ import {
     updateSubscription,
     deleteSubscription, 
     getSubscriptionSpending,
+    getPriceHistory,
     type SubscriptionSpending,
 } from "../services/subscriptionService";
 import {
@@ -233,6 +234,10 @@ function SubscriptionDetails({
             setError("");
             const data = await getSubscriptionById(subscriptionId);
             const spending = await getSubscriptionSpending(subscriptionId);
+            const priceHistory = await getPriceHistory(subscriptionId);
+
+            console.log("PRICE HISTORY:", priceHistory);
+            console.log("SPENDING:", spending);
 
             setSubscription(data);
             setPaymentsData(spending.payments);
