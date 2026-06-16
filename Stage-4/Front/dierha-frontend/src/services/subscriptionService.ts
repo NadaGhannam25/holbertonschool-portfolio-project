@@ -385,7 +385,7 @@ export const getMonthlyAnalytics = () => {
 };
 
 export const getUpcomingRenewals = () => {
-  return request("/subscriptions/upcoming-renewals");
+  return request("/upcoming-renewals");
 };
 
 export default subscriptionsService;
