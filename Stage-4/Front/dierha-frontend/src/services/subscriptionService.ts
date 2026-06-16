@@ -1,200 +1,715 @@
-import { apiRequest } from "./api";
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { and, desc, eq, ilike, sql, type SQL } from 'drizzle-orm';
+import { db } from '../db';
+import {
+  categories,
+  priceHistory,
+  reminders,
+  subscriptionProviders,
+  subscriptions,
+} from '../db/schema';
+import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
+import { FilterSubscriptionsDto } from './dto/filter-subscriptions.dto';
+import { generateSubscriptionsPdf } from '../services/pdf';
 
-export type BackendSubscription = {
-    id: number;
-    name: string;
-    price: string;
-    categoryId: number;
-    startDate?: string;
-    renewalDate: string;
-    billingCycle: "weekly" | "monthly" | "quarterly" | "semi_annual" | "yearly";
-    status: "active" | "inactive";
-    notes?: string | null;
-    cancelUrl?: string | null;
-    reminderDays?: number | null;
-    remindersEnabled?: boolean | null;
-    createdAt?: string;
-    category?: {
-        id: number;
-        name: string;
-    };
-    provider?: {
-        id: number | null;
-        name: string | null;
-        logoUrl: string | null;
-        websiteUrl: string | null;
-        cancelUrl: string | null;
-    };
-};
+type BillingCycle =
+  | 'weekly'
+  | 'monthly'
+  | 'quarterly'
+  | 'semi_annual'
+  | 'yearly';
 
-export type Provider = {
-    id: number;
-    name: string;
-    logoUrl: string | null;
-    websiteUrl: string | null;
-    cancelUrl: string | null;
-    isPopular: boolean;
-    category?: {
-        id: number;
-        name: string;
-    };
-};
+@Injectable()
+export class SubscriptionsService {
+  async findAll(userId: number, filters?: FilterSubscriptionsDto) {
+    const conditions: SQL[] = [
+      eq(subscriptions.userId, userId),
+      sql`${subscriptions.deletedAt} is null`,
+    ];
 
-export async function getSubscriptions(search?: string, categoryId?: number) {
-    const params = new URLSearchParams();
-
-    if (search) params.set("search", search);
-    if (categoryId) params.set("categoryId", String(categoryId));
-
-    const query = params.toString();
-
-    return apiRequest<BackendSubscription[]>(
-        `/api/subscriptions${query ? `?${query}` : ""}`
-    );
-}
-
-export async function getProviders() {
-    return apiRequest<Provider[]>("/api/providers");
-}
-
-export async function createSubscription(data: {
-    providerId?: number;
-    name: string;
-    price: number;
-    categoryId: number;
-    categoryName?: string;
-    startDate: string;
-    billingCycle: "weekly" | "monthly" | "quarterly" | "semi_annual" | "yearly";
-    status?: "active" | "inactive";
-    notes?: string;
-    cancelUrl?: string;
-    reminderDays?: number;
-    remindersEnabled?: boolean;
-}) {
-    return apiRequest<BackendSubscription>("/api/subscriptions", {
-        method: "POST",
-        body: JSON.stringify(data),
-    });
-}
-
-export async function getSubscriptionById(id: number | string) {
-    return apiRequest<BackendSubscription>(`/api/subscriptions/${id}`);
-}
-
-export async function updateSubscription(
-    id: number | string,
-    data: {
-        providerId?: number;
-        name?: string;
-        price?: number;
-        categoryId?: number;
-        renewalDate?: string;
-        billingCycle?: "weekly" | "monthly" | "quarterly" | "semi_annual" | "yearly";
-        status?: "active" | "inactive";
-        notes?: string;
-        cancelUrl?: string;
-        reminderDays?: number;
-        remindersEnabled?: boolean;
+    if (filters?.categoryId !== undefined) {
+      conditions.push(eq(subscriptions.categoryId, Number(filters.categoryId)));
     }
-) {
-    return apiRequest<BackendSubscription>(`/api/subscriptions/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(data),
+
+    if (filters?.search) {
+      conditions.push(ilike(subscriptions.name, `%${filters.search}%`));
+    }
+
+    if (filters?.paymentMonth !== undefined) {
+      conditions.push(
+        sql`extract(month from ${subscriptions.renewalDate}::date) = ${Number(filters.paymentMonth)}`,
+      );
+    }
+
+    if (filters?.paymentYear !== undefined) {
+      conditions.push(
+        sql`extract(year from ${subscriptions.renewalDate}::date) = ${Number(filters.paymentYear)}`,
+      );
+    }
+
+    return db
+      .select({
+        id: subscriptions.id,
+        userId: subscriptions.userId,
+        providerId: subscriptions.providerId,
+        name: subscriptions.name,
+        price: subscriptions.price,
+        categoryId: subscriptions.categoryId,
+        renewalDate: subscriptions.renewalDate,
+        startDate: subscriptions.startDate,
+        endDate: subscriptions.endDate,
+        billingCycle: subscriptions.billingCycle,
+        notes: subscriptions.notes,
+        status: subscriptions.status,
+        cancelUrl: subscriptions.cancelUrl,
+        reminderDays: subscriptions.reminderDays,
+        remindersEnabled: subscriptions.remindersEnabled,
+        deletedAt: subscriptions.deletedAt,
+        createdAt: subscriptions.createdAt,
+
+        category: {
+          id: categories.id,
+          name: categories.name,
+        },
+
+        provider: {
+          id: subscriptionProviders.id,
+          name: subscriptionProviders.name,
+          logoUrl: subscriptionProviders.logoUrl,
+          websiteUrl: subscriptionProviders.websiteUrl,
+          cancelUrl: subscriptionProviders.cancelUrl,
+        },
+      })
+      .from(subscriptions)
+      .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
+      .leftJoin(
+        subscriptionProviders,
+        eq(subscriptions.providerId, subscriptionProviders.id),
+      )
+      .where(and(...conditions));
+  }
+
+  async exportPdf(userId: number) {
+    return generateSubscriptionsPdf(userId);
+  }
+
+  async create(userId: number, dto: CreateSubscriptionDto) {
+    return db.transaction(async (tx) => {
+      const reminderDays = dto.reminderDays ?? 3;
+      const remindersEnabled = dto.remindersEnabled ?? true;
+      const startDate = dto.startDate;
+
+      const nextRenewalDate = this.getNextRenewalDate(
+        startDate,
+        dto.billingCycle as BillingCycle,
+      );
+
+      const resolvedCategoryId = await this.resolveCategoryId(
+        tx,
+        dto.categoryId,
+        dto.categoryName,
+      );
+
+      const [subscription] = await tx
+        .insert(subscriptions)
+        .values({
+          userId,
+          providerId: dto.providerId,
+          name: dto.name,
+          price: this.formatPrice(dto.price),
+          categoryId: resolvedCategoryId,
+          renewalDate: nextRenewalDate,
+          startDate,
+          endDate: null,
+          billingCycle: dto.billingCycle,
+          notes: dto.notes,
+          status: dto.status ?? 'active',
+          cancelUrl: dto.cancelUrl,
+          reminderDays,
+          remindersEnabled,
+        })
+        .returning();
+
+      if (remindersEnabled) {
+        const renewalDate = this.parseDate(nextRenewalDate);
+        renewalDate.setHours(23, 59, 59, 999);
+
+        const remindAt = this.parseDate(nextRenewalDate);
+        remindAt.setDate(remindAt.getDate() - reminderDays);
+
+        const now = new Date();
+
+        if (renewalDate >= now) {
+          await tx.insert(reminders).values({
+            subscriptionId: subscription.id,
+            remindAt: this.formatDate(remindAt <= now ? now : remindAt),
+            sent: false,
+            sentAt: null,
+          });
+        }
+      }
+
+      return subscription;
     });
-}
+  }
 
-export async function deleteSubscription(id: number | string) {
-    return apiRequest<{ message: string }>(`/api/subscriptions/${id}`, {
-        method: "DELETE",
+  async findOne(userId: number, id: number) {
+    return this.getOwnedSubscription(userId, id);
+  }
+
+  async getSubscriptionSpending(userId: number, id: number) {
+    const subscription = await this.getOwnedSubscription(userId, id);
+
+    // جلب تاريخ الأسعار مرتباً من الأقدم للأحدث
+    const priceChanges = await db
+      .select()
+      .from(priceHistory)
+      .where(eq(priceHistory.subscriptionId, subscription.id))
+      .orderBy(priceHistory.effectiveFrom);
+
+    // بناء قائمة الأسعار مع تواريخ السريان
+    const pricePeriods: { from: Date; amount: number }[] = [];
+
+    const startDate = this.parseDate(subscription.startDate);
+    startDate.setHours(0, 0, 0, 0);
+
+    // السعر الأصلي: أول قيمة قديمة في التاريخ أو السعر الحالي
+    let originalAmount = Number(subscription.price);
+    if (priceChanges.length > 0 && priceChanges[0].oldPrice) {
+      originalAmount = Number(priceChanges[0].oldPrice);
+    }
+
+    pricePeriods.push({ from: startDate, amount: originalAmount });
+
+    for (const change of priceChanges) {
+      const effectiveDate = this.parseDate(change.effectiveFrom);
+      effectiveDate.setHours(0, 0, 0, 0);
+      pricePeriods.push({ from: effectiveDate, amount: Number(change.newPrice) });
+    }
+
+    const payments = this.generatePaymentTimelineWithPriceHistory({
+      service: subscription.name,
+      pricePeriods,
+      currentAmount: Number(subscription.price),
+      startDate: subscription.startDate,
+      renewalDate: subscription.renewalDate,
+      billingCycle: subscription.billingCycle as BillingCycle,
     });
-}
 
-export type MonthlyAnalytics = {
-    month: string;
-    amount: number;
-};
+    return {
+      subscription: {
+        id: subscription.id,
+        name: subscription.name,
+      },
+      payments,
+    };
+  }
 
-export type CategoryAnalytics = {
-    category: string;
-    amount: number;
-};
+  async findPriceHistory(userId: number, id: number) {
+    const currentSubscription = await this.getOwnedSubscription(userId, id);
 
-export type UpcomingRenewal = {
-    id: number;
-    name: string;
+    return db
+      .select()
+      .from(priceHistory)
+      .where(eq(priceHistory.subscriptionId, currentSubscription.id))
+      .orderBy(desc(priceHistory.changedAt));
+  }
+
+  async update(userId: number, id: number, dto: UpdateSubscriptionDto) {
+    const currentSubscription = await this.getOwnedSubscription(userId, id);
+
+    return db.transaction(async (tx) => {
+      const updateData: Partial<typeof subscriptions.$inferInsert> = {};
+
+      if (dto.providerId !== undefined) updateData.providerId = dto.providerId;
+      if (dto.name !== undefined) updateData.name = dto.name;
+      if (dto.price !== undefined) updateData.price = this.formatPrice(dto.price);
+      if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
+      if (dto.notes !== undefined) updateData.notes = dto.notes;
+      if (dto.status !== undefined) updateData.status = dto.status;
+      if (dto.cancelUrl !== undefined) updateData.cancelUrl = dto.cancelUrl;
+      if (dto.reminderDays !== undefined) updateData.reminderDays = dto.reminderDays;
+      if (dto.remindersEnabled !== undefined) updateData.remindersEnabled = dto.remindersEnabled;
+
+      if (dto.renewalDate !== undefined) {
+        const parsed = this.parseDate(dto.renewalDate);
+        parsed.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (parsed >= today) {
+          updateData.renewalDate = dto.renewalDate;
+        }
+      }
+
+      if (dto.billingCycle !== undefined && dto.billingCycle !== currentSubscription.billingCycle) {
+        updateData.billingCycle = dto.billingCycle;
+
+        const recalculated = this.getNextRenewalDate(
+          currentSubscription.startDate,
+          dto.billingCycle as BillingCycle,
+        );
+        updateData.renewalDate = recalculated;
+      } else if (dto.billingCycle !== undefined) {
+        updateData.billingCycle = dto.billingCycle;
+      }
+
+      const [updatedSubscription] = await tx
+        .update(subscriptions)
+        .set(updateData)
+        .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+        .returning();
+
+      if (
+        dto.price !== undefined &&
+        Number(currentSubscription.price) !== Number(dto.price)
+      ) {
+        await tx.insert(priceHistory).values({
+          subscriptionId: id,
+          oldPrice: currentSubscription.price,
+          newPrice: this.formatPrice(dto.price),
+          effectiveFrom: updateData.renewalDate ?? currentSubscription.renewalDate,
+        });
+      }
+
+      const reminderSettingsChanged =
+        dto.reminderDays !== undefined ||
+        dto.remindersEnabled !== undefined ||
+        dto.renewalDate !== undefined ||
+        dto.billingCycle !== undefined; 
+
+      if (reminderSettingsChanged) {
+        await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
+
+        const finalRemindersEnabled =
+          dto.remindersEnabled ?? currentSubscription.remindersEnabled ?? true;
+
+        const finalReminderDays =
+          dto.reminderDays ?? currentSubscription.reminderDays ?? 3;
+
+        const finalRenewalDate =
+          updateData.renewalDate ?? currentSubscription.renewalDate;
+
+        if (finalRemindersEnabled) {
+          const renewalDate = this.parseDate(finalRenewalDate);
+          renewalDate.setHours(23, 59, 59, 999);
+
+          const remindAt = this.parseDate(finalRenewalDate);
+          remindAt.setDate(remindAt.getDate() - finalReminderDays);
+
+          const now = new Date();
+
+          if (renewalDate >= now) {
+            await tx.insert(reminders).values({
+              subscriptionId: id,
+              remindAt: this.formatDate(remindAt <= now ? now : remindAt),
+              sent: false,
+              sentAt: null,
+            });
+          }
+        }
+      }
+
+      return updatedSubscription;
+    });
+  }
+
+  async remove(userId: number, id: number) {
+    return db.transaction(async (tx) => {
+      await this.getOwnedSubscription(userId, id);
+
+      const today = this.formatDate(new Date());
+
+      await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
+
+      const [deletedSubscription] = await tx
+        .update(subscriptions)
+        .set({
+          status: 'inactive',
+          endDate: today,
+          deletedAt: new Date(),
+        })
+        .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+        .returning();
+
+      return {
+        message: 'Subscription deleted successfully',
+        subscription: deletedSubscription,
+      };
+    });
+  }
+
+  async toggle(userId: number, id: number) {
+    const currentSubscription = await this.getOwnedSubscription(userId, id);
+
+    const nextStatus =
+      currentSubscription.status === 'active' ? 'inactive' : 'active';
+
+    return db.transaction(async (tx) => {
+      const [updatedSubscription] = await tx
+        .update(subscriptions)
+        .set({
+          status: nextStatus,
+          endDate: nextStatus === 'inactive' ? this.formatDate(new Date()) : null,
+        })
+        .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+        .returning();
+
+      // عند إعادة التفعيل: نحذف أي reminders قديمة ونبني reminder جديد
+      // عند التعطيل: نحذف الـ reminders فقط (لا داعي لتذكير اشتراك غير نشط)
+      await tx.delete(reminders).where(eq(reminders.subscriptionId, id));
+
+      if (nextStatus === 'active' && currentSubscription.remindersEnabled) {
+        const renewalDate = this.parseDate(currentSubscription.renewalDate);
+        renewalDate.setHours(23, 59, 59, 999);
+
+        const remindAt = this.parseDate(currentSubscription.renewalDate);
+        remindAt.setDate(remindAt.getDate() - (currentSubscription.reminderDays ?? 3));
+
+        const now = new Date();
+
+        if (renewalDate >= now) {
+          await tx.insert(reminders).values({
+            subscriptionId: id,
+            remindAt: this.formatDate(remindAt <= now ? now : remindAt),
+            sent: false,
+            sentAt: null,
+          });
+        }
+      }
+
+      return updatedSubscription;
+    });
+  }
+
+  private async getOwnedSubscription(userId: number, id: number) {
+    const [subscription] = await db
+      .select({
+        id: subscriptions.id,
+        userId: subscriptions.userId,
+        providerId: subscriptions.providerId,
+        name: subscriptions.name,
+        price: subscriptions.price,
+        categoryId: subscriptions.categoryId,
+        renewalDate: subscriptions.renewalDate,
+        startDate: subscriptions.startDate,
+        endDate: subscriptions.endDate,
+        billingCycle: subscriptions.billingCycle,
+        notes: subscriptions.notes,
+        status: subscriptions.status,
+        cancelUrl: subscriptions.cancelUrl,
+        reminderDays: subscriptions.reminderDays,
+        remindersEnabled: subscriptions.remindersEnabled,
+        createdAt: subscriptions.createdAt,
+
+        category: {
+          id: categories.id,
+          name: categories.name,
+        },
+
+        provider: {
+          id: subscriptionProviders.id,
+          name: subscriptionProviders.name,
+          logoUrl: subscriptionProviders.logoUrl,
+          websiteUrl: subscriptionProviders.websiteUrl,
+          cancelUrl: subscriptionProviders.cancelUrl,
+        },
+      })
+      .from(subscriptions)
+      .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
+      .leftJoin(
+        subscriptionProviders,
+        eq(subscriptions.providerId, subscriptionProviders.id),
+      )
+      .where(and(
+        eq(subscriptions.id, id),
+        eq(subscriptions.userId, userId),
+        sql`${subscriptions.deletedAt} is null`,
+      ));
+
+    if (!subscription) {
+      throw new NotFoundException('Subscription not found');
+    }
+
+    return subscription;
+  }
+
+  private generatePaymentTimelineWithPriceHistory(params: {
+    service: string;
+    pricePeriods: { from: Date; amount: number }[];
+    currentAmount: number;
+    startDate: string;
     renewalDate: string;
-    price: string;
-};
+    billingCycle: BillingCycle;
+  }) {
+    const payments: {
+      service: string;
+      amount: number;
+      date: string;
+      month: string;
+      status: 'paid' | 'upcoming';
+    }[] = [];
 
-export type SubscriptionPayment = {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const currentDate = this.parseDate(params.startDate);
+    currentDate.setHours(0, 0, 0, 0);
+
+    // دالة تجلب السعر الصحيح لتاريخ معين
+    const getPriceForDate = (date: Date): number => {
+      let amount = params.pricePeriods[0]?.amount ?? params.currentAmount;
+      for (const period of params.pricePeriods) {
+        if (date >= period.from) {
+          amount = period.amount;
+        } else {
+          break;
+        }
+      }
+      return amount;
+    };
+
+    while (currentDate <= today) {
+      payments.push({
+        service: params.service,
+        amount: getPriceForDate(new Date(currentDate)),
+        date: this.formatDate(currentDate),
+        month: this.getArabicMonthName(currentDate),
+        status: 'paid',
+      });
+      this.moveDateForward(currentDate, params.billingCycle);
+    }
+
+    let upcomingDate = this.parseDate(params.renewalDate);
+    upcomingDate.setHours(0, 0, 0, 0);
+    if (upcomingDate <= today) {
+      upcomingDate = new Date(currentDate);
+    }
+
+    let upcomingCount = 0;
+    while (upcomingCount < 2) {
+      payments.push({
+        service: params.service,
+        amount: params.currentAmount,
+        date: this.formatDate(upcomingDate),
+        month: this.getArabicMonthName(upcomingDate),
+        status: 'upcoming',
+      });
+      upcomingCount += 1;
+      this.moveDateForward(upcomingDate, params.billingCycle);
+    }
+
+    return payments;
+  }
+
+  private generatePaymentTimeline(params: {
     service: string;
     amount: number;
-    date: string;
-    month: string;
-    status: "paid" | "upcoming";
-};
+    startDate: string;
+    renewalDate: string;
+    billingCycle: BillingCycle;
+  }) {
+    const payments: {
+      service: string;
+      amount: number;
+      date: string;
+      month: string;
+      status: 'paid' | 'upcoming';
+    }[] = [];
 
-export type SubscriptionSpending = {
-    subscription: {
-        id: number;
-        name: string;
-    };
-    payments: SubscriptionPayment[];
-};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-export async function getMonthlyAnalytics() {
-    return apiRequest<MonthlyAnalytics[]>("/api/analytics/monthly");
-}
+    const currentDate = this.parseDate(params.startDate);
+    currentDate.setHours(0, 0, 0, 0);
 
-export async function getCategoryAnalytics() {
-    return apiRequest<CategoryAnalytics[]>("/api/analytics/categories");
-}
+    while (currentDate <= today) {
+      payments.push({
+        service: params.service,
+        amount: params.amount,
+        date: this.formatDate(currentDate),
+        month: this.getArabicMonthName(currentDate),
+        status: 'paid',
+      });
 
-export async function getUpcomingRenewals() {
-    return apiRequest<UpcomingRenewal[]>("/api/analytics/upcoming");
-}
-
-export async function getSubscriptionSpending(id: number | string) {
-    return apiRequest<SubscriptionSpending>(
-        `/api/subscriptions/${id}/spending`
-    );
-}
-
-export async function exportSubscriptionsPdf() {
-    const token = localStorage.getItem("dierha_token");
-    const baseUrl = import.meta.env.VITE_API_URL ?? "https://dierha-backend.onrender.com";
-
-    const response = await fetch(
-        `${baseUrl}/api/subscriptions/export/pdf`,
-        {
-            method: "GET",
-            headers: {
-                Authorization: token ? `Bearer ${token}` : "",
-            },
-        }
-    );
-
-    if (!response.ok) {
-        let errorMsg = "فشل تصدير ملف PDF";
-        try {
-            const errJson = await response.json() as { message?: string };
-            if (errJson?.message) errorMsg = errJson.message;
-        } catch {
-        }
-        throw new Error(errorMsg);
+      this.moveDateForward(currentDate, params.billingCycle);
     }
 
-    const blob = await response.blob();
-    const downloadUrl = window.URL.createObjectURL(blob);
+    let upcomingDate = this.parseDate(params.renewalDate);
+    upcomingDate.setHours(0, 0, 0, 0);
 
-    const link = document.createElement("a");
-    link.href = downloadUrl;
-    link.download = `dierha-subscriptions-${new Date().toISOString().slice(0, 10)}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    if (upcomingDate <= today) {
+      upcomingDate = new Date(currentDate);
+    }
 
-    setTimeout(() => {
-        window.URL.revokeObjectURL(downloadUrl);
-    }, 2000);
+    let upcomingCount = 0;
+
+    while (upcomingCount < 2) {
+      payments.push({
+        service: params.service,
+        amount: params.amount,
+        date: this.formatDate(upcomingDate),
+        month: this.getArabicMonthName(upcomingDate),
+        status: 'upcoming',
+      });
+
+      upcomingCount += 1;
+      this.moveDateForward(upcomingDate, params.billingCycle);
+    }
+
+    return payments;
+  }
+
+  private moveDateForward(date: Date, billingCycle: BillingCycle) {
+    switch (billingCycle) {
+      case 'weekly':
+        date.setDate(date.getDate() + 7);
+        break;
+      case 'monthly':
+        date.setMonth(date.getMonth() + 1);
+        break;
+      case 'quarterly':
+        date.setMonth(date.getMonth() + 3);
+        break;
+      case 'semi_annual':
+        date.setMonth(date.getMonth() + 6);
+        break;
+      case 'yearly':
+        date.setFullYear(date.getFullYear() + 1);
+        break;
+      default:
+        date.setMonth(date.getMonth() + 1);
+    }
+  }
+
+  private getArabicMonthName(date: Date) {
+    const months = [
+      'يناير',
+      'فبراير',
+      'مارس',
+      'أبريل',
+      'مايو',
+      'يونيو',
+      'يوليو',
+      'أغسطس',
+      'سبتمبر',
+      'أكتوبر',
+      'نوفمبر',
+      'ديسمبر',
+    ];
+
+    return months[date.getMonth()];
+  }
+
+  private getDefaultCategoryName(categoryId?: number, categoryName?: string) {
+    const normalizedName = categoryName?.trim();
+
+    if (normalizedName) {
+      const normalizedMap: Record<string, string> = {
+        الترفيه: 'ترفيه',
+        العمل: 'عمل',
+        التعليم: 'تعليم',
+        الصحة: 'صحة',
+        أخرى: 'أخرى',
+      };
+
+      return normalizedMap[normalizedName] ?? normalizedName.replace(/^ال/, '');
+    }
+
+    const fallbackMap: Record<number, string> = {
+      1: 'ترفيه',
+      2: 'عمل',
+      3: 'تعليم',
+      4: 'صحة',
+      5: 'أخرى',
+    };
+
+    return fallbackMap[categoryId ?? 5] ?? 'أخرى';
+  }
+
+  private async resolveCategoryId(
+    tx: any,
+    categoryId: number,
+    categoryName?: string,
+  ) {
+    const existingById = await tx
+      .select({ id: categories.id })
+      .from(categories)
+      .where(eq(categories.id, categoryId))
+      .limit(1);
+
+    if (existingById[0]?.id) {
+      return existingById[0].id;
+    }
+
+    const safeName = this.getDefaultCategoryName(categoryId, categoryName);
+
+    const existingByName = await tx
+      .select({ id: categories.id })
+      .from(categories)
+      .where(eq(categories.name, safeName))
+      .limit(1);
+
+    if (existingByName[0]?.id) {
+      return existingByName[0].id;
+    }
+
+    const [createdCategory] = await tx
+      .insert(categories)
+      .values({ name: safeName })
+      .onConflictDoNothing()
+      .returning({ id: categories.id });
+
+    if (createdCategory?.id) {
+      return createdCategory.id;
+    }
+
+    const [createdAfterConflict] = await tx
+      .select({ id: categories.id })
+      .from(categories)
+      .where(eq(categories.name, safeName))
+      .limit(1);
+
+    return createdAfterConflict?.id ?? null;
+  }
+
+  private parseDate(dateValue: string | Date) {
+    if (dateValue instanceof Date) {
+      return new Date(dateValue);
+    }
+
+    const [year, month, day] = dateValue.split('-').map(Number);
+
+    return new Date(year, month - 1, day);
+  }
+
+  private formatDate(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  private getNextRenewalDate(startDateValue: string, billingCycle: BillingCycle) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const renewalDate = this.parseDate(startDateValue);
+    renewalDate.setHours(0, 0, 0, 0);
+
+    this.moveDateForward(renewalDate, billingCycle);
+
+    while (renewalDate < today) {
+      this.moveDateForward(renewalDate, billingCycle);
+    }
+
+    return this.formatDate(renewalDate);
+  }
+
+  private formatPrice(price: number | string) {
+    return Number(price).toFixed(2);
+  }
 }
