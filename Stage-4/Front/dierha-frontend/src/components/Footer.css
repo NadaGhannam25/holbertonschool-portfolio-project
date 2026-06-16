@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap");
+
+.main-footer {
+  --footer-navy: #07145f;
+  --footer-blue: #1d47da;
+  --footer-pink: #f56f96;
+  --footer-muted: #687188;
+  --footer-line: #e5eaf5;
+  --footer-surface: #ffffff;
+  --footer-soft-bg: #fbfcff;
+
+  width: 100%;
+  margin-top: 48px;
+  padding: 34px 0 18px;
+  border-top: 1px solid var(--footer-line);
+  background: var(--footer-surface);
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+.main-footer,
+.main-footer * {
+  box-sizing: border-box;
+}
+
+.footer-container {
+  width: min(1180px, calc(100% - 48px));
+  margin-inline: auto;
+}
+
+.footer-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 26px;
+  border: 1px solid var(--footer-line);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 14px 36px rgba(2, 11, 92, 0.055);
+}
+
+.footer-heading h4 {
+  margin: 0;
+  color: var(--footer-navy);
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.footer-links button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border: 1px solid #e8edf8;
+  border-radius: 999px;
+  color: var(--footer-muted);
+  background: var(--footer-soft-bg);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.footer-links button:hover {
+  color: var(--footer-blue);
+  border-color: rgba(29, 71, 218, 0.18);
+  background: #f3f6ff;
+}
+
+.footer-links button:focus-visible {
+  outline: 3px solid rgba(29, 71, 218, 0.18);
+  outline-offset: 3px;
+}
+
+.footer-copyright {
+  margin-top: 18px;
+  padding-top: 15px;
+  border-top: 1px solid var(--footer-line);
+  color: #939bad;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .main-footer {
+    margin-top: 32px;
+    padding-top: 26px;
+  }
+
+  .footer-container {
+    width: min(100% - 28px, 1180px);
+  }
+
+  .footer-card {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 22px;
+  }
+
+  .footer-links {
+    width: 100%;
+  }
+
+  .footer-links button {
+    flex: 1;
+    min-width: 130px;
+  }
+}
