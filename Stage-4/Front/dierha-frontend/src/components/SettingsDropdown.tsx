@@ -1,299 +1,313 @@
 import { useEffect, useRef, useState } from "react";
 import { getStoredUser } from "../services/authService";
-import { apiRequest } from "../services/api";
 
 type SettingsDropdownProps = {
-  onLogout?: () => void;
+    onLogout: () => void;
 };
 
 type StoredUser = {
-  id?: number;
-  name?: string;
-  email?: string;
+    id?: number | string;
+    name?: string;
+    email?: string;
+    [key: string]: unknown;
 };
 
-type UpdateProfileResponse = {
-  message: string;
-  user: StoredUser;
-};
+const STORAGE_USER_KEYS = [
+    "user",
+    "currentUser",
+    "authUser",
+    "dierhaUser",
+    "userData",
+    "auth",
+    "session",
+    "dierha-auth",
+    "auth-storage",
+];
+
+const DIRECT_NAME_KEYS = ["dierha_user_name", "userName", "name"];
+
+function normalizeName(value: string) {
+    return value.replace(/\s+/g, " ").trim();
+}
+
+function isValidName(value: string) {
+    const name = normalizeName(value);
+
+    if (name.length < 2) return false;
+    if (name.length > 40) return false;
+
+    return /^[\p{L}\p{M}\s.'-]+$/u.test(name);
+}
+
+function updateNameInObject(value: unknown, newName: string): unknown {
+    if (!value || typeof value !== "object") {
+        return value;
+    }
+
+    if (Array.isArray(value)) {
+        return value.map((item) => updateNameInObject(item, newName));
+    }
+
+    const objectValue = value as Record<string, unknown>;
+    const nextValue: Record<string, unknown> = { ...objectValue };
+
+    if ("name" in nextValue) {
+        nextValue.name = newName;
+    }
+
+    const nestedKeys = ["user", "data", "auth", "currentUser", "profile", "session", "state"];
+
+    for (const key of nestedKeys) {
+        if (nextValue[key] && typeof nextValue[key] === "object") {
+            nextValue[key] = updateNameInObject(nextValue[key], newName);
+        }
+    }
+
+    return nextValue;
+}
+
+function saveUserNameEverywhere(newName: string, fallbackUser: StoredUser) {
+    let updatedAnyStoredUser = false;
+    const storages = [localStorage, sessionStorage];
+
+    for (const storage of storages) {
+        for (const key of STORAGE_USER_KEYS) {
+            const rawValue = storage.getItem(key);
+
+            if (!rawValue) continue;
+
+            try {
+                const parsedValue = JSON.parse(rawValue);
+                const updatedValue = updateNameInObject(parsedValue, newName);
+
+                storage.setItem(key, JSON.stringify(updatedValue));
+                updatedAnyStoredUser = true;
+            } catch {
+                // Ignore non-JSON values.
+            }
+        }
+
+        for (const key of DIRECT_NAME_KEYS) {
+            if (storage.getItem(key) !== null) {
+                storage.setItem(key, newName);
+                updatedAnyStoredUser = true;
+            }
+        }
+    }
+
+    if (!updatedAnyStoredUser) {
+        localStorage.setItem(
+            "user",
+            JSON.stringify({
+                ...fallbackUser,
+                name: newName,
+            })
+        );
+    }
+}
+
+function PencilIcon() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+                d="M15.5 5.5L18.5 8.5M4 20H7.25L18.1 9.15C18.9284 8.32157 18.9284 6.97843 18.1 6.15L17.85 5.9C17.0216 5.07157 15.6784 5.07157 14.85 5.9L4 16.75V20Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    );
+}
 
 function SettingsDropdown({ onLogout }: SettingsDropdownProps) {
-  const [user, setUser] = useState<StoredUser | null>(() => getStoredUser());
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSupportOpen, setIsSupportOpen] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [newName, setNewName] = useState(user?.name || "");
-  const [isUpdatingName, setIsUpdatingName] = useState(false);
-  const [nameError, setNameError] = useState("");
+    const initialUser = (getStoredUser?.() ?? {}) as StoredUser;
+    const initialName = normalizeName(initialUser?.name || "مستخدم");
+    const initialEmail = String(initialUser?.email || "");
 
-  const menuRef = useRef<HTMLDivElement | null>(null);
-  const userInitial = (user?.name?.trim()?.charAt(0) || "ن").toUpperCase();
+    const [isOpen, setIsOpen] = useState(false);
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [userName, setUserName] = useState(initialName);
+    const [editedName, setEditedName] = useState(initialName);
+    const [errorMessage, setErrorMessage] = useState("");
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setIsSupportOpen(false);
-        setIsEditingName(false);
-      }
+    const userInitial = userName.charAt(0).toUpperCase();
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
+                setIsOpen(false);
+                setIsEditingName(false);
+                setErrorMessage("");
+                setEditedName(userName);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [userName]);
+
+    const handleStartEditing = () => {
+        setEditedName(userName);
+        setErrorMessage("");
+        setIsEditingName(true);
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    const handleCancelEditing = () => {
+        setEditedName(userName);
+        setErrorMessage("");
+        setIsEditingName(false);
+    };
 
-  const handleStartEditName = () => {
-    setNewName(user?.name || "");
-    setNameError("");
-    setIsEditingName(true);
-    setIsSupportOpen(false);
-  };
+    const handleSaveName = () => {
+        const nextName = normalizeName(editedName);
 
-  const handleUpdateName = async () => {
-    const trimmedName = newName.trim();
+        if (!isValidName(nextName)) {
+            setErrorMessage("اكتبي اسم صحيح من حرفين إلى 40 حرف.");
+            return;
+        }
 
-    if (!trimmedName) {
-      setNameError("يرجى إدخال الاسم.");
-      return;
-    }
+        const fallbackUser: StoredUser = {
+            ...initialUser,
+            name: nextName,
+            email: initialEmail,
+        };
 
-    try {
-      setIsUpdatingName(true);
-      setNameError("");
+        saveUserNameEverywhere(nextName, fallbackUser);
 
-      const response = await apiRequest<UpdateProfileResponse>("/auth/profile", {
-        method: "PATCH",
-        body: JSON.stringify({
-          name: trimmedName,
-        }),
-      });
+        setUserName(nextName);
+        setEditedName(nextName);
+        setErrorMessage("");
+        setIsEditingName(false);
 
-      localStorage.setItem("dierha_user", JSON.stringify(response.user));
+        window.dispatchEvent(
+            new CustomEvent("dierha:user-updated", {
+                detail: { name: nextName },
+            })
+        );
+    };
 
-      setUser(response.user);
-      setIsEditingName(false);
-    } catch (error) {
-      console.error(error);
-      setNameError("تعذر تحديث الاسم، حاول مرة أخرى.");
-    } finally {
-      setIsUpdatingName(false);
-    }
-  };
+    const handleLogout = () => {
+        setIsOpen(false);
+        onLogout();
+    };
 
-  return (
-    <div className="settings-dropdown-wrapper person-settings-wrapper" ref={menuRef}>
-      <button
-        type="button"
-        className={`profile-pill profile-settings-trigger ${isOpen ? "open" : ""}`}
-        onClick={() => {
-          setIsOpen((previous) => !previous);
-          setIsSupportOpen(false);
-          setIsEditingName(false);
-        }}
-        aria-label="فتح إعدادات الحساب"
-      >
-        <span className="profile-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" />
-          </svg>
-        </span>
-
-        <strong>{user?.name || "مستخدم"}</strong>
-
-        <span className={`settings-dropdown-arrow ${isOpen ? "open" : ""}`}>
-          ‹
-        </span>
-      </button>
-
-      {isOpen && (
-        <div className="settings-dropdown-menu person-settings-menu">
-          <div className="settings-account-info">
-            <div className="settings-account-row" style={{ display: "block" }}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "10px",
-                  marginBottom: "6px",
-                }}
-              >
-                <span>الاسم</span>
-
-                <button
-                  type="button"
-                  onClick={handleStartEditName}
-                  aria-label="تعديل الاسم"
-                  title="تعديل الاسم"
-                  style={{
-                    border: "none",
-                    background: "transparent",
-                    color: "#2454E8",
-                    cursor: "pointer",
-                    fontSize: "16px",
-                    padding: 0,
-                  }}
+    return (
+        <div className="settings-dropdown-wrapper person-settings-wrapper" ref={dropdownRef}>
+            <button
+                type="button"
+                className="settings-dropdown-trigger profile-settings-trigger"
+                onClick={() => setIsOpen((current) => !current)}
+                aria-expanded={isOpen}
+                aria-haspopup="menu"
+            >
+                <span
+                    className={`settings-dropdown-arrow ${isOpen ? "open" : ""}`}
+                    aria-hidden="true"
                 >
-                  ✎
-                </button>
-              </div>
+                    ^
+                </span>
 
-              {!isEditingName ? (
-                <strong
-                  style={{
-                    display: "block",
-                    wordBreak: "break-word",
-                    fontSize: "15px",
-                  }}
-                >
-                  {user?.name || "مستخدم"}
-                </strong>
-              ) : (
-                <div style={{ marginTop: "8px" }}>
-                  <input
-                    type="text"
-                    value={newName}
-                    onChange={(event) => setNewName(event.target.value)}
-                    placeholder="اكتب الاسم"
-                    style={{
-                      width: "100%",
-                      border: "1px solid #D6DAE1",
-                      borderRadius: "14px",
-                      padding: "10px 12px",
-                      outline: "none",
-                      fontWeight: 700,
-                    }}
-                  />
+                <strong>{userName}</strong>
 
-                  {nameError && (
-                    <p
-                      style={{
-                        color: "#EF476F",
-                        fontSize: "12px",
-                        marginTop: "6px",
-                      }}
-                    >
-                      {nameError}
-                    </p>
-                  )}
+                <span className="settings-dropdown-avatar" aria-hidden="true">
+                    {userInitial}
+                </span>
+            </button>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "8px",
-                      marginTop: "10px",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={handleUpdateName}
-                      disabled={isUpdatingName}
-                      style={{
-                        flex: 1,
-                        border: "none",
-                        borderRadius: "12px",
-                        background: "#2454E8",
-                        color: "#FFFFFF",
-                        padding: "9px",
-                        cursor: "pointer",
-                        fontWeight: 700,
-                      }}
-                    >
-                      {isUpdatingName ? "جاري الحفظ..." : "حفظ"}
-                    </button>
+            {isOpen && (
+                <div className="settings-dropdown-menu person-settings-menu" role="menu">
+                    {!isEditingName ? (
+                        <>
+                            <div className="settings-dropdown-profile">
+                                <span className="settings-dropdown-avatar" aria-hidden="true">
+                                    {userInitial}
+                                </span>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsEditingName(false);
-                        setNameError("");
-                      }}
-                      disabled={isUpdatingName}
-                      style={{
-                        flex: 1,
-                        border: "1px solid #D6DAE1",
-                        borderRadius: "12px",
-                        background: "#FFFFFF",
-                        color: "#667085",
-                        padding: "9px",
-                        cursor: "pointer",
-                        fontWeight: 700,
-                      }}
-                    >
-                      إلغاء
-                    </button>
-                  </div>
+                                <div>
+                                    <strong>{userName}</strong>
+                                    {initialEmail && <p>{initialEmail}</p>}
+                                </div>
+                            </div>
+
+                            <div className="settings-dropdown-divider" />
+
+                            <div className="settings-dropdown-section">
+                                <button
+                                    type="button"
+                                    className="settings-dropdown-support"
+                                    onClick={handleStartEditing}
+                                >
+                                    <span>تعديل الاسم</span>
+                                    <span className="support-left-arrow" aria-hidden="true">
+                                        <PencilIcon />
+                                    </span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="settings-dropdown-support settings-dropdown-logout"
+                                    onClick={handleLogout}
+                                >
+                                    <span>تسجيل الخروج</span>
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <form
+                            className="settings-profile-edit-form"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                handleSaveName();
+                            }}
+                        >
+                            <div className="settings-profile-edit-title">
+                                <PencilIcon />
+                                <label htmlFor="settings-profile-name">الاسم :</label>
+                            </div>
+
+                            <input
+                                id="settings-profile-name"
+                                type="text"
+                                value={editedName}
+                                onChange={(event) => {
+                                    setEditedName(event.target.value);
+                                    setErrorMessage("");
+                                }}
+                                autoFocus
+                                maxLength={40}
+                            />
+
+                            {errorMessage && (
+                                <p className="settings-profile-edit-error">{errorMessage}</p>
+                            )}
+
+                            <div className="settings-profile-edit-actions">
+                                <button
+                                    type="submit"
+                                    className="settings-profile-save-btn"
+                                >
+                                    حفظ
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="settings-profile-cancel-btn"
+                                    onClick={handleCancelEditing}
+                                >
+                                    إلغاء
+                                </button>
+                            </div>
+                        </form>
+                    )}
                 </div>
-              )}
-            </div>
-
-            <div className="settings-account-row" style={{ display: "block", marginTop: "14px" }}>
-              <span style={{ display: "block", marginBottom: "6px" }}>
-                البريد الإلكتروني
-              </span>
-
-              <strong
-                className="settings-account-email"
-                style={{
-                  display: "block",
-                  wordBreak: "break-all",
-                  lineHeight: 1.7,
-                }}
-              >
-                {user?.email || "غير متوفر"}
-              </strong>
-            </div>
-          </div>
-
-          <div className="settings-dropdown-divider" />
-
-          <button
-            type="button"
-            className={`settings-dropdown-support ${isSupportOpen ? "open" : ""}`}
-            onClick={() => {
-              setIsSupportOpen((previous) => !previous);
-              setIsEditingName(false);
-            }}
-          >
-            <span>الدعم والمساعدة</span>
-            <span className={`support-left-arrow ${isSupportOpen ? "open" : ""}`}>
-              ‹
-            </span>
-          </button>
-
-          {isSupportOpen && (
-            <div className="settings-support-mini-box">
-              <a
-                href="https://mail.google.com/mail/?view=cm&fs=1&to=support@dierha.com&su=طلب%20دعم%20-%20ديرها"
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  color: "#667085",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                  fontSize: "13px",
-                  wordBreak: "break-all",
-                }}
-              >
-                support@dierha.com
-              </a>
-            </div>
-          )}
-
-          {onLogout && (
-            <>
-              <div className="settings-dropdown-divider" />
-
-              <button type="button" className="settings-logout-btn" onClick={onLogout}>
-                تسجيل الخروج
-              </button>
-            </>
-          )}
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 }
 
 export default SettingsDropdown;
