@@ -232,12 +232,9 @@ function SubscriptionDetails({
         try {
             setLoading(true);
             setError("");
+
             const data = await getSubscriptionById(subscriptionId);
             const spending = await getSubscriptionSpending(subscriptionId);
-            const priceHistory = await getPriceHistory(subscriptionId);
-
-            console.log("PRICE HISTORY:", priceHistory);
-            console.log("SPENDING:", spending);
 
             setSubscription(data);
             setPaymentsData(spending.payments);
@@ -249,6 +246,18 @@ function SubscriptionDetails({
                         amount: Number(payment.amount),
                     }))
             );
+
+            try {
+                const priceHistory = await getPriceHistory(subscriptionId);
+                console.log("PRICE HISTORY:", priceHistory);
+                console.log("SPENDING:", spending);
+            } catch (priceHistoryError) {
+                console.warn(
+                    "Price history request failed, details page still loaded.",
+                    priceHistoryError
+                );
+                console.log("SPENDING:", spending);
+            }
         } catch (err) {
             console.error(err);
             setError("فشل تحميل تفاصيل الاشتراك.");
