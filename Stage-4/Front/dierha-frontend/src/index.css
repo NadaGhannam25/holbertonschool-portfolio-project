@@ -3846,3 +3846,32 @@ a { text-decoration: none; color: inherit; }
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Final: smaller subscription details arrow button */
+.arrow-details-btn {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  border-radius: 13px !important;
+  padding: 0 !important;
+  font-size: 0 !important;
+}
+
+.arrow-details-btn svg {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+}
+
+.subscription-list-actions .arrow-details-btn {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+}
+
+.subscription-card-v2-footer .arrow-details-btn {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+}
