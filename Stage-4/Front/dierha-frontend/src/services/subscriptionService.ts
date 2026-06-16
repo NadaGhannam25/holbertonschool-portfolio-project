@@ -1,6 +1,12 @@
 // rebuild
-const API_BASE_URL =
+const RAW_API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://dierha-backend.onrender.com/api";
+
+const NORMALIZED_API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, "");
+
+const API_BASE_URL = NORMALIZED_API_BASE_URL.endsWith("/api")
+  ? NORMALIZED_API_BASE_URL
+  : `${NORMALIZED_API_BASE_URL}/api`;
 
 export type BillingCycle =
   | "weekly"
@@ -42,6 +48,23 @@ export type Subscription = {
     websiteUrl?: string | null;
     cancelUrl?: string | null;
   } | null;
+};
+
+export type BackendSubscription = Subscription;
+
+export type SubscriptionPaymentStatus = "paid" | "upcoming" | string;
+
+export type SubscriptionPayment = {
+  date: string;
+  month: string;
+  amount: number | string;
+  status: SubscriptionPaymentStatus;
+  service?: string | null;
+};
+
+export type SubscriptionSpending = {
+  payments: SubscriptionPayment[];
+  total?: number | string;
 };
 
 export type CreateSubscriptionDto = {
@@ -297,7 +320,7 @@ export class SubscriptionsService {
   }
 
   getSubscriptionSpending(id: number | string) {
-    return request(`/subscriptions/${id}/spending`);
+    return request<SubscriptionSpending>(`/subscriptions/${id}/spending`);
   }
 
   findPriceHistory(id: number | string) {
