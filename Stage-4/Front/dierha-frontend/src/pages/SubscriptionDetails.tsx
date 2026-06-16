@@ -260,18 +260,24 @@ function SubscriptionDetails({
   if (loading) {
   return (
     <div className="home-page">
+      <AuthenticatedHeader
+        activePage="subscriptions"
+        onLogout={onLogout}
+        goToHome={goToHome}
+        goToSubscriptions={goToSubscriptions}
+      />
       <main className="dashboard-wrapper loading-page-center">
         <div className="dierha-page-loader">
           <span
             className="dierha-page-loader-ring"
             aria-hidden="true"
           />
-
           <strong className="dierha-page-loader-text">
             جاري تحميل بيانات الاشتراك...
           </strong>
         </div>
       </main>
+      <Footer goToHome={goToHome} goToSubscriptions={goToSubscriptions} />
     </div>
   );
 }
@@ -279,11 +285,18 @@ function SubscriptionDetails({
     if (error || !subscription) {
         return (
             <div className="home-page">
+                <AuthenticatedHeader
+                    activePage="subscriptions"
+                    onLogout={onLogout}
+                    goToHome={goToHome}
+                    goToSubscriptions={goToSubscriptions}
+                />
                 <main className="dashboard-wrapper loading-page-center">
                     <div className="subscriptions-empty-card">
                         {error || "لم يتم العثور على الاشتراك."}
                     </div>
                 </main>
+                <Footer goToHome={goToHome} goToSubscriptions={goToSubscriptions} />
             </div>
         );
     }
