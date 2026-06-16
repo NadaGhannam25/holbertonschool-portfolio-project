@@ -313,10 +313,6 @@ function EditSubscriptionModal({
                                         )
                                     )}
                                 </select>
-
-                                <span className="edit-select-arrow">
-                                    ▾
-                                </span>
                             </div>
                         </div>
 
@@ -372,10 +368,6 @@ function EditSubscriptionModal({
                                         )
                                     )}
                                 </select>
-
-                                <span className="edit-select-arrow">
-                                    ▾
-                                </span>
                             </div>
                         </div>
 
@@ -499,10 +491,6 @@ function EditSubscriptionModal({
                                         )
                                     )}
                                 </select>
-
-                                <span className="edit-select-arrow">
-                                    ▾
-                                </span>
                             </div>
                         </div>
 
@@ -536,10 +524,6 @@ function EditSubscriptionModal({
                                         )
                                     )}
                                 </select>
-
-                                <span className="edit-select-arrow">
-                                    ▾
-                                </span>
                             </div>
                         </div>
 
