@@ -25,7 +25,7 @@ function getMonthlyEquivalent(price: string, cycle: string): number {
 }
 
 export async function generatePdfClient(
-    subscriptions: BackendSubscription[] | undefined | null,
+    subscriptions: BackendSubscription[],
     userName: string,
     userEmail: string
 ): Promise<void> {
@@ -126,16 +126,11 @@ export async function generatePdfClient(
 </body>
 </html>`;
 
-    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-    const blobUrl = URL.createObjectURL(blob);
-    const win = window.open(blobUrl, "_blank");
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
-    if (!win) {
-        const a = document.createElement("a");
-        a.href = blobUrl;
-        a.download = `dierha-subscriptions-${new Date().toISOString().split("T")[0]}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
+    const win = window.open("", "_blank");
+    if (!win) return;
+    setTimeout(() => {
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+    }, 0);
 }
