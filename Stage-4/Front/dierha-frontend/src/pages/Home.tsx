@@ -659,7 +659,7 @@ function Home({
                                     onClick={async () => {
                                         try {
                                             setPdfLoading(true);
-                                            await generatePdfClient();
+                                            await generatePdfClient(tableSubscriptions);
                                         } catch (error) {
                                             console.error(error);
                                             setPdfMessage(
