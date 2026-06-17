@@ -53,7 +53,7 @@ const features: Feature[] = [
     },
     {
         title: "خصوصية أعلى",
-        description: "بياناتك آمنة ولا تحتاجين لربط حسابك البنكي.",
+        description: "بياناتك آمنة ولا تحتاج لربط حسابك البنكي.",
         icon: "shield",
         tone: "navy",
     },
@@ -62,23 +62,23 @@ const features: Feature[] = [
 const steps = [
     {
         number: "01",
-        title: "أضيفي اشتراكاتك",
-        description: "أضيف الخدمة والمبلغ وتاريخ التجديد.",
+        title: "أضف اشتراكاتك",
+        description: "أضيف الاشتراك والمبلغ وتاريخ الاشتراك.",
     },
     {
         number: "02",
         title: "نراقب وننبهك",
-        description: "تنبيهات قبل التجديد لتبقى بالصورة.",
+        description: "تنبيهات قبل التجديد لتبقى على اطلاع.",
     },
     {
         number: "03",
         title: "حلل ووفر",
-        description: "اكتشف فرص التوفير وافهم صرفك.",
+        description: "اكتشف فرص التوفير وافهم انفاقك.",
     },
     {
         number: "04",
         title: "تحكم بذكاء",
-        description: "اتخذ قرارات مالية أفضل بهدوء.",
+        description: "اتخذ قرارات مالية بشكل أفضل .",
     },
 ];
 
@@ -129,7 +129,7 @@ const team: TeamMember[] = [
         name: "ريناد الزعيبر",
         major: "علوم حاسب",
         description:
-            "بناء قاعدة البيانات وربط الخدمات التقنية وتحسين منطق النظام.",
+            "تطوير الواجهة الأمامية وضمان تجربة مستخدم سلسة من التصميم حتى التنفيذ.",
         tags: ["Frontend", "UX/UI", "Testing"],
         image: renadPhoto,
         linkedin: "https://www.linkedin.com/in/rinad-fahad-735a3830a",
@@ -395,7 +395,7 @@ function DashboardPreview() {
 
                     <div className="dl-dashboard-metrics">
                         <div>
-                            <span>إجمالي المصروفات</span>
+                            <span>إجمالي المصروف</span>
                             <b>386</b>
                             <small>ريال هذا الشهر</small>
                         </div>
@@ -598,8 +598,8 @@ export default function DierhaLanding() {
                             </p>
 
                             <p>
-                                الفكرة بسيطة: تضيف الاشتراك يدويًا، تحدد تاريخ
-                                التجديد، وتتابع المصروفات والتنبيهات بدون مشاركة
+                                الفكرة بسيطة: أضيف الاشتراك ، حدد تاريخ
+                                الاشتراك، وتابع المصاريف والتنبيهات بدون مشاركة
                                 بياناتك البنكية.
                             </p>
                         </div>
@@ -651,7 +651,7 @@ export default function DierhaLanding() {
 
                             <p>
                                 نمنحك أرقامًا سهلة القراءة تساعدك على إدارة اشتراكاتك
-                                بثقة، ومعرفة مصاريفك الشهرية أفضل.
+                                بثقة، ومعرفة مصاريفك الشهرية.
                             </p>
 
                             <div className="dl-insight-checks">
