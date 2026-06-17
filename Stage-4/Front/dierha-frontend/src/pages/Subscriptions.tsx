@@ -35,14 +35,6 @@ const arabicMonthOptions = [
 
 const yearOptions = ["2024", "2025", "2026", "2027", "2028"];
 
-const categoryMap: Record<string, number> = {
-    الترفيه: 1,
-    العمل: 2,
-    التعليم: 3,
-    الصحة: 4,
-    أخرى: 5,
-};
-
 const logoModules = import.meta.glob("../assets/*-logo.png", {
     eager: true,
     query: "?url",
@@ -71,6 +63,27 @@ const logoFileNameMap: Record<string, string> = {
     "OSN+": "osn-plus-logo.png",
     STARZPLAY: "starzplay-logo.png",
     "Amazon Prime": "amazon-prime-logo.png",
+};
+
+const normalizeText = (value?: string | null) => {
+    return String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/[أإآ]/g, "ا")
+        .replace(/ة/g, "ه")
+        .replace(/\s+/g, " ");
+};
+
+const normalizeCategory = (value?: string | null) => {
+    const normalized = normalizeText(value);
+
+    if (normalized === "ترفيه" || normalized === "الترفيه") return "الترفيه";
+    if (normalized === "عمل" || normalized === "العمل") return "العمل";
+    if (normalized === "صحه" || normalized === "الصحه") return "الصحة";
+    if (normalized === "تعليم" || normalized === "التعليم") return "التعليم";
+    if (normalized === "اخرى" || normalized === "الأخرى") return "أخرى";
+
+    return value || "أخرى";
 };
 
 const formatBillingCycle = (cycle: BackendSubscription["billingCycle"]) => {
@@ -123,20 +136,15 @@ function Subscriptions({
 
     const [subscriptionsData, setSubscriptionsData] = useState<BackendSubscription[]>([]);
     const [loading, setLoading] = useState(true);
-    // يتتبع إذا كان المستخدم عنده اشتراكات سابقة
-    // نحفظه في sessionStorage بحيث لو شاف اشتراكات في نفس الجلسة يبقى true
+
     const [hadSubscriptionsBefore, setHadSubscriptionsBefore] = useState<boolean>(() => {
         return sessionStorage.getItem("dierha_had_subs") === "true";
     });
 
     useEffect(() => {
         const timer = window.setTimeout(() => {
-            const trimmed = searchTerm.trim();
-            // لا ترسل للباكند إلا لو فاضي تماماً أو أكثر من حرفين
-            if (trimmed === "" || trimmed.length >= 2) {
-                setDebouncedSearchTerm(trimmed);
-            }
-        }, 400);
+            setDebouncedSearchTerm(searchTerm.trim());
+        }, 350);
 
         return () => window.clearTimeout(timer);
     }, [searchTerm]);
@@ -144,21 +152,11 @@ function Subscriptions({
     useEffect(() => {
         const loadSubscriptions = async () => {
             try {
-                if (subscriptionsData.length === 0) {
                 setLoading(true);
-            }
 
-                const categoryId =
-                    activeCategory !== "الكل"
-                        ? categoryMap[activeCategory]
-                        : undefined;
-
-                const data = await getSubscriptions(
-                    debouncedSearchTerm || undefined,
-                    categoryId
-                );
-
+                const data = await getSubscriptions();
                 const result = Array.isArray(data) ? data : [];
+
                 setSubscriptionsData(result);
                 
                 if (result.length > 0) {
@@ -167,52 +165,66 @@ function Subscriptions({
                 }
             } catch (err) {
                 console.warn("Subscriptions API request failed.", err);
-                
             } finally {
                 setLoading(false);
             }
         };
 
         loadSubscriptions();
-    }, [debouncedSearchTerm, activeCategory]);
+    }, []);
 
-     const filteredSubscriptionsData = useMemo(() => {
+    const filteredSubscriptionsData = useMemo(() => {
+        const normalizedSearch = normalizeText(debouncedSearchTerm);
+        const normalizedActiveCategory = normalizeCategory(activeCategory);
 
-    return subscriptionsData.filter((item) => {
+        return subscriptionsData.filter((item) => {
+            const itemCategory = normalizeCategory(item.category?.name ?? "أخرى");
 
+            const categoryMatches =
+                normalizedActiveCategory === "الكل" ||
+                itemCategory === normalizedActiveCategory;
 
+            const searchableText = normalizeText(
+                [
+                    item.name,
+                    item.provider?.name,
+                    item.category?.name,
+                    item.notes,
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+            );
 
-        if (!selectedMonth && !selectedYear) return true;
+            const searchMatches =
+                !normalizedSearch || searchableText.includes(normalizedSearch);
 
-        const subscriptionDateValue = item.startDate || item.renewalDate;
+            if (!categoryMatches || !searchMatches) return false;
 
-        if (!subscriptionDateValue) return false;
+            if (!selectedMonth && !selectedYear) return true;
 
-        const subscriptionDate = new Date(subscriptionDateValue);
+            const subscriptionDateValue = item.startDate || item.renewalDate;
 
-        if (Number.isNaN(subscriptionDate.getTime())) return false;
+            if (!subscriptionDateValue) return false;
 
+            const subscriptionDate = new Date(subscriptionDateValue);
 
+            if (Number.isNaN(subscriptionDate.getTime())) return false;
 
-        const itemMonth = String(subscriptionDate.getMonth() + 1).padStart(2, "0");
+            const itemMonth = String(subscriptionDate.getMonth() + 1).padStart(2, "0");
+            const itemYear = String(subscriptionDate.getFullYear());
 
-        const itemYear = String(subscriptionDate.getFullYear());
+            const monthMatches = selectedMonth ? itemMonth === selectedMonth : true;
+            const yearMatches = selectedYear ? itemYear === selectedYear : true;
 
-       
-
-        const monthMatches = selectedMonth ? itemMonth === selectedMonth : true;
-
-        const yearMatches = selectedYear ? itemYear === selectedYear : true;
-
-
-
-        return monthMatches && yearMatches;
-
-    });
-
-
-
-}, [subscriptionsData, selectedMonth, selectedYear]); 
+            return monthMatches && yearMatches;
+        });
+    }, [
+        subscriptionsData,
+        debouncedSearchTerm,
+        activeCategory,
+        selectedMonth,
+        selectedYear,
+    ]);
 
     const handleDetailsClick = (id: number) => {
         goToSubscriptionDetails(id);
@@ -300,7 +312,6 @@ function Subscriptions({
                         <section className="subscriptions-alt-toolbar subscriptions-alt-toolbar-balanced">
                             <div className="subscriptions-toolbar-layout">
 
-                                {/* بحث */}
                                 <div className="subscriptions-search-area">
                                     <input
                                         type="text"
@@ -310,7 +321,6 @@ function Subscriptions({
                                     />
                                 </div>
 
-                                {/* تصنيف */}
                                 <div className="month-year-filter-wrapper category-filter-wrapper">
                                     <button
                                         type="button"
@@ -349,7 +359,6 @@ function Subscriptions({
                                     )}
                                 </div>
 
-                                {/* تاريخ */}
                                 <div className="month-year-filter-wrapper date-filter-wrapper">
                                     <button
                                         type="button"
@@ -421,10 +430,8 @@ function Subscriptions({
                                     )}
                                 </div>
 
-                                {/* مسافة فاضية — تدفع إعادة التعيين وزر الظهور لأقصى اليسار */}
                                 <div style={{ flex: 1 }} />
 
-                                {/* إعادة تعيين الفلتر */}
                                 <button
                                     type="button"
                                     className="clear-all-filters-btn"
@@ -433,37 +440,36 @@ function Subscriptions({
                                     إعادة تعيين الفلتر
                                 </button>
 
-                                {/* ظهور الاشتراكات */}
                                 <div className="view-mode-toggle" aria-label="طريقة عرض الاشتراكات">
-                                        <button
-                                            type="button"
-                                            title="عرض كمربعات"
-                                            onClick={() => setViewMode("cards")}
-                                            className={viewMode === "cards" ? "active" : ""}
-                                        >
-                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                                                <rect x="4" y="4" width="6" height="6" rx="1.5" />
-                                                <rect x="14" y="4" width="6" height="6" rx="1.5" />
-                                                <rect x="4" y="14" width="6" height="6" rx="1.5" />
-                                                <rect x="14" y="14" width="6" height="6" rx="1.5" />
-                                            </svg>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            title="عرض كشريط"
-                                            onClick={() => setViewMode("list")}
-                                            className={viewMode === "list" ? "active" : ""}
-                                        >
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                                <rect x="4" y="6" width="3" height="3" rx="1" />
-                                                <rect x="9" y="6" width="11" height="3" rx="1.5" />
-                                                <rect x="4" y="11" width="3" height="3" rx="1" />
-                                                <rect x="9" y="11" width="11" height="3" rx="1.5" />
-                                                <rect x="4" y="16" width="3" height="3" rx="1" />
-                                                <rect x="9" y="16" width="11" height="3" rx="1.5" />
-                                            </svg>
-                                        </button>
-                                    </div>
+                                    <button
+                                        type="button"
+                                        title="عرض كمربعات"
+                                        onClick={() => setViewMode("cards")}
+                                        className={viewMode === "cards" ? "active" : ""}
+                                    >
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                            <rect x="4" y="4" width="6" height="6" rx="1.5" />
+                                            <rect x="14" y="4" width="6" height="6" rx="1.5" />
+                                            <rect x="4" y="14" width="6" height="6" rx="1.5" />
+                                            <rect x="14" y="14" width="6" height="6" rx="1.5" />
+                                        </svg>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        title="عرض كشريط"
+                                        onClick={() => setViewMode("list")}
+                                        className={viewMode === "list" ? "active" : ""}
+                                    >
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <rect x="4" y="6" width="3" height="3" rx="1" />
+                                            <rect x="9" y="6" width="11" height="3" rx="1.5" />
+                                            <rect x="4" y="11" width="3" height="3" rx="1" />
+                                            <rect x="9" y="11" width="11" height="3" rx="1.5" />
+                                            <rect x="4" y="16" width="3" height="3" rx="1" />
+                                            <rect x="9" y="16" width="11" height="3" rx="1.5" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </section>
 
@@ -522,7 +528,15 @@ function Subscriptions({
                                                     aria-label="فتح تفاصيل الاشتراك"
                                                     title="تفاصيل الاشتراك"
                                                 >
-                                                    ←
+                                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                        <path
+                                                            d="M15 6L9 12L15 18"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2.4"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        />
+                                                    </svg>
                                                 </button>
                                             </div>
                                         </article>
@@ -530,7 +544,7 @@ function Subscriptions({
                                 ) : (
                                     <div className="subscriptions-empty-card">
                                         {hadSubscriptionsBefore
-                                            ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
+                                            ? "لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد."
                                             : "لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد."}
                                     </div>
                                 )}
@@ -593,7 +607,15 @@ function Subscriptions({
                                                     aria-label="فتح تفاصيل الاشتراك"
                                                     title="تفاصيل الاشتراك"
                                                 >
-                                                    ←
+                                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                        <path
+                                                            d="M15 6L9 12L15 18"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2.4"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        />
+                                                    </svg>
                                                 </button>
                                             </div>
                                         </article>
@@ -601,7 +623,7 @@ function Subscriptions({
                                 ) : (
                                     <div className="subscriptions-empty-card">
                                         {hadSubscriptionsBefore
-                                            ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
+                                            ? "لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد."
                                             : "لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد."}
                                     </div>
                                 )}
@@ -621,3 +643,4 @@ function Subscriptions({
 }
 
 export default Subscriptions;
+
