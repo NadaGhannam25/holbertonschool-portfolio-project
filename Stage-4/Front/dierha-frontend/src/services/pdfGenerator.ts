@@ -152,7 +152,9 @@ function loadScriptOnce(id: string, src: string): Promise<void> {
     if (existing) {
         return new Promise<void>((resolve, reject) => {
             existing.addEventListener("load", () => resolve(), { once: true });
-            existing.addEventListener("error", () => reject(new Error(`Failed to load ${src}`)), { once: true });
+            existing.addEventListener("error", () => reject(new Error(`Failed to load ${src}`)), {
+                once: true,
+            });
         });
     }
 
@@ -210,21 +212,16 @@ function buildTableRows(subscriptions: BackendSubscription[]): string {
 
     return subscriptions
         .map((subscription, index) => {
-            const isDeleted = Boolean(subscription.deletedAt);
-            const rowBackground = isDeleted
-                ? "background:#FFF5F5;opacity:0.72;"
-                : index % 2 === 1
-                  ? "background:#FAFBFC;"
-                  : "background:#FFFFFF;";
+            const rowBackground =
+                index % 2 === 1 ? "background:#FAFBFC;" : "background:#FFFFFF;";
 
             const cellStyle =
                 "padding:11px 10px;border-bottom:1px solid #E5E9F1;font-size:11px;line-height:1.7;color:#292B2E;vertical-align:middle;text-align:right;";
 
-            const statusStyle = isDeleted
-                ? "background:#FFEBEE;color:#C62828;"
-                : subscription.status === "active"
-                  ? "background:#E8F5E9;color:#2E7D32;"
-                  : "background:#FFF8E1;color:#F57F17;";
+            const statusStyle =
+                subscription.status === "active"
+                    ? "background:#E8F5E9;color:#2E7D32;"
+                    : "background:#FFF8E1;color:#F57F17;";
 
             return `
                 <tr style="${rowBackground}">
@@ -267,29 +264,29 @@ function buildHTML(
 <body>
   <div style="width:794px;min-height:1123px;background:#FAFBFC;font-family:Tahoma,Arial,sans-serif;direction:rtl;color:#292B2E;padding:34px 0;">
     <div style="width:700px;margin:0 auto;background:#FFFFFF;border:1px solid #D6DAE1;border-radius:24px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.04);">
-      <div style="background:linear-gradient(135deg,#666CC0 0%,#6E87C0 45%,#F3B0B9 100%);padding:48px 40px 40px;text-align:center;color:white;">
+      <div style="background:#020B5C;padding:48px 40px 40px;text-align:center;color:white;">
         ${logoBase64 ? `<img src="${logoBase64}" style="width:220px;margin:0 auto 18px;border-radius:24px;padding:12px;display:block;background:transparent;box-shadow:0 12px 28px rgba(0,0,0,0.12);" />` : ""}
         <div style="font-size:34px;font-weight:900;color:white;text-align:center;">تقرير إدارة الاشتراكات</div>
       </div>
 
       <div style="padding:38px 44px;">
-      <div style="background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:22px 26px;margin-bottom:24px;line-height:2.1;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
+      <div style="background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:22px 26px;margin-bottom:24px;line-height:2.1;box-shadow:0 6px 16px rgba(2,11,92,0.06);">
         <div style="font-size:13px;color:#292B2E;">الحساب: <strong>${escapeHtml(name)}</strong></div>
         <div style="font-size:13px;color:#292B2E;">البريد الإلكتروني: <strong>${escapeHtml(email || "غير متوفر")}</strong></div>
         <div style="font-size:13px;color:#292B2E;">تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA-u-nu-latn")}</strong></div>
       </div>
 
       <div style="display:flex;gap:12px;margin-bottom:24px;">
-        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
-          <div style="color:#6E87C0;font-size:11px;margin-bottom:7px;font-weight:800;">إجمالي الاشتراكات</div>
+        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(2,11,92,0.06);">
+          <div style="color:#020B5C;font-size:11px;margin-bottom:7px;font-weight:800;">إجمالي الاشتراكات</div>
           <div style="color:#292B2E;font-size:22px;font-weight:900;">${subscriptions.length}</div>
         </div>
-        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
-          <div style="color:#6E87C0;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي الشهري النشط</div>
+        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(2,11,92,0.06);">
+          <div style="color:#020B5C;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي الشهري النشط</div>
           <div style="color:#292B2E;font-size:20px;font-weight:900;">${monthlyTotal.toFixed(2)} ريال</div>
         </div>
-        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
-          <div style="color:#6E87C0;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي السنوي النشط</div>
+        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(2,11,92,0.06);">
+          <div style="color:#020B5C;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي السنوي النشط</div>
           <div style="color:#292B2E;font-size:20px;font-weight:900;">${yearlyTotal.toFixed(2)} ريال</div>
         </div>
       </div>
@@ -299,13 +296,13 @@ function buildHTML(
       <table style="width:100%;background:white;border:1px solid #E5E9F1;border-radius:24px;overflow:hidden;">
         <thead>
           <tr>
-            <th style="width:19%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الخدمة</th>
-            <th style="width:13%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">التصنيف</th>
-            <th style="width:15%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">السعر</th>
-            <th style="width:14%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">دورة الدفع</th>
-            <th style="width:15%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ البداية</th>
-            <th style="width:15%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ التجديد</th>
-            <th style="width:9%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الحالة</th>
+            <th style="width:19%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الخدمة</th>
+            <th style="width:13%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">التصنيف</th>
+            <th style="width:15%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">السعر</th>
+            <th style="width:14%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">دورة الدفع</th>
+            <th style="width:15%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ البداية</th>
+            <th style="width:15%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ التجديد</th>
+            <th style="width:9%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الحالة</th>
           </tr>
         </thead>
         <tbody>${buildTableRows(subscriptions)}</tbody>
@@ -355,7 +352,10 @@ export async function generatePdfClient(
     const name = userName && userName !== "undefined" ? userName : user.name;
     const email = userEmail && userEmail !== "undefined" ? userEmail : user.email;
 
-    const visibleSubscriptions = safe.filter((subscription) => !subscription.deletedAt);
+    const visibleSubscriptions = safe.filter(
+        (subscription) => !subscription.deletedAt,
+    );
+
     const activeSubscriptions = visibleSubscriptions.filter(
         (subscription) => subscription.status === "active",
     );
