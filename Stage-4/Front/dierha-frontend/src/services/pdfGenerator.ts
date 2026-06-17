@@ -111,7 +111,7 @@ async function resolveSubscriptions(
 ): Promise<BackendSubscription[]> {
     const provided = normalizeSubscriptions(subscriptions);
 
-    if (provided.length > 0 || Array.isArray(subscriptions)) {
+    if (provided.length > 0) {
         return provided;
     }
 
