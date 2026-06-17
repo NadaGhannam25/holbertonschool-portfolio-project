@@ -55,6 +55,29 @@ async function logoToBase64(): Promise<string> {
     } catch { return ""; }
 }
 
+async function loadLibs(): Promise<{ html2canvas: any; jsPDF: any }> {
+    if (!(window as any).html2canvas) {
+        await new Promise<void>((res, rej) => {
+            const s = document.createElement("script");
+            s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+            s.onload = () => res(); s.onerror = rej;
+            document.head.appendChild(s);
+        });
+    }
+    if (!(window as any).jspdf?.jsPDF) {
+        await new Promise<void>((res, rej) => {
+            const s = document.createElement("script");
+            s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+            s.onload = () => res(); s.onerror = rej;
+            document.head.appendChild(s);
+        });
+    }
+    return {
+        html2canvas: (window as any).html2canvas,
+        jsPDF: (window as any).jspdf.jsPDF,
+    };
+}
+
 export async function generatePdfClient(
     subscriptions: BackendSubscription[],
     userName?: string,
@@ -72,7 +95,10 @@ export async function generatePdfClient(
     );
     const yearlyTotal = monthlyTotal * 12;
 
-    const logoBase64 = await logoToBase64();
+    const [logoBase64, { html2canvas, jsPDF }] = await Promise.all([
+        logoToBase64(),
+        loadLibs(),
+    ]);
 
     const tableRows = safe.map((s) => `
       <tr class="${s.deletedAt ? "deleted-row" : ""}">
@@ -89,75 +115,99 @@ export async function generatePdfClient(
         </td>
       </tr>`).join("");
 
-    const html = `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8"/>
+    const container = document.createElement("div");
+    container.style.cssText = `
+        position: fixed; top: -99999px; left: -99999px;
+        width: 794px; background: #FAFBFC;
+        font-family: Tahoma, Arial, sans-serif; direction: rtl;
+    `;
+    container.innerHTML = `
 <style>
-body{font-family:Tahoma,Arial,sans-serif;direction:rtl;margin:0;padding:0;background:#FAFBFC;color:#292B2E}
-.wrapper{width:100%;min-height:100vh;background:#FAFBFC}
-.header{background:linear-gradient(135deg,#666CC0 0%,#6E87C0 45%,#F3B0B9 100%);padding:55px 40px 45px;text-align:center;color:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.header img{width:220px;margin-bottom:22px;background:transparent;border-radius:24px;padding:12px;box-shadow:0 12px 28px rgba(0,0,0,0.12)}
-.header h1{margin:0;font-size:38px;font-weight:800}
-.header p{margin-top:12px;font-size:16px;opacity:.95}
-.content{padding:45px 55px}
-.info{background:white;border:1px solid #D6DAE1;border-radius:24px;padding:24px;margin-bottom:34px;line-height:2.1;box-shadow:0 6px 18px rgba(102,108,192,0.05)}
-.info div{margin-bottom:8px;font-size:15px}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:40px}
-.card{background:linear-gradient(180deg,#FFFFFF,#FAFBFC);border:1px solid #D6DAE1;border-radius:24px;padding:26px;text-align:center;box-shadow:0 6px 16px rgba(102,108,192,0.06);-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.card .label{color:#6E87C0;font-size:14px;margin-bottom:10px;font-weight:700}
-.card .value{color:#292B2E;font-size:28px;font-weight:800}
-.section-title{color:#666CC0;font-size:28px;font-weight:800;margin:0 0 20px}
-table{width:100%;border-collapse:collapse;background:white;border-radius:24px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.04)}
-th{background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:18px;text-align:right;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-td{padding:16px 18px;border-bottom:1px solid #E5E9F1;color:#292B2E;font-size:13px}
-tr:nth-child(even) td{background:#FAFBFC}
-.deleted-row td{opacity:0.6;background:#FFF5F5!important}
-.status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.status-active{background:#E8F5E9;color:#2E7D32}
-.status-inactive{background:#FFF8E1;color:#F57F17}
-.status-deleted{background:#FFEBEE;color:#C62828}
-.footer{margin-top:40px;text-align:center;color:#63676E;font-size:14px;padding-bottom:30px}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .header { background: linear-gradient(135deg, #666CC0 0%, #6E87C0 45%, #F3B0B9 100%); padding: 55px 40px 45px; text-align: center; color: white; }
+  .header img { width: 180px; margin-bottom: 18px; border-radius: 20px; padding: 10px; background: rgba(255,255,255,0.15); }
+  .header h1 { margin: 0; font-size: 34px; font-weight: 800; font-family: Tahoma, Arial, sans-serif; }
+  .header p { margin-top: 10px; font-size: 15px; opacity: .95; }
+  .content { padding: 36px 44px; }
+  .info { background: white; border: 1px solid #D6DAE1; border-radius: 20px; padding: 20px 24px; margin-bottom: 28px; line-height: 2; }
+  .info div { font-size: 14px; color: #292B2E; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+  .card { background: linear-gradient(180deg, #FFFFFF, #FAFBFC); border: 1px solid #D6DAE1; border-radius: 20px; padding: 22px; text-align: center; }
+  .card .label { color: #6E87C0; font-size: 12px; margin-bottom: 8px; font-weight: 700; }
+  .card .value { color: #292B2E; font-size: 24px; font-weight: 800; }
+  .section-title { color: #666CC0; font-size: 24px; font-weight: 800; margin: 0 0 16px; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; }
+  th { background: linear-gradient(135deg, #666CC0, #6E87C0); color: white; padding: 15px 16px; text-align: right; font-size: 12px; font-family: Tahoma, Arial, sans-serif; }
+  td { padding: 13px 16px; border-bottom: 1px solid #E5E9F1; color: #292B2E; font-size: 12px; font-family: Tahoma, Arial, sans-serif; }
+  tr:nth-child(even) td { background: #FAFBFC; }
+  .deleted-row td { opacity: 0.6; background: #FFF5F5; }
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .status-active   { background: #E8F5E9; color: #2E7D32; }
+  .status-inactive { background: #FFF8E1; color: #F57F17; }
+  .status-deleted  { background: #FFEBEE; color: #C62828; }
+  .footer { margin-top: 32px; text-align: center; color: #63676E; font-size: 13px; padding-bottom: 24px; }
 </style>
-</head>
-<body>
-<div class="wrapper">
-  <div class="header">
-    ${logoBase64 ? `<img src="${logoBase64}" alt="ديرها" />` : ""}
-    <h1>ديرها</h1>
-    <p>تقرير إدارة الاشتراكات</p>
-  </div>
-  <div class="content">
-    <div class="info">
-      <div>الحساب: <strong>${name}</strong></div>
-      <div>البريد الإلكتروني: <strong>${email}</strong></div>
-      <div>تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA")}</strong></div>
-    </div>
-    <div class="cards">
-      <div class="card"><div class="label">إجمالي الاشتراكات</div><div class="value">${safe.length}</div></div>
-      <div class="card"><div class="label">الإجمالي الشهري (النشطة)</div><div class="value">${monthlyTotal.toFixed(2)} ريال</div></div>
-      <div class="card"><div class="label">الإجمالي السنوي (النشطة)</div><div class="value">${yearlyTotal.toFixed(2)} ريال</div></div>
-    </div>
-    <h2 class="section-title">جدول الاشتراكات</h2>
-    <table>
-      <thead>
-        <tr><th>الخدمة</th><th>التصنيف</th><th>السعر</th><th>دورة الدفع</th><th>تاريخ البداية</th><th>تاريخ التجديد</th><th>الحالة</th></tr>
-      </thead>
-      <tbody>${tableRows}</tbody>
-    </table>
-    <div class="footer">ديرها | منصة إدارة الاشتراكات</div>
-  </div>
+<div class="header">
+  ${logoBase64 ? `<img src="${logoBase64}" alt="ديرها" />` : ""}
+  <h1>ديرها</h1>
+  <p>تقرير إدارة الاشتراكات</p>
 </div>
-</body>
-</html>`;
+<div class="content">
+  <div class="info">
+    <div>الحساب: <strong>${name}</strong></div>
+    <div>البريد الإلكتروني: <strong>${email}</strong></div>
+    <div>تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA")}</strong></div>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="label">إجمالي الاشتراكات</div><div class="value">${safe.length}</div></div>
+    <div class="card"><div class="label">الإجمالي الشهري (النشطة)</div><div class="value">${monthlyTotal.toFixed(2)} ريال</div></div>
+    <div class="card"><div class="label">الإجمالي السنوي (النشطة)</div><div class="value">${yearlyTotal.toFixed(2)} ريال</div></div>
+  </div>
+  <h2 class="section-title">جدول الاشتراكات</h2>
+  <table>
+    <thead>
+      <tr><th>الخدمة</th><th>التصنيف</th><th>السعر</th><th>دورة الدفع</th><th>تاريخ البداية</th><th>تاريخ التجديد</th><th>الحالة</th></tr>
+    </thead>
+    <tbody>${tableRows}</tbody>
+  </table>
+  <div class="footer">ديرها | منصة إدارة الاشتراكات</div>
+</div>`;
 
-    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href     = url;
-    a.download = `dierha-subscriptions-${new Date().toISOString().slice(0, 10)}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    document.body.appendChild(container);
+
+    try {
+        const canvas = await html2canvas(container, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#FAFBFC",
+            logging: false,
+        });
+
+        const imgW = 210; 
+        const imgH = (canvas.height * imgW) / canvas.width;
+
+        const doc = new jsPDF({
+            orientation: imgH > 297 ? "portrait" : "portrait",
+            unit: "mm",
+            format: "a4",
+        });
+
+        const pageH = 297;
+        let yPos = 0;
+
+        while (yPos < imgH) {
+            if (yPos > 0) doc.addPage();
+            doc.addImage(
+                canvas.toDataURL("image/jpeg", 0.95),
+                "JPEG",
+                0, -yPos,
+                imgW, imgH
+            );
+            yPos += pageH;
+        }
+
+        doc.save(`dierha-subscriptions-${new Date().toISOString().slice(0, 10)}.pdf`);
+    } finally {
+        document.body.removeChild(container);
+    }
 }
