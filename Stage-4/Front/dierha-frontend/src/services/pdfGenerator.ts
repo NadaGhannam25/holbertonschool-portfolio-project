@@ -265,53 +265,54 @@ function buildHTML(
   </style>
 </head>
 <body>
-  <div style="width:794px;min-height:1123px;background:#FAFBFC;font-family:Tahoma,Arial,sans-serif;direction:rtl;color:#292B2E;">
-    <div style="background:linear-gradient(135deg,#020B5C 0%,#1D47DA 55%,#F56F96 100%);padding:34px 40px 30px;text-align:center;color:white;">
-      ${logoBase64 ? `<img src="${logoBase64}" style="width:142px;margin:0 auto 10px;border-radius:18px;padding:8px;display:block;background:rgba(255,255,255,.96);" />` : ""}
-      <div style="font-size:28px;font-weight:900;color:white;">ديرها</div>
-      <div style="margin-top:8px;font-size:14px;font-weight:700;opacity:.96;color:white;">تقرير إدارة الاشتراكات</div>
-    </div>
+  <div style="width:794px;min-height:1123px;background:#FAFBFC;font-family:Tahoma,Arial,sans-serif;direction:rtl;color:#292B2E;padding:34px 0;">
+    <div style="width:700px;margin:0 auto;background:#FFFFFF;border:1px solid #D6DAE1;border-radius:24px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.04);">
+      <div style="background:linear-gradient(135deg,#666CC0 0%,#6E87C0 45%,#F3B0B9 100%);padding:48px 40px 40px;text-align:center;color:white;">
+        ${logoBase64 ? `<img src="${logoBase64}" style="width:220px;margin:0 auto 18px;border-radius:24px;padding:12px;display:block;background:transparent;box-shadow:0 12px 28px rgba(0,0,0,0.12);" />` : ""}
+        <div style="font-size:34px;font-weight:900;color:white;text-align:center;">تقرير إدارة الاشتراكات</div>
+      </div>
 
-    <div style="padding:28px 34px;">
-      <div style="background:white;border:1px solid #D6DAE1;border-radius:18px;padding:16px 20px;margin-bottom:20px;line-height:1.9;">
+      <div style="padding:38px 44px;">
+      <div style="background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:22px 26px;margin-bottom:24px;line-height:2.1;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
         <div style="font-size:13px;color:#292B2E;">الحساب: <strong>${escapeHtml(name)}</strong></div>
         <div style="font-size:13px;color:#292B2E;">البريد الإلكتروني: <strong>${escapeHtml(email || "غير متوفر")}</strong></div>
         <div style="font-size:13px;color:#292B2E;">تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA-u-nu-latn")}</strong></div>
       </div>
 
       <div style="display:flex;gap:12px;margin-bottom:24px;">
-        <div style="flex:1;background:white;border:1px solid #D6DAE1;border-radius:18px;padding:16px 10px;text-align:center;">
-          <div style="color:#1D47DA;font-size:11px;margin-bottom:7px;font-weight:800;">إجمالي الاشتراكات</div>
+        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
+          <div style="color:#6E87C0;font-size:11px;margin-bottom:7px;font-weight:800;">إجمالي الاشتراكات</div>
           <div style="color:#292B2E;font-size:22px;font-weight:900;">${subscriptions.length}</div>
         </div>
-        <div style="flex:1;background:white;border:1px solid #D6DAE1;border-radius:18px;padding:16px 10px;text-align:center;">
-          <div style="color:#1D47DA;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي الشهري النشط</div>
+        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
+          <div style="color:#6E87C0;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي الشهري النشط</div>
           <div style="color:#292B2E;font-size:20px;font-weight:900;">${monthlyTotal.toFixed(2)} ريال</div>
         </div>
-        <div style="flex:1;background:white;border:1px solid #D6DAE1;border-radius:18px;padding:16px 10px;text-align:center;">
-          <div style="color:#1D47DA;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي السنوي النشط</div>
+        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
+          <div style="color:#6E87C0;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي السنوي النشط</div>
           <div style="color:#292B2E;font-size:20px;font-weight:900;">${yearlyTotal.toFixed(2)} ريال</div>
         </div>
       </div>
 
       <div style="color:#020B5C;font-size:22px;font-weight:900;margin:0 0 14px;">جدول الاشتراكات</div>
 
-      <table style="width:100%;background:white;border:1px solid #E5E9F1;border-radius:18px;overflow:hidden;">
+      <table style="width:100%;background:white;border:1px solid #E5E9F1;border-radius:24px;overflow:hidden;">
         <thead>
           <tr>
-            <th style="width:19%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الخدمة</th>
-            <th style="width:13%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">التصنيف</th>
-            <th style="width:15%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">السعر</th>
-            <th style="width:14%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">دورة الدفع</th>
-            <th style="width:15%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ البداية</th>
-            <th style="width:15%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ التجديد</th>
-            <th style="width:9%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الحالة</th>
+            <th style="width:19%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الخدمة</th>
+            <th style="width:13%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">التصنيف</th>
+            <th style="width:15%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">السعر</th>
+            <th style="width:14%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">دورة الدفع</th>
+            <th style="width:15%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ البداية</th>
+            <th style="width:15%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ التجديد</th>
+            <th style="width:9%;background:#6E87C0;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الحالة</th>
           </tr>
         </thead>
         <tbody>${buildTableRows(subscriptions)}</tbody>
       </table>
 
-      <div style="margin-top:26px;text-align:center;color:#667085;font-size:12px;padding-bottom:18px;">ديرها | منصة إدارة الاشتراكات</div>
+      <div style="margin:30px -44px -38px;text-align:center;color:#63676E;font-size:14px;padding:24px;background:#E5E9F1;border-top:1px solid #D6DAE1;">ديرها | منصة إدارة الاشتراكات</div>
+      </div>
     </div>
   </div>
 </body>
@@ -354,8 +355,9 @@ export async function generatePdfClient(
     const name = userName && userName !== "undefined" ? userName : user.name;
     const email = userEmail && userEmail !== "undefined" ? userEmail : user.email;
 
-    const activeSubscriptions = safe.filter(
-        (subscription) => subscription.status === "active" && !subscription.deletedAt,
+    const visibleSubscriptions = safe.filter((subscription) => !subscription.deletedAt);
+    const activeSubscriptions = visibleSubscriptions.filter(
+        (subscription) => subscription.status === "active",
     );
 
     const monthlyTotal = activeSubscriptions.reduce(
@@ -364,9 +366,6 @@ export async function generatePdfClient(
         0,
     );
     const yearlyTotal = monthlyTotal * 12;
-
-    // إزالة الاشتراكات المحذوفة قبل عرضها في الـ PDF
-    const visibleSubscriptions = safe.filter((s) => !s.deletedAt);
 
     const [{ html2canvas, jsPDF }, logoBase64] = await Promise.all([
         loadLibs(),
