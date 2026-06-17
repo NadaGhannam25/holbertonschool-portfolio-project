@@ -32,44 +32,12 @@ function formatDateSafe(val: string | null | undefined): string {
     return d.toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" });
 }
 
-async function loadJsPDF(): Promise<any> {
-    if ((window as any).jspdf?.jsPDF) return (window as any).jspdf.jsPDF;
-    await new Promise<void>((res, rej) => {
-        const s = document.createElement("script");
-        s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-        s.onload = () => res(); s.onerror = rej;
-        document.head.appendChild(s);
-    });
-    await new Promise<void>((res, rej) => {
-        const s = document.createElement("script");
-        s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js";
-        s.onload = () => res(); s.onerror = rej;
-        document.head.appendChild(s);
-    });
-    return (window as any).jspdf.jsPDF;
-}
-
-async function toBase64(url: string): Promise<string | null> {
-    try {
-        const res = await fetch(url);
-        const blob = await res.blob();
-        return await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.readAsDataURL(blob);
-        });
-    } catch { return null; }
-}
-
 function getUserData(): { name: string; email: string } {
     try {
         const raw = localStorage.getItem("dierha_user");
         if (raw) {
-            const parsed = JSON.parse(raw);
-            return {
-                name: parsed?.name ?? parsed?.userName ?? "مستخدم",
-                email: parsed?.email ?? parsed?.userEmail ?? "",
-            };
+            const p = JSON.parse(raw);
+            return { name: p?.name ?? "مستخدم", email: p?.email ?? "" };
         }
     } catch { /* ignore */ }
     return { name: "مستخدم", email: "" };
@@ -83,7 +51,7 @@ export async function generatePdfClient(
     const safe = Array.isArray(subscriptions) ? subscriptions : [];
 
     const user = getUserData();
-    const name = (userName && userName !== "undefined") ? userName : user.name;
+    const name  = (userName  && userName  !== "undefined") ? userName  : user.name;
     const email = (userEmail && userEmail !== "undefined") ? userEmail : user.email;
 
     const active = safe.filter((s) => s.status === "active" && !s.deletedAt);
@@ -92,142 +60,104 @@ export async function generatePdfClient(
     );
     const yearlyTotal = monthlyTotal * 12;
 
-    const [jsPDF, logoBase64] = await Promise.all([
-        loadJsPDF(),
-        toBase64(LOGO_URL),
-    ]);
+    const tableRows = safe.map((s) => `
+      <tr class="${s.deletedAt ? "deleted-row" : ""}">
+        <td>${s.name}</td>
+        <td>${s.category?.name ?? "أخرى"}</td>
+        <td>${Number(s.price).toFixed(2)} ريال</td>
+        <td>${formatBillingCycle(s.billingCycle)}</td>
+        <td>${formatDateSafe(s.startDate)}</td>
+        <td>${formatDateSafe(s.renewalDate)}</td>
+        <td>
+          <span class="status-badge status-${s.deletedAt ? "deleted" : (s.status ?? "active")}">
+            ${formatStatus(s.status ?? "active", s.deletedAt ?? null)}
+          </span>
+        </td>
+      </tr>`).join("");
 
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const W = doc.internal.pageSize.getWidth();
-    const H = doc.internal.pageSize.getHeight();
+    const css = `
+      body { font-family: Tahoma, Arial, sans-serif; direction: rtl; margin: 0; padding: 0; background: #FAFBFC; color: #292B2E; }
+      .wrapper { width: 100%; min-height: 100vh; background: #FAFBFC; }
+      .header { background: linear-gradient(135deg, #666CC0 0%, #6E87C0 45%, #F3B0B9 100%); padding: 55px 40px 45px; text-align: center; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .header img { width: 220px; margin-bottom: 22px; background: transparent; border-radius: 24px; padding: 12px; box-shadow: 0 12px 28px rgba(0,0,0,0.12); }
+      .header h1 { margin: 0; font-size: 38px; font-weight: 800; }
+      .header p { margin-top: 12px; font-size: 16px; opacity: .95; }
+      .content { padding: 45px 55px; }
+      .info { background: white; border: 1px solid #D6DAE1; border-radius: 24px; padding: 24px; margin-bottom: 34px; line-height: 2.1; box-shadow: 0 6px 18px rgba(102,108,192,0.05); }
+      .info div { margin-bottom: 8px; font-size: 15px; }
+      .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 40px; }
+      .card { background: linear-gradient(180deg, #FFFFFF, #FAFBFC); border: 1px solid #D6DAE1; border-radius: 24px; padding: 26px; text-align: center; box-shadow: 0 6px 16px rgba(102,108,192,0.06); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .card .label { color: #6E87C0; font-size: 14px; margin-bottom: 10px; font-weight: 700; }
+      .card .value { color: #292B2E; font-size: 28px; font-weight: 800; }
+      .section-title { color: #666CC0; font-size: 28px; font-weight: 800; margin: 0 0 20px; }
+      table { width: 100%; border-collapse: collapse; background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+      th { background: linear-gradient(135deg, #666CC0, #6E87C0); color: white; padding: 18px; text-align: right; font-size: 13px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      td { padding: 16px 18px; border-bottom: 1px solid #E5E9F1; color: #292B2E; font-size: 13px; }
+      tr:nth-child(even) td { background: #FAFBFC; }
+      .deleted-row td { opacity: 0.6; background: #FFF5F5 !important; }
+      .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .status-active   { background: #E8F5E9; color: #2E7D32; }
+      .status-inactive { background: #FFF8E1; color: #F57F17; }
+      .status-deleted  { background: #FFEBEE; color: #C62828; }
+      .footer { margin-top: 40px; text-align: center; color: #63676E; font-size: 14px; padding-bottom: 30px; }
+      @media print {
+        @page { size: A4; margin: 0; }
+        body { background: white; }
+      }
+    `;
 
-    doc.setFillColor(102, 108, 192);
-    doc.rect(0, 0, W, 70, "F");
-    const steps = 30;
-    for (let i = 0; i < steps; i++) {
-        const t = i / steps;
-        const r = Math.round(102 + (243 - 102) * t);
-        const g = Math.round(108 + (176 - 108) * t);
-        const b = Math.round(192 + (185 - 192) * t);
-        doc.setFillColor(r, g, b);
-        doc.rect(W * (i / steps), 0, W / steps + 0.5, 70, "F");
-    }
+    const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<style>${css}</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <img src="${LOGO_URL}" alt="ديرها" />
+    <h1>ديرها</h1>
+    <p>تقرير إدارة الاشتراكات</p>
+  </div>
+  <div class="content">
+    <div class="info">
+      <div>الحساب: <strong>${name}</strong></div>
+      <div>البريد الإلكتروني: <strong>${email}</strong></div>
+      <div>تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA")}</strong></div>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="label">إجمالي الاشتراكات</div><div class="value">${safe.length}</div></div>
+      <div class="card"><div class="label">الإجمالي الشهري (النشطة)</div><div class="value">${monthlyTotal.toFixed(2)} ريال</div></div>
+      <div class="card"><div class="label">الإجمالي السنوي (النشطة)</div><div class="value">${yearlyTotal.toFixed(2)} ريال</div></div>
+    </div>
+    <h2 class="section-title">جدول الاشتراكات</h2>
+    <table>
+      <thead>
+        <tr><th>الخدمة</th><th>التصنيف</th><th>السعر</th><th>دورة الدفع</th><th>تاريخ البداية</th><th>تاريخ التجديد</th><th>الحالة</th></tr>
+      </thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+    <div class="footer">ديرها | منصة إدارة الاشتراكات</div>
+  </div>
+</div>
+</body>
+</html>`;
 
-    
-    if (logoBase64) {
-        const logoW = 42;
-        const logoH = 30;
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(W / 2 - logoW / 2 - 4, 6, logoW + 8, logoH + 8, 6, 6, "F");
-        doc.addImage(logoBase64, "PNG", W / 2 - logoW / 2, 10, logoW, logoH);
-    }
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;";
+    document.body.appendChild(iframe);
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(24);
-    doc.text("\u062F\u064A\u0631\u0647\u0627", W / 2, logoBase64 ? 54 : 28, { align: "center" });
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.text("\u062A\u0642\u0631\u064A\u0631 \u0625\u062F\u0627\u0631\u0629 \u0627\u0644\u0627\u0634\u062A\u0631\u0627\u0643\u0627\u062A", W / 2, logoBase64 ? 62 : 38, { align: "center" });
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!iframeDoc) { document.body.removeChild(iframe); return; }
 
-    let y = 78;
-    doc.setFillColor(255, 255, 255);
-    doc.setDrawColor(214, 218, 225);
-    doc.roundedRect(14, y, W - 28, 26, 4, 4, "FD");
-    doc.setTextColor(41, 43, 46);
-    doc.setFontSize(10);
-    doc.text(`\u0627\u0644\u062D\u0633\u0627\u0628: ${name}`, W - 20, y + 9, { align: "right" });
-    doc.text(`\u0627\u0644\u0628\u0631\u064A\u062F: ${email}`, W - 20, y + 17, { align: "right" });
-    doc.text(`\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0625\u0635\u062F\u0627\u0631: ${new Date().toLocaleDateString("ar-SA")}`, 20, y + 9);
+    iframeDoc.open();
+    iframeDoc.write(html);
+    iframeDoc.close();
 
-    y += 32;
-    const cW = (W - 28 - 8) / 3;
-    const cardData = [
-        { label: "\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0627\u0634\u062A\u0631\u0627\u0643\u0627\u062A", value: String(safe.length) },
-        { label: "\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0634\u0647\u0631\u064A (\u0627\u0644\u0646\u0634\u0637\u0629)", value: `${monthlyTotal.toFixed(2)} \u0631\u064A\u0627\u0644` },
-        { label: "\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0633\u0646\u0648\u064A (\u0627\u0644\u0646\u0634\u0637\u0629)", value: `${yearlyTotal.toFixed(2)} \u0631\u064A\u0627\u0644` },
-    ];
-    cardData.forEach((card, i) => {
-        const cx = 14 + i * (cW + 4);
-        doc.setFillColor(255, 255, 255);
-        doc.setDrawColor(214, 218, 225);
-        doc.roundedRect(cx, y, cW, 22, 4, 4, "FD");
-        doc.setFontSize(8);
-        doc.setTextColor(110, 135, 192);
-        doc.text(card.label, cx + cW / 2, y + 7, { align: "center" });
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(41, 43, 46);
-        doc.text(card.value, cx + cW / 2, y + 16, { align: "center" });
-        doc.setFont("helvetica", "normal");
-    });
-
-    y += 28;
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(102, 108, 192);
-    doc.text("\u062C\u062F\u0648\u0644 \u0627\u0644\u0627\u0634\u062A\u0631\u0627\u0643\u0627\u062A", W - 14, y, { align: "right" });
-
-    y += 5;
-    const tableBody = safe.map((s) => [
-        s.name,
-        s.category?.name ?? "\u0623\u062E\u0631\u0649",
-        `${Number(s.price).toFixed(2)} \u0631\u064A\u0627\u0644`,
-        formatBillingCycle(s.billingCycle),
-        formatDateSafe(s.startDate),
-        formatDateSafe(s.renewalDate),
-        formatStatus(s.status ?? "active", s.deletedAt ?? null),
-    ]);
-
-    (doc as any).autoTable({
-        startY: y,
-        head: [[
-            "\u0627\u0644\u062E\u062F\u0645\u0629",
-            "\u0627\u0644\u062A\u0635\u0646\u064A\u0641",
-            "\u0627\u0644\u0633\u0639\u0631",
-            "\u062F\u0648\u0631\u0629 \u0627\u0644\u062F\u0641\u0639",
-            "\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0628\u062F\u0627\u064A\u0629",
-            "\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u062A\u062C\u062F\u064A\u062F",
-            "\u0627\u0644\u062D\u0627\u0644\u0629",
-        ]],
-        body: tableBody,
-        styles: { font: "helvetica", fontSize: 9, cellPadding: 4, textColor: [41, 43, 46] },
-        headStyles: { fillColor: [102, 108, 192], textColor: [255, 255, 255], fontStyle: "bold" },
-        alternateRowStyles: { fillColor: [250, 251, 252] },
-        didParseCell: (data: any) => {
-            if (data.section === "body") {
-                const row = data.row.raw as string[];
-                if (row[6] === "\u0645\u062D\u0630\u0648\u0641") {
-                    data.cell.styles.textColor = [180, 180, 180];
-                    data.cell.styles.fillColor = [255, 245, 245];
-                }
-            }
-        },
-        didDrawCell: (data: any) => {
-            if (data.section === "body" && data.column.index === 6) {
-                const status = (data.row.raw as string[])[6];
-                const x = data.cell.x + 1.5, y2 = data.cell.y + 1.5;
-                const w = data.cell.width - 3, h = data.cell.height - 3;
-                if (status === "\u0646\u0634\u0637") {
-                    doc.setFillColor(232, 245, 233); doc.setTextColor(46, 125, 50);
-                } else if (status === "\u063A\u064A\u0631 \u0646\u0634\u0637") {
-                    doc.setFillColor(255, 248, 225); doc.setTextColor(245, 127, 23);
-                } else {
-                    doc.setFillColor(255, 235, 238); doc.setTextColor(198, 40, 40);
-                }
-                doc.roundedRect(x, y2, w, h, 2, 2, "F");
-                doc.setFontSize(8); doc.setFont("helvetica", "bold");
-                doc.text(status, x + w / 2, y2 + h / 2 + 1, { align: "center" });
-                doc.setFont("helvetica", "normal"); doc.setTextColor(41, 43, 46);
-            }
-        },
-        margin: { left: 14, right: 14 },
-    });
-
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text("\u062F\u064A\u0631\u0647\u0627 | \u0645\u0646\u0635\u0629 \u0625\u062F\u0627\u0631\u0629 \u0627\u0644\u0627\u0634\u062A\u0631\u0627\u0643\u0627\u062A", W / 2, H - 8, { align: "center" });
-
-    // ── تنزيل مباشر ──────────────────────────────────────────────────────────
-    doc.save(`dierha-subscriptions-${new Date().toISOString().slice(0, 10)}.pdf`);
+    iframe.onload = () => {
+        setTimeout(() => {
+            iframe.contentWindow?.print();
+            setTimeout(() => document.body.removeChild(iframe), 1000);
+        }, 600);
+    };
 }
