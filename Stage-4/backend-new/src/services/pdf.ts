@@ -3,8 +3,7 @@ import { db } from '../db';
 import { categories, subscriptions, users } from '../db/schema';
 
 const { jsPDF } = require('jspdf') as { jsPDF: any };
-require('jspdf-autotable') as any;
-
+const autoTable = require('jspdf-autotable').default;
 
 function formatBillingCycle(cycle: string): string {
   const map: Record<string, string> = {
@@ -127,7 +126,7 @@ export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> 
     formatStatus(s.status ?? 'active', s.deletedAt),
   ]);
 
-  (doc as any).autoTable({
+  autoTable(doc, ({
     startY: cardY + 26,
     head: [['Service', 'Category', 'Price', 'Billing', 'Start Date', 'Renewal Date', 'Status']],
     body: tableBody,
@@ -152,6 +151,5 @@ export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> 
   return Buffer.from(doc.output('arraybuffer') as ArrayBuffer);
 }
 
-// Stubs — Puppeteer no longer needed
 export async function initBrowser(): Promise<void> { /* no-op */ }
 export async function initLogo(): Promise<void> { /* no-op */ }
