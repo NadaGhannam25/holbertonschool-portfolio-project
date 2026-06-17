@@ -149,10 +149,10 @@ function Subscriptions({
                         ? categoryMap[activeCategory]
                         : undefined;
 
-                const data = await getSubscriptions(
-                    debouncedSearchTerm || undefined,
-                    categoryId
-                );
+                const data = await getSubscriptions({
+                    search: debouncedSearchTerm || undefined,
+                    categoryId: categoryId,
+                });
 
                 const result = Array.isArray(data) ? data : [];
                 setSubscriptionsData(result);
@@ -512,34 +512,24 @@ function Subscriptions({
                                                 </span>
 
                                                 <button
-  type="button"
-  className="arrow-details-btn"
-  onClick={() => handleDetailsClick(item.id)}
-  aria-label="فتح تفاصيل الاشتراك"
-  title="تفاصيل الاشتراك"
->
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M15 6L9 12L15 18"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-</button>
+                                                    type="button"
+                                                    className="arrow-details-btn"
+                                                    onClick={() => handleDetailsClick(item.id)}
+                                                    aria-label="فتح تفاصيل الاشتراك"
+                                                    title="تفاصيل الاشتراك"
+                                                >
+                                                    ←
+                                                </button>
                                             </div>
                                         </article>
                                     ))
                                 ) : (
                                     <div className="subscriptions-empty-card">
-                                        {hadSubscriptionsBefore
-                                            ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
-                                            : "لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد."}
+                                        {(debouncedSearchTerm || activeCategory !== "الكل" || selectedMonth || selectedYear)
+                                            ? "لا يوجد اشتراكات مطابقة."
+                                            : hadSubscriptionsBefore
+                                                ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
+                                                : "لم تقم بإضافة أي اشتراكات بعد."}
                                     </div>
                                 )}
                             </section>
@@ -594,35 +584,25 @@ function Subscriptions({
                                                     {formatStatus(item.status)}
                                                 </span>
 
-                                               <button
-  type="button"
-  className="arrow-details-btn"
-  onClick={() => handleDetailsClick(item.id)}
-  aria-label="فتح تفاصيل الاشتراك"
-  title="تفاصيل الاشتراك"
->
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M15 6L9 12L15 18"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-</button>
+                                                <button
+                                                    type="button"
+                                                    className="arrow-details-btn"
+                                                    onClick={() => handleDetailsClick(item.id)}
+                                                    aria-label="فتح تفاصيل الاشتراك"
+                                                    title="تفاصيل الاشتراك"
+                                                >
+                                                    ←
+                                                </button>
                                             </div>
                                         </article>
                                     ))
                                 ) : (
                                     <div className="subscriptions-empty-card">
-                                        {hadSubscriptionsBefore
-                                            ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
-                                            : "لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد."}
+                                        {(debouncedSearchTerm || activeCategory !== "الكل" || selectedMonth || selectedYear)
+                                            ? "لا يوجد اشتراكات مطابقة."
+                                            : hadSubscriptionsBefore
+                                                ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
+                                                : "لم تقم بإضافة أي اشتراكات بعد."}
                                     </div>
                                 )}
                             </section>
