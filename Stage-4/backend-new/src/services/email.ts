@@ -128,7 +128,9 @@ const EMAIL_STYLES = `
 `;
 
 function getFrontendUrl(): string {
-  return process.env.FRONTEND_URL ?? 'http://localhost:5173';
+  const raw = process.env.FRONTEND_URL ?? 'http://localhost:5173';
+  // إذا كانت القيمة تحتوي على أكثر من URL مفصولة بفاصلة نأخذ الأولى فقط
+  return raw.split(',')[0].trim();
 }
 
 function formatDate(dateStr: string): string {
