@@ -1093,9 +1093,9 @@ a { text-decoration: none; color: inherit; }
 }
 
 .upcoming-payment {
-  background: rgba(245, 111, 150, 0.10);
-  color: var(--logo-pink);
-  border: 1px solid rgba(245, 111, 150, 0.28);
+  background: rgba(234, 179, 8, 0.10);
+  color: #a16207;
+  border: 1px solid rgba(234, 179, 8, 0.30);
 }
 
 /* # SUBSCRIPTIONS PAGE */
@@ -1593,14 +1593,14 @@ a { text-decoration: none; color: inherit; }
 }
 
 .arrow-details-btn {
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  border: 1px solid rgba(29, 71, 218, 0.16);
-  background: rgba(29, 71, 218, 0.06);
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  border: 1px solid rgba(29, 71, 218, 0.18);
+  background: #f8faff;
   color: var(--logo-blue);
-  border-radius: 14px;
-  font-size: 1.15rem;
+  border-radius: 16px;
+  font-size: 1.2rem;
   font-weight: 900;
   cursor: pointer;
   padding: 0;
@@ -1608,13 +1608,43 @@ a { text-decoration: none; color: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: 0.2s ease;
+  box-shadow: 0 8px 18px rgba(2, 11, 92, 0.055);
+  transition:
+    color 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.arrow-details-icon {
+  display: block;
+  line-height: 1;
+  transform: none !important;
 }
 
 .arrow-details-btn:hover {
-  background: linear-gradient(135deg, var(--logo-blue), var(--logo-blue-2));
+  background: var(--logo-pink);
+  border-color: var(--logo-pink);
   color: var(--white);
-  transform: translateX(-2px);
+  box-shadow: 0 8px 18px rgba(245, 111, 150, 0.18);
+  transform: none !important;
+}
+
+.arrow-details-btn:hover .arrow-details-icon,
+.arrow-details-btn:active .arrow-details-icon,
+.arrow-details-btn:focus .arrow-details-icon {
+  transform: none !important;
+}
+
+.arrow-details-btn:active,
+.arrow-details-btn:focus,
+.arrow-details-btn:focus-visible {
+  transform: none !important;
+}
+
+.arrow-details-btn:focus-visible {
+  outline: 3px solid rgba(245, 111, 150, 0.2);
+  outline-offset: 3px;
 }
 
 /* List view */
@@ -1633,7 +1663,7 @@ a { text-decoration: none; color: inherit; }
   box-shadow: var(--shadow-card);
   padding: 1rem;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.55fr) 140px;
+  grid-template-columns: minmax(280px, 1.25fr) minmax(390px, 1.55fr) 160px;
   align-items: center;
   gap: 1rem;
 }
@@ -3574,4 +3604,476 @@ a { text-decoration: none; color: inherit; }
   background-position: initial !important;
   background-size: 0 !important;
   padding-left: 0.74rem !important;
+}
+/* =========================================================
+   FINAL FIXES - Dierha details/edit modals and spending UI
+   ========================================================= */
+
+/* اجعل تمويه المودالات يغطي كامل الصفحة وليس الكرت فقط */
+.edit-modal-overlay,
+.delete-confirm-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  background: rgba(2, 11, 79, 0.42) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 2147483000 !important;
+  overflow-y: auto !important;
+  direction: rtl !important;
+}
+
+/* خلي مربع تعديل الاشتراك بنفس الحجم تقريبًا ومنزّل شوي */
+.edit-modal-card {
+  width: min(500px, calc(100vw - 2rem)) !important;
+  max-width: 500px !important;
+  max-height: none !important;
+  overflow: visible !important;
+  margin: auto !important;
+  transform: translateY(10px) !important;
+  border-radius: 22px !important;
+  padding: 1rem !important;
+}
+
+/* مربع تأكيد الحذف في المنتصف تمامًا */
+.delete-confirm-card {
+  width: min(430px, calc(100vw - 2rem)) !important;
+  max-width: 430px !important;
+  margin: auto !important;
+  transform: none !important;
+}
+
+/* Cairo داخل مودال التعديل كامل */
+.edit-modal-card,
+.edit-modal-card *,
+.edit-modal-card input,
+.edit-modal-card select,
+.edit-modal-card textarea,
+.edit-modal-card button,
+.edit-modal-card option {
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+.edit-modal-card input::placeholder,
+.edit-modal-card textarea::placeholder {
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+/* ضبط مقاسات الحقول بدون سكرول داخلي */
+.edit-modal-header {
+  padding-bottom: 0.7rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.edit-modal-form {
+  gap: 0.7rem !important;
+}
+
+.edit-modal-grid {
+  gap: 0.62rem !important;
+}
+
+.edit-modal-field {
+  gap: 0.3rem !important;
+}
+
+.edit-modal-field label {
+  font-size: 0.74rem !important;
+  line-height: 1.35 !important;
+}
+
+.edit-modal-field input,
+.edit-modal-field textarea,
+.edit-select-wrapper select,
+.fixed-reminder-edit div {
+  min-height: 44px !important;
+  height: 44px !important;
+  border-radius: 13px !important;
+  font-size: 0.8rem !important;
+  line-height: 1.4 !important;
+}
+
+.edit-modal-field textarea {
+  min-height: 66px !important;
+  height: 66px !important;
+  resize: none !important;
+  padding-top: 0.65rem !important;
+}
+
+.edit-modal-actions {
+  gap: 0.6rem !important;
+  margin-top: 0 !important;
+}
+
+.edit-modal-actions button {
+  height: 42px !important;
+  min-height: 42px !important;
+  border-radius: 12px !important;
+  font-size: 0.8rem !important;
+}
+
+/* أسهم القوائم المنسدلة رمادية وموزونة */
+.edit-select-wrapper {
+  position: relative !important;
+}
+
+.edit-select-wrapper select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: none !important;
+  padding-left: 3.1rem !important;
+  padding-right: 0.85rem !important;
+  text-align: right !important;
+  direction: rtl !important;
+  cursor: pointer !important;
+}
+
+.edit-select-arrow {
+  display: none !important;
+}
+
+.edit-select-wrapper::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 22px !important;
+  top: 50% !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-right: 2px solid #667085 !important;
+  border-bottom: 2px solid #667085 !important;
+  transform: translateY(-65%) rotate(45deg) !important;
+  pointer-events: none !important;
+  z-index: 3 !important;
+}
+
+/* خانة السعر وكلمة ريال بدون خط فاصل وبمحاذاة صحيحة */
+.edit-price-input {
+  display: flex !important;
+  align-items: stretch !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 13px !important;
+  background: #fbfcff !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.edit-price-input input {
+  flex: 1 !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: #fbfcff !important;
+  padding: 0 0.85rem !important;
+  text-align: right !important;
+  font-size: 0.82rem !important;
+  font-weight: 900 !important;
+}
+
+.edit-price-input span {
+  width: 58px !important;
+  min-width: 58px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 0 !important;
+  border-right: 0 !important;
+  border-left: 0 !important;
+  border-inline-start: 0 !important;
+  border-inline-end: 0 !important;
+  background: #fbfcff !important;
+  color: var(--grey) !important;
+  font-size: 0.78rem !important;
+  font-weight: 900 !important;
+}
+
+/* شكل تطبيق آخر / التطبيق المخصص مثل التطبيقات المسجلة */
+.details-service-logo {
+  background: #f1f3f9 !important;
+  border: 1px solid var(--border) !important;
+  color: var(--logo-blue) !important;
+}
+
+.details-service-logo span {
+  width: 100% !important;
+  height: 100% !important;
+  display: grid !important;
+  place-items: center !important;
+  color: var(--logo-blue) !important;
+  background: #ffffff !important;
+  border-radius: 18px !important;
+  font-size: 1.3rem !important;
+  font-weight: 900 !important;
+}
+
+.app-select-logo-empty,
+.app-select-option-logo.app-select-logo-empty {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 14px !important;
+  background: var(--white) !important;
+  border: 1px solid var(--border) !important;
+  border-style: solid !important;
+  color: var(--logo-blue) !important;
+  opacity: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 900 !important;
+}
+
+.app-select-placeholder strong,
+.app-select-placeholder p {
+  opacity: 1 !important;
+}
+
+/* لون الدفعة القادمة أصفر واضح */
+.payment-status.upcoming-payment,
+.upcoming-payment {
+  background: rgba(234, 179, 8, 0.14) !important;
+  color: #a16207 !important;
+  border: 1px solid rgba(234, 179, 8, 0.34) !important;
+}
+
+@media (max-width: 650px) {
+  .edit-modal-card {
+    width: min(100% - 1rem, 500px) !important;
+    transform: translateY(0) !important;
+  }
+
+  .edit-modal-grid,
+  .edit-modal-actions,
+  .delete-confirm-actions {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* =========================================================
+   Final requested fixes: small details arrows + profile edit popup
+   ========================================================= */
+
+/* تصغير أسهم الدخول لتفاصيل الاشتراك في المكعبات والشريط */
+.arrow-details-btn,
+.subscription-card-v2-footer .arrow-details-btn,
+.subscription-list-actions .arrow-details-btn {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  font-size: 0 !important;
+  line-height: 1 !important;
+}
+
+.arrow-details-btn svg,
+.subscription-card-v2-footer .arrow-details-btn svg,
+.subscription-list-actions .arrow-details-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+}
+
+.arrow-details-btn:hover,
+.arrow-details-btn:active,
+.arrow-details-btn:focus {
+  transform: none !important;
+}
+
+/* تصغير أزرار تعديل الاسم في قائمة البروفايل */
+.person-settings-menu,
+.settings-dropdown-menu.person-settings-menu {
+  width: 340px !important;
+  min-width: 340px !important;
+  max-width: calc(100vw - 28px) !important;
+  padding: 12px !important;
+  border-radius: 18px !important;
+}
+
+.person-settings-menu input,
+.person-settings-menu textarea {
+  min-height: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  padding: 0 14px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+.person-settings-menu .app-mobile-name-actions,
+.person-settings-menu [class*="name-actions"],
+.person-settings-menu [class*="edit-actions"] {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  margin-top: 10px !important;
+}
+
+.person-settings-menu .app-mobile-save-btn,
+.person-settings-menu .app-mobile-cancel-btn,
+.person-settings-menu button[class*="save"],
+.person-settings-menu button[class*="cancel"] {
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  padding: 0 16px !important;
+  border-radius: 14px !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  flex: unset !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.person-settings-menu .app-mobile-name-error,
+.person-settings-menu [class*="name-error"],
+.person-settings-menu [class*="error"] {
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  margin: 6px 0 0 !important;
+}
+
+.edit-modal-card .edit-modal-grid {
+  align-items: end !important;
+}
+
+/* Final profile dropdown name edit fix */
+.settings-profile-edit-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.72rem !important;
+  padding: 0.75rem !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.settings-profile-edit-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.65rem !important;
+  color: var(--logo-blue) !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
+}
+
+.settings-profile-edit-title svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+}
+
+.settings-profile-edit-form label {
+  color: var(--logo-blue) !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
+}
+
+.settings-profile-edit-form input {
+  width: 100% !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  padding: 0 0.9rem !important;
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
+  text-align: right !important;
+  outline: none !important;
+}
+
+.settings-profile-edit-form input:focus {
+  border-color: rgba(29, 71, 218, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(29, 71, 218, 0.08) !important;
+}
+
+.settings-profile-edit-error {
+  margin: -0.25rem 0 0 !important;
+  color: var(--logo-pink) !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+  text-align: right !important;
+}
+
+.settings-profile-edit-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.6rem !important;
+  margin-top: 0.1rem !important;
+}
+
+.settings-profile-edit-actions button,
+.settings-profile-save-btn,
+.settings-profile-cancel-btn {
+  width: 108px !important;
+  min-width: 108px !important;
+  max-width: 108px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 !important;
+  border-radius: 13px !important;
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 0.86rem !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  flex: 0 0 108px !important;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease !important;
+  transform: none !important;
+}
+
+.settings-profile-save-btn {
+  border: 1px solid var(--logo-blue) !important;
+  background: var(--logo-blue) !important;
+  color: #ffffff !important;
+}
+
+.settings-profile-save-btn:hover {
+  background: var(--logo-navy) !important;
+  border-color: var(--logo-navy) !important;
+  transform: none !important;
+}
+
+.settings-profile-cancel-btn {
+  border: 1px solid var(--border) !important;
+  background: #ffffff !important;
+  color: var(--grey) !important;
+}
+
+.settings-profile-cancel-btn:hover {
+  color: var(--logo-pink) !important;
+  border-color: rgba(245, 111, 150, 0.35) !important;
+  background: #fff7fa !important;
+  transform: none !important;
+}
+
+.settings-dropdown-logout {
+  color: var(--logo-pink) !important;
+}
+
+.support-left-arrow svg {
+  width: 18px !important;
+  height: 18px !important;
 }
