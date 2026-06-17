@@ -21,7 +21,6 @@ function getAuthToken() {
   for (const storage of [localStorage, sessionStorage]) {
     for (const key of directKeys) {
       const value = storage.getItem(key);
-
       if (value) {
         return value.replace(/^Bearer\s+/i, "");
       }
@@ -40,33 +39,18 @@ function getAuthToken() {
   for (const storage of [localStorage, sessionStorage]) {
     for (const key of objectKeys) {
       const value = storage.getItem(key);
-
       if (!value) continue;
-
       try {
         const parsed = JSON.parse(value);
-
         const token =
-          parsed?.token ||
-          parsed?.accessToken ||
-          parsed?.authToken ||
-          parsed?.access_token ||
-          parsed?.jwt ||
-          parsed?.jwtToken ||
-          parsed?.data?.token ||
-          parsed?.data?.accessToken ||
-          parsed?.data?.authToken ||
-          parsed?.data?.access_token ||
-          parsed?.user?.token ||
-          parsed?.user?.accessToken ||
-          parsed?.user?.authToken ||
-          parsed?.user?.access_token;
-
+          parsed?.token || parsed?.accessToken || parsed?.authToken ||
+          parsed?.access_token || parsed?.jwt || parsed?.jwtToken ||
+          parsed?.data?.token || parsed?.data?.accessToken ||
+          parsed?.user?.token || parsed?.user?.accessToken;
         if (token) {
           return String(token).replace(/^Bearer\s+/i, "");
         }
       } catch {
-        // Ignore invalid JSON values.
       }
     }
   }
@@ -82,7 +66,7 @@ export async function generatePdfClient(): Promise<void> {
   }
 
   const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 70_000);
+  const timeoutId = window.setTimeout(() => controller.abort(), 30_000);
 
   try {
     const response = await fetch(
@@ -98,7 +82,6 @@ export async function generatePdfClient(): Promise<void> {
 
     if (!response.ok) {
       let msg = "تعذر تصدير ملف PDF";
-
       try {
         const err = await response.json();
         msg = err?.message || err?.error || msg;
@@ -107,10 +90,8 @@ export async function generatePdfClient(): Promise<void> {
           const text = await response.text();
           msg = text || msg;
         } catch {
-          // Ignore unreadable response body.
         }
       }
-
       throw new Error(msg);
     }
 
@@ -119,10 +100,7 @@ export async function generatePdfClient(): Promise<void> {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = `dierha-subscriptions-${new Date()
-      .toISOString()
-      .slice(0, 10)}.pdf`;
-
+    a.download = `dierha-subscriptions-${new Date().toISOString().slice(0, 10)}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -132,7 +110,6 @@ export async function generatePdfClient(): Promise<void> {
     if (error instanceof DOMException && error.name === "AbortError") {
       throw new Error("انتهت مهلة الطلب، يرجى المحاولة مجدداً");
     }
-
     throw error;
   } finally {
     window.clearTimeout(timeoutId);
