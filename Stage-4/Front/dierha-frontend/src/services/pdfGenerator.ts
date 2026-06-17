@@ -78,6 +78,97 @@ async function loadLibs(): Promise<{ html2canvas: any; jsPDF: any }> {
     };
 }
 
+function buildHTML(
+    safe: BackendSubscription[],
+    name: string,
+    email: string,
+    logoBase64: string,
+    monthlyTotal: number,
+    yearlyTotal: number,
+): string {
+    const tableRows = safe.map((s) => `
+        <tr style="${s.deletedAt ? "opacity:0.6;background:#FFF5F5;" : ""}">
+          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${s.name}</td>
+          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${s.category?.name ?? "أخرى"}</td>
+          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${Number(s.price).toFixed(2)} ريال</td>
+          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${formatBillingCycle(s.billingCycle)}</td>
+          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${formatDateSafe(s.startDate)}</td>
+          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${formatDateSafe(s.renewalDate)}</td>
+          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;">
+            <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:Tahoma,Arial,sans-serif;
+              ${s.deletedAt ? "background:#FFEBEE;color:#C62828;" : s.status === "active" ? "background:#E8F5E9;color:#2E7D32;" : "background:#FFF8E1;color:#F57F17;"}">
+              ${formatStatus(s.status ?? "active", s.deletedAt ?? null)}
+            </span>
+          </td>
+        </tr>`).join("");
+
+    const evenRows = safe.map((_, i) =>
+        i % 2 === 1 ? `tr:nth-child(${i + 1}) td { background: #FAFBFC; }` : ""
+    ).join("");
+
+    return `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head><meta charset="UTF-8"/>
+<style>
+  body{margin:0;padding:0;background:#FAFBFC;}
+  table{border-collapse:collapse;}
+</style>
+</head>
+<body>
+<div style="width:794px;background:#FAFBFC;font-family:Tahoma,Arial,sans-serif;direction:rtl;">
+
+  <div style="background:linear-gradient(135deg,#666CC0 0%,#6E87C0 45%,#F3B0B9 100%);padding:55px 40px 45px;text-align:center;color:white;">
+    ${logoBase64 ? `<img src="${logoBase64}" style="width:180px;margin-bottom:18px;border-radius:20px;padding:10px;display:block;margin-left:auto;margin-right:auto;"/>` : ""}
+    <div style="font-size:34px;font-weight:800;font-family:Tahoma,Arial,sans-serif;color:white;">ديرها</div>
+    <div style="margin-top:10px;font-size:15px;opacity:.95;color:white;">تقرير إدارة الاشتراكات</div>
+  </div>
+
+  <div style="padding:36px 44px;">
+
+    <div style="background:white;border:1px solid #D6DAE1;border-radius:20px;padding:20px 24px;margin-bottom:28px;line-height:2;">
+      <div style="font-size:14px;color:#292B2E;margin-bottom:4px;">الحساب: <strong>${name}</strong></div>
+      <div style="font-size:14px;color:#292B2E;margin-bottom:4px;">البريد الإلكتروني: <strong>${email}</strong></div>
+      <div style="font-size:14px;color:#292B2E;">تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA")}</strong></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;">
+      <div style="background:linear-gradient(180deg,#FFFFFF,#FAFBFC);border:1px solid #D6DAE1;border-radius:20px;padding:22px;text-align:center;">
+        <div style="color:#6E87C0;font-size:12px;margin-bottom:8px;font-weight:700;">إجمالي الاشتراكات</div>
+        <div style="color:#292B2E;font-size:24px;font-weight:800;">${safe.length}</div>
+      </div>
+      <div style="background:linear-gradient(180deg,#FFFFFF,#FAFBFC);border:1px solid #D6DAE1;border-radius:20px;padding:22px;text-align:center;">
+        <div style="color:#6E87C0;font-size:12px;margin-bottom:8px;font-weight:700;">الإجمالي الشهري (النشطة)</div>
+        <div style="color:#292B2E;font-size:24px;font-weight:800;">${monthlyTotal.toFixed(2)} ريال</div>
+      </div>
+      <div style="background:linear-gradient(180deg,#FFFFFF,#FAFBFC);border:1px solid #D6DAE1;border-radius:20px;padding:22px;text-align:center;">
+        <div style="color:#6E87C0;font-size:12px;margin-bottom:8px;font-weight:700;">الإجمالي السنوي (النشطة)</div>
+        <div style="color:#292B2E;font-size:24px;font-weight:800;">${yearlyTotal.toFixed(2)} ريال</div>
+      </div>
+    </div>
+
+    <div style="color:#666CC0;font-size:24px;font-weight:800;margin:0 0 16px;">جدول الاشتراكات</div>
+
+    <table style="width:100%;border-collapse:collapse;background:white;border-radius:20px;overflow:hidden;">
+      <thead>
+        <tr>
+          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">الخدمة</th>
+          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">التصنيف</th>
+          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">السعر</th>
+          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">دورة الدفع</th>
+          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">تاريخ البداية</th>
+          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">تاريخ التجديد</th>
+          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">الحالة</th>
+        </tr>
+      </thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+
+    <div style="margin-top:32px;text-align:center;color:#63676E;font-size:13px;padding-bottom:24px;">ديرها | منصة إدارة الاشتراكات</div>
+  </div>
+</div>
+</body></html>`;
+}
+
 export async function generatePdfClient(
     subscriptions: BackendSubscription[],
     userName?: string,
@@ -99,107 +190,49 @@ export async function generatePdfClient(
         loadLibs(),
     ]);
 
-    const tableRows = safe.map((s) => `
-        <tr class="${s.deletedAt ? "dierha-deleted" : ""}">
-          <td>${s.name}</td>
-          <td>${s.category?.name ?? "أخرى"}</td>
-          <td>${Number(s.price).toFixed(2)} ريال</td>
-          <td>${formatBillingCycle(s.billingCycle)}</td>
-          <td>${formatDateSafe(s.startDate)}</td>
-          <td>${formatDateSafe(s.renewalDate)}</td>
-          <td><span class="dierha-badge dierha-${s.deletedAt ? "deleted" : (s.status ?? "active")}">
-            ${formatStatus(s.status ?? "active", s.deletedAt ?? null)}
-          </span></td>
-        </tr>`).join("");
+    const html = buildHTML(safe, name, email, logoBase64, monthlyTotal, yearlyTotal);
 
-    // نستخدم shadow DOM لعزل الـ styles كلياً عن الصفحة
-    const host = document.createElement("div");
-    host.style.cssText = "position:fixed;top:-99999px;left:-99999px;width:0;height:0;overflow:hidden;";
-    document.body.appendChild(host);
-
-    const shadow = host.attachShadow({ mode: "open" });
-
-    const tmpl = document.createElement("div");
-    tmpl.style.cssText = "width:794px;background:#FAFBFC;";
-    tmpl.innerHTML = `
-<style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  .dierha-wrap{width:794px;background:#FAFBFC;font-family:Tahoma,Arial,sans-serif;direction:rtl;}
-  .dierha-header{background:linear-gradient(135deg,#666CC0 0%,#6E87C0 45%,#F3B0B9 100%);padding:55px 40px 45px;text-align:center;color:white;}
-  .dierha-header img{width:180px;margin-bottom:18px;border-radius:20px;padding:10px;background:rgba(255,255,255,0.15);}
-  .dierha-header h1{margin:0;font-size:34px;font-weight:800;font-family:Tahoma,Arial,sans-serif;}
-  .dierha-header p{margin-top:10px;font-size:15px;opacity:.95;}
-  .dierha-content{padding:36px 44px;}
-  .dierha-info{background:white;border:1px solid #D6DAE1;border-radius:20px;padding:20px 24px;margin-bottom:28px;line-height:2;}
-  .dierha-info div{font-size:14px;color:#292B2E;margin-bottom:4px;}
-  .dierha-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
-  .dierha-card{background:linear-gradient(180deg,#FFFFFF,#FAFBFC);border:1px solid #D6DAE1;border-radius:20px;padding:22px;text-align:center;}
-  .dierha-card .lbl{color:#6E87C0;font-size:12px;margin-bottom:8px;font-weight:700;}
-  .dierha-card .val{color:#292B2E;font-size:24px;font-weight:800;}
-  .dierha-title{color:#666CC0;font-size:24px;font-weight:800;margin:0 0 16px;}
-  .dierha-table{width:100%;border-collapse:collapse;background:white;border-radius:20px;overflow:hidden;}
-  .dierha-table thead tr th{background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;}
-  .dierha-table tbody tr td{padding:13px 16px;border-bottom:1px solid #E5E9F1;color:#292B2E;font-size:12px;font-family:Tahoma,Arial,sans-serif;}
-  .dierha-table tbody tr:nth-child(even) td{background:#FAFBFC;}
-  .dierha-deleted td{opacity:0.6;background:#FFF5F5!important;}
-  .dierha-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-  .dierha-active{background:#E8F5E9;color:#2E7D32;}
-  .dierha-inactive{background:#FFF8E1;color:#F57F17;}
-  .dierha-deleted-badge,.dierha-deleted{background:#FFEBEE;color:#C62828;}
-  .dierha-footer{margin-top:32px;text-align:center;color:#63676E;font-size:13px;padding-bottom:24px;}
-</style>
-<div class="dierha-wrap">
-  <div class="dierha-header">
-    ${logoBase64 ? `<img src="${logoBase64}" alt="ديرها"/>` : ""}
-    <h1>ديرها</h1>
-    <p>تقرير إدارة الاشتراكات</p>
-  </div>
-  <div class="dierha-content">
-    <div class="dierha-info">
-      <div>الحساب: <strong>${name}</strong></div>
-      <div>البريد الإلكتروني: <strong>${email}</strong></div>
-      <div>تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA")}</strong></div>
-    </div>
-    <div class="dierha-cards">
-      <div class="dierha-card"><div class="lbl">إجمالي الاشتراكات</div><div class="val">${safe.length}</div></div>
-      <div class="dierha-card"><div class="lbl">الإجمالي الشهري (النشطة)</div><div class="val">${monthlyTotal.toFixed(2)} ريال</div></div>
-      <div class="dierha-card"><div class="lbl">الإجمالي السنوي (النشطة)</div><div class="val">${yearlyTotal.toFixed(2)} ريال</div></div>
-    </div>
-    <h2 class="dierha-title">جدول الاشتراكات</h2>
-    <table class="dierha-table">
-      <thead><tr>
-        <th>الخدمة</th><th>التصنيف</th><th>السعر</th><th>دورة الدفع</th><th>تاريخ البداية</th><th>تاريخ التجديد</th><th>الحالة</th>
-      </tr></thead>
-      <tbody>${tableRows}</tbody>
-    </table>
-    <div class="dierha-footer">ديرها | منصة إدارة الاشتراكات</div>
-  </div>
-</div>`;
-
-    shadow.appendChild(tmpl);
-
-    // نخلي الـ host مرئي مؤقتاً بدون أن يظهر للمستخدم
-    host.style.cssText = "position:fixed;top:0;left:-9999px;width:794px;height:auto;overflow:visible;z-index:-1;";
-
-    // ننتظر الـ render يكتمل
-    await new Promise((r) => setTimeout(r, 300));
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText = "position:fixed;left:0;top:0;width:794px;height:1px;border:none;visibility:hidden;";
+    document.body.appendChild(iframe);
 
     try {
-        const canvas = await html2canvas(tmpl, {
+        const iDoc = iframe.contentDocument!;
+        iDoc.open(); iDoc.write(html); iDoc.close();
+
+        await new Promise<void>((resolve) => {
+            const imgs = iDoc.querySelectorAll("img");
+            if (imgs.length === 0) { setTimeout(resolve, 200); return; }
+            let loaded = 0;
+            imgs.forEach((img) => {
+                if (img.complete) { loaded++; if (loaded === imgs.length) setTimeout(resolve, 200); }
+                else { img.onload = img.onerror = () => { loaded++; if (loaded === imgs.length) setTimeout(resolve, 200); }; }
+            });
+        });
+
+        const target = iDoc.body.firstElementChild as HTMLElement;
+        const totalH = target.scrollHeight;
+        iframe.style.height = totalH + "px";
+
+        await new Promise((r) => setTimeout(r, 150));
+
+        const canvas = await html2canvas(target, {
             scale: 2,
             useCORS: true,
             backgroundColor: "#FAFBFC",
             logging: false,
             width: 794,
+            height: totalH,
+            windowWidth: 794,
+            windowHeight: totalH,
         });
 
         const imgW  = 210;
         const imgH  = (canvas.height * imgW) / canvas.width;
         const pageH = 297;
-
-        const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
         const imgData = canvas.toDataURL("image/jpeg", 0.97);
 
+        const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
         let yPos = 0;
         let first = true;
         while (yPos < imgH) {
@@ -211,6 +244,6 @@ export async function generatePdfClient(
 
         doc.save(`dierha-subscriptions-${new Date().toISOString().slice(0, 10)}.pdf`);
     } finally {
-        document.body.removeChild(host);
+        document.body.removeChild(iframe);
     }
 }
