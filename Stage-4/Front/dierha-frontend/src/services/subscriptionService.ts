@@ -1,12 +1,5 @@
-// rebuild
-const RAW_API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://dierha-backend.onrender.com/api";
-
-const NORMALIZED_API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, "");
-
-const API_BASE_URL = NORMALIZED_API_BASE_URL.endsWith("/api")
-  ? NORMALIZED_API_BASE_URL
-  : `${NORMALIZED_API_BASE_URL}/api`;
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://dierha-backend.onrender.com";
 
 export type BillingCycle =
   | "weekly"
@@ -50,23 +43,6 @@ export type Subscription = {
   } | null;
 };
 
-export type BackendSubscription = Subscription;
-
-export type SubscriptionPaymentStatus = "paid" | "upcoming" | string;
-
-export type SubscriptionPayment = {
-  date: string;
-  month: string;
-  amount: number | string;
-  status: SubscriptionPaymentStatus;
-  service?: string | null;
-};
-
-export type SubscriptionSpending = {
-  payments: SubscriptionPayment[];
-  total?: number | string;
-};
-
 export type CreateSubscriptionDto = {
   providerId?: number | null;
   name: string;
@@ -98,113 +74,12 @@ type RequestOptions = RequestInit & {
   skipJson?: boolean;
 };
 
-function cleanToken(token: string) {
-  return token.replace(/^Bearer\s+/i, "").trim();
-}
-
-function extractToken(value: unknown): string | null {
-  if (!value) return null;
-
-  if (typeof value === "string") {
-    return cleanToken(value);
-  }
-
-  if (typeof value !== "object") {
-    return null;
-  }
-
-  const data = value as Record<string, unknown>;
-
-  const directToken =
-    data.token ||
-    data.accessToken ||
-    data.authToken ||
-    data.access_token ||
-    data.jwt ||
-    data.jwtToken;
-
-  if (typeof directToken === "string" && directToken.trim()) {
-    return cleanToken(directToken);
-  }
-
-  const nestedSources = [
-    data.data,
-    data.user,
-    data.auth,
-    data.currentUser,
-    data.session,
-  ];
-
-  for (const source of nestedSources) {
-    const nestedToken = extractToken(source);
-    if (nestedToken) {
-      return nestedToken;
-    }
-  }
-
-  return null;
-}
-
 function getToken() {
-  const directKeys = [
-    "token",
-    "accessToken",
-    "authToken",
-    "jwt",
-    "jwtToken",
-    "access_token",
-    "dierha_token",
-    "dierhaToken",
-  ];
-
-  const objectKeys = [
-    "user",
-    "currentUser",
-    "auth",
-    "authUser",
-    "dierhaUser",
-    "userData",
-    "session",
-    "dierha-auth",
-    "auth-storage",
-  ];
-
-  const storages = [localStorage, sessionStorage];
-
-  for (const storage of storages) {
-    for (const key of directKeys) {
-      const value = storage.getItem(key);
-
-      if (value) {
-        return cleanToken(value);
-      }
-    }
-  }
-
-  for (const storage of storages) {
-    for (const key of objectKeys) {
-      const value = storage.getItem(key);
-
-      if (!value) continue;
-
-      try {
-        const parsed = JSON.parse(value);
-        const token = extractToken(parsed);
-
-        if (token) {
-          return token;
-        }
-      } catch {
-        const token = extractToken(value);
-
-        if (token) {
-          return token;
-        }
-      }
-    }
-  }
-
-  return null;
+  return (
+    localStorage.getItem("token") ||
+    localStorage.getItem("accessToken") ||
+    localStorage.getItem("authToken")
+  );
 }
 
 function buildQuery(filters?: FilterSubscriptionsDto) {
@@ -232,28 +107,19 @@ function buildQuery(filters?: FilterSubscriptionsDto) {
   return query ? `?${query}` : "";
 }
 
-function buildHeaders(options?: RequestOptions) {
-  const token = getToken();
-  const headers = new Headers(options?.headers);
-
-  if (!headers.has("Content-Type") && options?.body) {
-    headers.set("Content-Type", "application/json");
-  }
-
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
-
-  return headers;
-}
-
 async function request<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
+  const token = getToken();
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
-    headers: buildHeaders(options),
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
   });
 
   if (!response.ok) {
@@ -299,7 +165,7 @@ export class SubscriptionsService {
 
   update(id: number | string, dto: UpdateSubscriptionDto) {
     return request<Subscription>(`/subscriptions/${id}`, {
-      method: "PUT",
+      method: "PATCH",
       body: JSON.stringify(dto),
     });
   }
@@ -320,7 +186,7 @@ export class SubscriptionsService {
   }
 
   getSubscriptionSpending(id: number | string) {
-    return request<SubscriptionSpending>(`/subscriptions/${id}/spending`);
+    return request(`/subscriptions/${id}/spending`);
   }
 
   findPriceHistory(id: number | string) {
@@ -328,9 +194,13 @@ export class SubscriptionsService {
   }
 
   async exportPdf() {
+    const token = getToken();
+
     const response = await fetch(`${API_BASE_URL}/subscriptions/export/pdf`, {
       method: "GET",
-      headers: buildHeaders(),
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
     });
 
     if (!response.ok) {
@@ -407,27 +277,11 @@ export const getMonthlyAnalytics = () => {
   return request("/analytics/monthly");
 };
 
-export const getUpcomingRenewals = async () => {
-  const subscriptions = await subscriptionsService.findAll();
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  return subscriptions
-    .filter((subscription) => {
-      if (!subscription.renewalDate) return false;
-
-      const renewalDate = new Date(subscription.renewalDate);
-      renewalDate.setHours(0, 0, 0, 0);
-
-      return renewalDate >= today && subscription.status !== "inactive";
-    })
-    .sort((a, b) => {
-      return (
-        new Date(a.renewalDate).getTime() -
-        new Date(b.renewalDate).getTime()
-      );
-    });
+export const getUpcomingRenewals = () => {
+  return request("/subscriptions/upcoming-renewals");
 };
 
 export default subscriptionsService;
+
+// alias لـ Subscription يُستخدم في الـ pages والـ components
+export type BackendSubscription = Subscription;
