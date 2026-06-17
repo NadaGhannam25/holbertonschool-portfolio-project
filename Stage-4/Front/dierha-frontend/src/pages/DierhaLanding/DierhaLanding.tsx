@@ -62,7 +62,7 @@ const features: Feature[] = [
 const steps = [
     {
         number: "01",
-        title: "أضيف اشتراكاتك",
+        title: "أضيفي اشتراكاتك",
         description: "أضيف الخدمة والمبلغ وتاريخ التجديد.",
     },
     {
@@ -764,7 +764,8 @@ export default function DierhaLanding() {
                         <h4>روابط سريعة</h4>
                         <a href="#home">الرئيسية</a>
                         <a href="#features">المزايا</a>
-                        <a href="#story">قصتنا</a>
+                        <a href="#story">القصة</a>
+                        <a href="#how">كيف تبدأ</a>
                         <a href="#team">الفريق</a>
                     </div>
 
