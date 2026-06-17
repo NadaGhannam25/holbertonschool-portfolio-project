@@ -202,7 +202,7 @@ function buildTableRows(subscriptions: BackendSubscription[]): string {
     if (subscriptions.length === 0) {
         return `
             <tr>
-                <td colspan="7" style="padding:22px 16px;border-bottom:1px solid #E5E9F1;font-size:13px;text-align:center;color:#667085;font-weight:700;">
+                <td colspan="7" style="padding:22px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;text-align:center;color:#667085;font-weight:700;">
                     لا توجد اشتراكات حتى الآن.
                 </td>
             </tr>
@@ -215,7 +215,7 @@ function buildTableRows(subscriptions: BackendSubscription[]): string {
                 index % 2 === 1 ? "background:#FAFBFC;" : "background:#FFFFFF;";
 
             const cellStyle =
-                "padding:11px 8px;border-bottom:1px solid #E5E9F1;font-size:11px;line-height:1.7;color:#292B2E;vertical-align:middle;text-align:center;";
+                "padding:10px 6px;border-bottom:1px solid #E5E9F1;font-size:10px;line-height:1.6;color:#292B2E;vertical-align:middle;text-align:center;";
 
             const statusStyle =
                 subscription.status === "active"
@@ -224,14 +224,14 @@ function buildTableRows(subscriptions: BackendSubscription[]): string {
 
             return `
                 <tr style="${rowBackground}">
-                    <td style="${cellStyle};font-weight:800;max-width:122px;word-break:break-word;text-align:right;">${escapeHtml(subscription.name)}</td>
+                    <td style="${cellStyle};font-weight:800;word-break:break-word;text-align:right;">${escapeHtml(subscription.name)}</td>
                     <td style="${cellStyle}">${escapeHtml(subscription.category?.name ?? "أخرى")}</td>
                     <td style="${cellStyle};white-space:nowrap;font-weight:800;">${Number(subscription.price || 0).toFixed(2)} ريال</td>
                     <td style="${cellStyle};white-space:nowrap;">${formatBillingCycle(String(subscription.billingCycle))}</td>
                     <td style="${cellStyle};white-space:nowrap;">${formatDateSafe(subscription.startDate)}</td>
                     <td style="${cellStyle};white-space:nowrap;">${formatDateSafe(subscription.renewalDate)}</td>
-                    <td style="${cellStyle};white-space:nowrap;">
-                        <span style="display:inline-block;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:800;${statusStyle}">
+                    <td style="${cellStyle};white-space:nowrap;text-align:center;">
+                        <span style="display:inline-block;min-width:48px;padding:4px 7px;border-radius:999px;font-size:9px;font-weight:800;${statusStyle}">
                             ${formatStatus(subscription.status)}
                         </span>
                     </td>
@@ -296,13 +296,13 @@ function buildHTML(
       <table style="width:100%;background:white;border:1px solid #E5E9F1;border-radius:24px;overflow:hidden;">
         <thead>
           <tr>
-            <th style="width:19%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">الخدمة</th>
-            <th style="width:13%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">التصنيف</th>
-            <th style="width:15%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">السعر</th>
-            <th style="width:14%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">دورة الدفع</th>
-            <th style="width:15%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">تاريخ البداية</th>
-            <th style="width:15%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">تاريخ التجديد</th>
-            <th style="width:9%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">الحالة</th>
+            <th style="width:17%;background:#6E87C0;color:white;padding:11px 6px;text-align:center;font-size:10px;font-weight:900;">الخدمة</th>
+            <th style="width:12%;background:#6E87C0;color:white;padding:11px 6px;text-align:center;font-size:10px;font-weight:900;">التصنيف</th>
+            <th style="width:14%;background:#6E87C0;color:white;padding:11px 6px;text-align:center;font-size:10px;font-weight:900;">السعر</th>
+            <th style="width:13%;background:#6E87C0;color:white;padding:11px 6px;text-align:center;font-size:10px;font-weight:900;">دورة الدفع</th>
+            <th style="width:15%;background:#6E87C0;color:white;padding:11px 6px;text-align:center;font-size:10px;font-weight:900;">تاريخ البداية</th>
+            <th style="width:15%;background:#6E87C0;color:white;padding:11px 6px;text-align:center;font-size:10px;font-weight:900;">تاريخ التجديد</th>
+            <th style="width:14%;background:#6E87C0;color:white;padding:11px 6px;text-align:center;font-size:10px;font-weight:900;">الحالة</th>
           </tr>
         </thead>
         <tbody>${buildTableRows(subscriptions)}</tbody>
