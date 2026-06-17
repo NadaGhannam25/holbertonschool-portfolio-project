@@ -1,254 +1,442 @@
-import type { BackendSubscription } from "./subscriptionService";
+import { getSubscriptions, type BackendSubscription } from "./subscriptionService";
 
 const LOGO_URL =
     "https://zpijpebyajnkxsrnrfre.supabase.co/storage/v1/object/public/assets/dierha-logo.png";
 
+type Libs = { html2canvas: any; jsPDF: any };
+
+let libsPromise: Promise<Libs> | null = null;
+let logoBase64Promise: Promise<string> | null = null;
+
+function escapeHtml(value: unknown): string {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 function formatBillingCycle(cycle: string): string {
     const map: Record<string, string> = {
-        weekly: "أسبوعي", monthly: "شهري", quarterly: "كل 3 أشهر",
-        semi_annual: "كل 6 أشهر", yearly: "سنوي",
+        weekly: "أسبوعي",
+        monthly: "شهري",
+        quarterly: "كل 3 أشهر",
+        semi_annual: "كل 6 أشهر",
+        yearly: "سنوي",
     };
+
     return map[cycle] ?? cycle;
 }
 
-function formatStatus(status: string, deletedAt: string | null | undefined): string {
+function formatStatus(status: string | undefined, deletedAt: string | null | undefined): string {
     if (deletedAt) return "محذوف";
     return status === "active" ? "نشط" : "غير نشط";
 }
 
-function getMonthlyEquivalent(price: string, cycle: string): number {
-    const n = Number(price);
-    if (cycle === "weekly") return n * 4;
-    if (cycle === "quarterly") return n / 3;
-    if (cycle === "semi_annual") return n / 6;
-    if (cycle === "yearly") return n / 12;
-    return n;
+function getMonthlyEquivalent(price: string | number, cycle: string): number {
+    const amount = Number(price);
+
+    if (!Number.isFinite(amount)) return 0;
+    if (cycle === "weekly") return amount * 4;
+    if (cycle === "quarterly") return amount / 3;
+    if (cycle === "semi_annual") return amount / 6;
+    if (cycle === "yearly") return amount / 12;
+
+    return amount;
 }
 
-function formatDateSafe(val: string | null | undefined): string {
-    if (!val) return "—";
-    const d = new Date(val);
-    if (isNaN(d.getTime())) return "—";
-    return d.toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" });
+function formatDateSafe(value: string | null | undefined): string {
+    if (!value) return "—";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+
+    return date.toLocaleDateString("ar-SA-u-nu-latn", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
 }
 
 function getUserData(): { name: string; email: string } {
-    try {
-        const raw = localStorage.getItem("dierha_user");
-        if (raw) {
-            const p = JSON.parse(raw);
-            return { name: p?.name ?? "مستخدم", email: p?.email ?? "" };
+    const userKeys = [
+        "dierha_user",
+        "user",
+        "currentUser",
+        "authUser",
+        "dierhaUser",
+        "userData",
+    ];
+
+    for (const storage of [localStorage, sessionStorage]) {
+        for (const key of userKeys) {
+            try {
+                const raw = storage.getItem(key);
+                if (!raw) continue;
+
+                const parsed = JSON.parse(raw);
+                const user = parsed?.user ?? parsed?.data?.user ?? parsed?.data ?? parsed;
+
+                if (user && typeof user === "object") {
+                    return {
+                        name: user?.name ?? "مستخدم",
+                        email: user?.email ?? "",
+                    };
+                }
+            } catch {
+                // Ignore unreadable storage values.
+            }
         }
-    } catch { /* ignore */ }
+    }
+
     return { name: "مستخدم", email: "" };
 }
 
-async function logoToBase64(): Promise<string> {
-    try {
-        const res = await fetch(LOGO_URL);
-        const blob = await res.blob();
-        return await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.readAsDataURL(blob);
-        });
-    } catch { return ""; }
+function normalizeSubscriptions(value: unknown): BackendSubscription[] {
+    if (Array.isArray(value)) return value as BackendSubscription[];
+
+    if (value && typeof value === "object") {
+        const record = value as Record<string, unknown>;
+
+        if (Array.isArray(record.data)) return record.data as BackendSubscription[];
+        if (Array.isArray(record.subscriptions)) return record.subscriptions as BackendSubscription[];
+        if (Array.isArray(record.items)) return record.items as BackendSubscription[];
+    }
+
+    return [];
 }
 
-async function loadLibs(): Promise<{ html2canvas: any; jsPDF: any }> {
-    if (!(window as any).html2canvas) {
-        await new Promise<void>((res, rej) => {
-            const s = document.createElement("script");
-            s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
-            s.onload = () => res(); s.onerror = rej;
-            document.head.appendChild(s);
+async function resolveSubscriptions(
+    subscriptions?: BackendSubscription[] | unknown,
+): Promise<BackendSubscription[]> {
+    const provided = normalizeSubscriptions(subscriptions);
+
+    if (provided.length > 0 || Array.isArray(subscriptions)) {
+        return provided;
+    }
+
+    const fetched = await getSubscriptions();
+    return normalizeSubscriptions(fetched);
+}
+
+async function logoToBase64(): Promise<string> {
+    if (!logoBase64Promise) {
+        logoBase64Promise = (async () => {
+            try {
+                const response = await fetch(LOGO_URL, { cache: "force-cache" });
+                const blob = await response.blob();
+
+                return await new Promise<string>((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(String(reader.result || ""));
+                    reader.onerror = () => resolve("");
+                    reader.readAsDataURL(blob);
+                });
+            } catch {
+                return "";
+            }
+        })();
+    }
+
+    return logoBase64Promise;
+}
+
+function loadScriptOnce(id: string, src: string): Promise<void> {
+    const existing = document.getElementById(id) as HTMLScriptElement | null;
+
+    if (existing?.dataset.loaded === "true") {
+        return Promise.resolve();
+    }
+
+    if (existing) {
+        return new Promise<void>((resolve, reject) => {
+            existing.addEventListener("load", () => resolve(), { once: true });
+            existing.addEventListener("error", () => reject(new Error(`Failed to load ${src}`)), { once: true });
         });
     }
-    if (!(window as any).jspdf?.jsPDF) {
-        await new Promise<void>((res, rej) => {
-            const s = document.createElement("script");
-            s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-            s.onload = () => res(); s.onerror = rej;
-            document.head.appendChild(s);
-        });
+
+    return new Promise<void>((resolve, reject) => {
+        const script = document.createElement("script");
+        script.id = id;
+        script.src = src;
+        script.async = true;
+        script.onload = () => {
+            script.dataset.loaded = "true";
+            resolve();
+        };
+        script.onerror = () => reject(new Error(`Failed to load ${src}`));
+        document.head.appendChild(script);
+    });
+}
+
+async function loadLibs(): Promise<Libs> {
+    if (!libsPromise) {
+        libsPromise = (async () => {
+            if (!(window as any).html2canvas) {
+                await loadScriptOnce(
+                    "dierha-html2canvas",
+                    "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+                );
+            }
+
+            if (!(window as any).jspdf?.jsPDF) {
+                await loadScriptOnce(
+                    "dierha-jspdf",
+                    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+                );
+            }
+
+            return {
+                html2canvas: (window as any).html2canvas,
+                jsPDF: (window as any).jspdf.jsPDF,
+            };
+        })();
     }
-    return {
-        html2canvas: (window as any).html2canvas,
-        jsPDF: (window as any).jspdf.jsPDF,
-    };
+
+    return libsPromise;
+}
+
+function buildTableRows(subscriptions: BackendSubscription[]): string {
+    if (subscriptions.length === 0) {
+        return `
+            <tr>
+                <td colspan="7" style="padding:22px 16px;border-bottom:1px solid #E5E9F1;font-size:13px;text-align:center;color:#667085;font-weight:700;">
+                    لا توجد اشتراكات حتى الآن.
+                </td>
+            </tr>
+        `;
+    }
+
+    return subscriptions
+        .map((subscription, index) => {
+            const isDeleted = Boolean(subscription.deletedAt);
+            const rowBackground = isDeleted
+                ? "background:#FFF5F5;opacity:0.72;"
+                : index % 2 === 1
+                  ? "background:#FAFBFC;"
+                  : "background:#FFFFFF;";
+
+            const cellStyle =
+                "padding:11px 10px;border-bottom:1px solid #E5E9F1;font-size:11px;line-height:1.7;color:#292B2E;vertical-align:middle;text-align:right;";
+
+            const statusStyle = isDeleted
+                ? "background:#FFEBEE;color:#C62828;"
+                : subscription.status === "active"
+                  ? "background:#E8F5E9;color:#2E7D32;"
+                  : "background:#FFF8E1;color:#F57F17;";
+
+            return `
+                <tr style="${rowBackground}">
+                    <td style="${cellStyle};font-weight:800;max-width:122px;word-break:break-word;">${escapeHtml(subscription.name)}</td>
+                    <td style="${cellStyle}">${escapeHtml(subscription.category?.name ?? "أخرى")}</td>
+                    <td style="${cellStyle};white-space:nowrap;font-weight:800;">${Number(subscription.price || 0).toFixed(2)} ريال</td>
+                    <td style="${cellStyle};white-space:nowrap;">${formatBillingCycle(String(subscription.billingCycle))}</td>
+                    <td style="${cellStyle};white-space:nowrap;">${formatDateSafe(subscription.startDate)}</td>
+                    <td style="${cellStyle};white-space:nowrap;">${formatDateSafe(subscription.renewalDate)}</td>
+                    <td style="${cellStyle};white-space:nowrap;">
+                        <span style="display:inline-block;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:800;${statusStyle}">
+                            ${formatStatus(subscription.status, subscription.deletedAt ?? null)}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        })
+        .join("");
 }
 
 function buildHTML(
-    safe: BackendSubscription[],
+    subscriptions: BackendSubscription[],
     name: string,
     email: string,
     logoBase64: string,
     monthlyTotal: number,
     yearlyTotal: number,
 ): string {
-    const tableRows = safe.map((s) => `
-        <tr style="${s.deletedAt ? "opacity:0.6;background:#FFF5F5;" : ""}">
-          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${s.name}</td>
-          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${s.category?.name ?? "أخرى"}</td>
-          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${Number(s.price).toFixed(2)} ريال</td>
-          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${formatBillingCycle(s.billingCycle)}</td>
-          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${formatDateSafe(s.startDate)}</td>
-          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;color:#292B2E;">${formatDateSafe(s.renewalDate)}</td>
-          <td style="padding:13px 16px;border-bottom:1px solid #E5E9F1;font-size:12px;font-family:Tahoma,Arial,sans-serif;">
-            <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:Tahoma,Arial,sans-serif;
-              ${s.deletedAt ? "background:#FFEBEE;color:#C62828;" : s.status === "active" ? "background:#E8F5E9;color:#2E7D32;" : "background:#FFF8E1;color:#F57F17;"}">
-              ${formatStatus(s.status ?? "active", s.deletedAt ?? null)}
-            </span>
-          </td>
-        </tr>`).join("");
-
-    const evenRows = safe.map((_, i) =>
-        i % 2 === 1 ? `tr:nth-child(${i + 1}) td { background: #FAFBFC; }` : ""
-    ).join("");
-
     return `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head><meta charset="UTF-8"/>
-<style>
-  body{margin:0;padding:0;background:#FAFBFC;}
-  table{border-collapse:collapse;}
-</style>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #FAFBFC; }
+    body { font-family: Tahoma, Arial, sans-serif; direction: rtl; }
+    table { border-collapse: collapse; table-layout: fixed; }
+  </style>
 </head>
 <body>
-<div style="width:794px;background:#FAFBFC;font-family:Tahoma,Arial,sans-serif;direction:rtl;">
-
-  <div style="background:linear-gradient(135deg,#666CC0 0%,#6E87C0 45%,#F3B0B9 100%);padding:55px 40px 45px;text-align:center;color:white;">
-    ${logoBase64 ? `<img src="${logoBase64}" style="width:180px;margin-bottom:18px;border-radius:20px;padding:10px;display:block;margin-left:auto;margin-right:auto;"/>` : ""}
-    <div style="font-size:34px;font-weight:800;font-family:Tahoma,Arial,sans-serif;color:white;">ديرها</div>
-    <div style="margin-top:10px;font-size:15px;opacity:.95;color:white;">تقرير إدارة الاشتراكات</div>
-  </div>
-
-  <div style="padding:36px 44px;">
-
-    <div style="background:white;border:1px solid #D6DAE1;border-radius:20px;padding:20px 24px;margin-bottom:28px;line-height:2;">
-      <div style="font-size:14px;color:#292B2E;margin-bottom:4px;">الحساب: <strong>${name}</strong></div>
-      <div style="font-size:14px;color:#292B2E;margin-bottom:4px;">البريد الإلكتروني: <strong>${email}</strong></div>
-      <div style="font-size:14px;color:#292B2E;">تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA")}</strong></div>
+  <div style="width:794px;min-height:1123px;background:#FAFBFC;font-family:Tahoma,Arial,sans-serif;direction:rtl;color:#292B2E;">
+    <div style="background:linear-gradient(135deg,#020B5C 0%,#1D47DA 55%,#F56F96 100%);padding:34px 40px 30px;text-align:center;color:white;">
+      ${logoBase64 ? `<img src="${logoBase64}" style="width:142px;margin:0 auto 10px;border-radius:18px;padding:8px;display:block;background:rgba(255,255,255,.96);" />` : ""}
+      <div style="font-size:28px;font-weight:900;color:white;">ديرها</div>
+      <div style="margin-top:8px;font-size:14px;font-weight:700;opacity:.96;color:white;">تقرير إدارة الاشتراكات</div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;">
-      <div style="background:linear-gradient(180deg,#FFFFFF,#FAFBFC);border:1px solid #D6DAE1;border-radius:20px;padding:22px;text-align:center;">
-        <div style="color:#6E87C0;font-size:12px;margin-bottom:8px;font-weight:700;">إجمالي الاشتراكات</div>
-        <div style="color:#292B2E;font-size:24px;font-weight:800;">${safe.length}</div>
+    <div style="padding:28px 34px;">
+      <div style="background:white;border:1px solid #D6DAE1;border-radius:18px;padding:16px 20px;margin-bottom:20px;line-height:1.9;">
+        <div style="font-size:13px;color:#292B2E;">الحساب: <strong>${escapeHtml(name)}</strong></div>
+        <div style="font-size:13px;color:#292B2E;">البريد الإلكتروني: <strong>${escapeHtml(email || "غير متوفر")}</strong></div>
+        <div style="font-size:13px;color:#292B2E;">تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA-u-nu-latn")}</strong></div>
       </div>
-      <div style="background:linear-gradient(180deg,#FFFFFF,#FAFBFC);border:1px solid #D6DAE1;border-radius:20px;padding:22px;text-align:center;">
-        <div style="color:#6E87C0;font-size:12px;margin-bottom:8px;font-weight:700;">الإجمالي الشهري (النشطة)</div>
-        <div style="color:#292B2E;font-size:24px;font-weight:800;">${monthlyTotal.toFixed(2)} ريال</div>
+
+      <div style="display:flex;gap:12px;margin-bottom:24px;">
+        <div style="flex:1;background:white;border:1px solid #D6DAE1;border-radius:18px;padding:16px 10px;text-align:center;">
+          <div style="color:#1D47DA;font-size:11px;margin-bottom:7px;font-weight:800;">إجمالي الاشتراكات</div>
+          <div style="color:#292B2E;font-size:22px;font-weight:900;">${subscriptions.length}</div>
+        </div>
+        <div style="flex:1;background:white;border:1px solid #D6DAE1;border-radius:18px;padding:16px 10px;text-align:center;">
+          <div style="color:#1D47DA;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي الشهري النشط</div>
+          <div style="color:#292B2E;font-size:20px;font-weight:900;">${monthlyTotal.toFixed(2)} ريال</div>
+        </div>
+        <div style="flex:1;background:white;border:1px solid #D6DAE1;border-radius:18px;padding:16px 10px;text-align:center;">
+          <div style="color:#1D47DA;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي السنوي النشط</div>
+          <div style="color:#292B2E;font-size:20px;font-weight:900;">${yearlyTotal.toFixed(2)} ريال</div>
+        </div>
       </div>
-      <div style="background:linear-gradient(180deg,#FFFFFF,#FAFBFC);border:1px solid #D6DAE1;border-radius:20px;padding:22px;text-align:center;">
-        <div style="color:#6E87C0;font-size:12px;margin-bottom:8px;font-weight:700;">الإجمالي السنوي (النشطة)</div>
-        <div style="color:#292B2E;font-size:24px;font-weight:800;">${yearlyTotal.toFixed(2)} ريال</div>
-      </div>
+
+      <div style="color:#020B5C;font-size:22px;font-weight:900;margin:0 0 14px;">جدول الاشتراكات</div>
+
+      <table style="width:100%;background:white;border:1px solid #E5E9F1;border-radius:18px;overflow:hidden;">
+        <thead>
+          <tr>
+            <th style="width:19%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الخدمة</th>
+            <th style="width:13%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">التصنيف</th>
+            <th style="width:15%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">السعر</th>
+            <th style="width:14%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">دورة الدفع</th>
+            <th style="width:15%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ البداية</th>
+            <th style="width:15%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ التجديد</th>
+            <th style="width:9%;background:#1D47DA;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الحالة</th>
+          </tr>
+        </thead>
+        <tbody>${buildTableRows(subscriptions)}</tbody>
+      </table>
+
+      <div style="margin-top:26px;text-align:center;color:#667085;font-size:12px;padding-bottom:18px;">ديرها | منصة إدارة الاشتراكات</div>
     </div>
-
-    <div style="color:#666CC0;font-size:24px;font-weight:800;margin:0 0 16px;">جدول الاشتراكات</div>
-
-    <table style="width:100%;border-collapse:collapse;background:white;border-radius:20px;overflow:hidden;">
-      <thead>
-        <tr>
-          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">الخدمة</th>
-          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">التصنيف</th>
-          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">السعر</th>
-          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">دورة الدفع</th>
-          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">تاريخ البداية</th>
-          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">تاريخ التجديد</th>
-          <th style="background:linear-gradient(135deg,#666CC0,#6E87C0);color:white;padding:15px 16px;text-align:right;font-size:12px;font-family:Tahoma,Arial,sans-serif;font-weight:700;">الحالة</th>
-        </tr>
-      </thead>
-      <tbody>${tableRows}</tbody>
-    </table>
-
-    <div style="margin-top:32px;text-align:center;color:#63676E;font-size:13px;padding-bottom:24px;">ديرها | منصة إدارة الاشتراكات</div>
   </div>
-</div>
-</body></html>`;
+</body>
+</html>`;
+}
+
+async function waitForImages(documentRef: Document): Promise<void> {
+    const images = Array.from(documentRef.querySelectorAll("img"));
+
+    if (images.length === 0) {
+        await new Promise((resolve) => window.setTimeout(resolve, 50));
+        return;
+    }
+
+    await Promise.all(
+        images.map(
+            (image) =>
+                new Promise<void>((resolve) => {
+                    if (image.complete) {
+                        resolve();
+                        return;
+                    }
+
+                    image.onload = () => resolve();
+                    image.onerror = () => resolve();
+                }),
+        ),
+    );
+
+    await new Promise((resolve) => window.setTimeout(resolve, 50));
 }
 
 export async function generatePdfClient(
-    subscriptions: BackendSubscription[],
+    subscriptions?: BackendSubscription[] | unknown,
     userName?: string,
     userEmail?: string,
 ): Promise<void> {
-    const safe = Array.isArray(subscriptions)
-     ? subscriptions
-     : Array.isArray((subscriptions as any)?.data)
-       ? (subscriptions as any).data
-       : Array.isArray((subscriptions as any)?.subscriptions)
-         ? (subscriptions as any).subscriptions
-         : [];
-    const user  = getUserData();
-    const name  = (userName  && userName  !== "undefined") ? userName  : user.name;
-    const email = (userEmail && userEmail !== "undefined") ? userEmail : user.email;
+    const safe = await resolveSubscriptions(subscriptions);
+    const user = getUserData();
+    const name = userName && userName !== "undefined" ? userName : user.name;
+    const email = userEmail && userEmail !== "undefined" ? userEmail : user.email;
 
-    const active = safe.filter((s) => s.status === "active" && !s.deletedAt);
-    const monthlyTotal = active.reduce(
-        (sum, s) => sum + getMonthlyEquivalent(String(s.price), s.billingCycle), 0
+    const activeSubscriptions = safe.filter(
+        (subscription) => subscription.status === "active" && !subscription.deletedAt,
+    );
+
+    const monthlyTotal = activeSubscriptions.reduce(
+        (sum, subscription) =>
+            sum + getMonthlyEquivalent(subscription.price, String(subscription.billingCycle)),
+        0,
     );
     const yearlyTotal = monthlyTotal * 12;
 
-    const [logoBase64, { html2canvas, jsPDF }] = await Promise.all([
-        logoToBase64(),
+    const [{ html2canvas, jsPDF }, logoBase64] = await Promise.all([
         loadLibs(),
+        logoToBase64(),
     ]);
 
     const html = buildHTML(safe, name, email, logoBase64, monthlyTotal, yearlyTotal);
 
     const iframe = document.createElement("iframe");
-    iframe.style.cssText = "position:fixed;left:0;top:0;width:794px;height:1px;border:none;visibility:hidden;";
+    iframe.setAttribute("aria-hidden", "true");
+    iframe.style.cssText =
+        "position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:none;opacity:0;pointer-events:none;z-index:-1;";
     document.body.appendChild(iframe);
 
     try {
-        const iDoc = iframe.contentDocument!;
-        iDoc.open(); iDoc.write(html); iDoc.close();
+        const iframeDocument = iframe.contentDocument;
 
-        await new Promise<void>((resolve) => {
-            const imgs = iDoc.querySelectorAll("img");
-            if (imgs.length === 0) { setTimeout(resolve, 200); return; }
-            let loaded = 0;
-            imgs.forEach((img) => {
-                if (img.complete) { loaded++; if (loaded === imgs.length) setTimeout(resolve, 200); }
-                else { img.onload = img.onerror = () => { loaded++; if (loaded === imgs.length) setTimeout(resolve, 200); }; }
-            });
-        });
+        if (!iframeDocument) {
+            throw new Error("تعذر تجهيز ملف PDF.");
+        }
 
-        const target = iDoc.body.firstElementChild as HTMLElement;
-        const totalH = target.scrollHeight;
-        iframe.style.height = totalH + "px";
+        iframeDocument.open();
+        iframeDocument.write(html);
+        iframeDocument.close();
 
-        await new Promise((r) => setTimeout(r, 150));
+        await waitForImages(iframeDocument);
+
+        const target = iframeDocument.body.firstElementChild as HTMLElement | null;
+
+        if (!target) {
+            throw new Error("تعذر إنشاء محتوى PDF.");
+        }
+
+        const totalHeight = Math.max(target.scrollHeight, 1123);
+        iframe.style.height = `${totalHeight}px`;
 
         const canvas = await html2canvas(target, {
-            scale: 2,
+            scale: 1.45,
             useCORS: true,
             backgroundColor: "#FAFBFC",
             logging: false,
             width: 794,
-            height: totalH,
+            height: totalHeight,
             windowWidth: 794,
-            windowHeight: totalH,
+            windowHeight: totalHeight,
         });
 
-        const imgW  = 210;
-        const imgH  = (canvas.height * imgW) / canvas.width;
-        const pageH = 297;
-        const imgData = canvas.toDataURL("image/jpeg", 0.97);
+        const pdfWidth = 210;
+        const pageHeight = 297;
+        const pdfImageHeight = (canvas.height * pdfWidth) / canvas.width;
+        const imageData = canvas.toDataURL("image/jpeg", 0.92);
 
-        const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-        let yPos = 0;
-        let first = true;
-        while (yPos < imgH) {
-            if (!first) doc.addPage();
-            first = false;
-            doc.addImage(imgData, "JPEG", 0, -yPos, imgW, imgH);
-            yPos += pageH;
+        const documentPdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4",
+            compress: true,
+        });
+
+        let yPosition = 0;
+        let isFirstPage = true;
+
+        while (yPosition < pdfImageHeight) {
+            if (!isFirstPage) {
+                documentPdf.addPage();
+            }
+
+            isFirstPage = false;
+            documentPdf.addImage(imageData, "JPEG", 0, -yPosition, pdfWidth, pdfImageHeight);
+            yPosition += pageHeight;
         }
 
-        doc.save(`dierha-subscriptions-${new Date().toISOString().slice(0, 10)}.pdf`);
+        documentPdf.save(`dierha-subscriptions-${new Date().toISOString().slice(0, 10)}.pdf`);
     } finally {
         document.body.removeChild(iframe);
     }
