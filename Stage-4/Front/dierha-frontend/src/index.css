@@ -2326,8 +2326,8 @@ a { text-decoration: none; color: inherit; }
 .details-service-main h2 { color: var(--dark); font-size: 1.1rem; font-weight: 900; margin: 0 0 0.2rem; }
 .details-service-main p { color: var(--grey); font-size: 0.78rem; font-weight: 700; margin: 0 0 0.35rem; }
 .details-service-main span {
-  background: rgba(29, 71, 218, 0.08);
-  color: var(--logo-blue);
+  background: var(--logo-blue);
+  color: #ffffff !important;
   padding: 0.22rem 0.6rem;
   border-radius: 999px;
   font-size: 0.72rem;
