@@ -66,7 +66,7 @@ export async function generatePdfClient(): Promise<void> {
   }
 
   const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 30_000);
+  const timeoutId = window.setTimeout(() => controller.abort(), 10_000);
 
   try {
     const response = await fetch(
