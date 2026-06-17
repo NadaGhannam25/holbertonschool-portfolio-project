@@ -131,8 +131,12 @@ function Subscriptions({
 
     useEffect(() => {
         const timer = window.setTimeout(() => {
-            setDebouncedSearchTerm(searchTerm.trim());
-        }, 350);
+            const trimmed = searchTerm.trim();
+            // لا ترسل للباكند إلا لو فاضي تماماً أو أكثر من حرفين
+            if (trimmed === "" || trimmed.length >= 2) {
+                setDebouncedSearchTerm(trimmed);
+            }
+        }, 400);
 
         return () => window.clearTimeout(timer);
     }, [searchTerm]);
@@ -149,10 +153,10 @@ function Subscriptions({
                         ? categoryMap[activeCategory]
                         : undefined;
 
-                const data = await getSubscriptions({
-                    search: debouncedSearchTerm || undefined,
-                    categoryId: categoryId,
-                });
+                const data = await getSubscriptions(
+                    debouncedSearchTerm || undefined,
+                    categoryId
+                );
 
                 const result = Array.isArray(data) ? data : [];
                 setSubscriptionsData(result);
@@ -525,11 +529,9 @@ function Subscriptions({
                                     ))
                                 ) : (
                                     <div className="subscriptions-empty-card">
-                                        {(debouncedSearchTerm || activeCategory !== "الكل" || selectedMonth || selectedYear)
-                                            ? "لا يوجد اشتراكات مطابقة."
-                                            : hadSubscriptionsBefore
-                                                ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
-                                                : "لم تقم بإضافة أي اشتراكات بعد."}
+                                        {hadSubscriptionsBefore
+                                            ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
+                                            : "لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد."}
                                     </div>
                                 )}
                             </section>
@@ -598,11 +600,9 @@ function Subscriptions({
                                     ))
                                 ) : (
                                     <div className="subscriptions-empty-card">
-                                        {(debouncedSearchTerm || activeCategory !== "الكل" || selectedMonth || selectedYear)
-                                            ? "لا يوجد اشتراكات مطابقة."
-                                            : hadSubscriptionsBefore
-                                                ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
-                                                : "لم تقم بإضافة أي اشتراكات بعد."}
+                                        {hadSubscriptionsBefore
+                                            ? "لا توجد اشتراكات نشطة حالياً. اشتراكاتك السابقة محفوظة في تقرير الـ PDF."
+                                            : "لا توجد اشتراكات مطابقة للبحث أو التصنيف أو تاريخ الاشتراك المحدد."}
                                     </div>
                                 )}
                             </section>
