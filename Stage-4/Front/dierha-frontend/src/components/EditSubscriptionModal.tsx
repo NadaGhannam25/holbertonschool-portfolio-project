@@ -8,7 +8,7 @@ type ReminderPreference =
 
 type EditSubscriptionValues = {
     category: string;
-    price: number;
+    price: number | string;
     duration: string;
     renewalDate: string;
     status: string;
@@ -95,6 +95,11 @@ function EditSubscriptionModal({
     const [formData, setFormData] =
         useState<EditSubscriptionValues>({
             ...initialValues,
+            price:
+                initialValues.price === null ||
+                initialValues.price === undefined
+                    ? ""
+                    : String(initialValues.price),
             reminderPreference:
                 initialValues.reminderPreference ||
                 "قبل بيوم",
@@ -110,6 +115,11 @@ function EditSubscriptionModal({
         if (isOpen) {
             setFormData({
                 ...initialValues,
+                price:
+                    initialValues.price === null ||
+                    initialValues.price === undefined
+                        ? ""
+                        : String(initialValues.price),
                 reminderPreference:
                     initialValues.reminderPreference ||
                     "قبل بيوم",
@@ -118,6 +128,7 @@ function EditSubscriptionModal({
             setIsReminderConfirmOpen(false);
         }
     }, [isOpen, initialValues]);
+
     useEffect(() => {
         if (!formData.renewalDate) {
             setCalculatedRenewalDate("");
@@ -153,6 +164,7 @@ function EditSubscriptionModal({
         
         setCalculatedRenewalDate(`${yyyy}-${mm}-${dd}`);
     }, [formData.renewalDate, formData.duration]);
+
     if (!isOpen) return null;
 
     const updateField = (
@@ -181,10 +193,12 @@ function EditSubscriptionModal({
     ) => {
         event.preventDefault();
 
-        const normalizedPrice = Number(formData.price);
+        const priceValue = String(formData.price).trim();
+        const normalizedPrice = Number(priceValue);
 
         if (
             !formData.category ||
+            !priceValue ||
             !Number.isFinite(normalizedPrice) ||
             normalizedPrice < 0 ||
             !formData.duration ||
@@ -214,9 +228,14 @@ function EditSubscriptionModal({
             return;
         }
 
-        onSave({...formData,
-            renewalDate: calculatedRenewalDate || formData.renewalDate });
-        onClose(); };
+        onSave({
+            ...formData,
+            price: normalizedPrice,
+            renewalDate: calculatedRenewalDate || formData.renewalDate,
+        });
+
+        onClose();
+    };
 
     return (
         <div
@@ -328,14 +347,18 @@ function EditSubscriptionModal({
                                     step="0.01"
                                     inputMode="decimal"
                                     value={formData.price}
-                                    onChange={(event) =>
+                                    onFocus={(event) => {
+                                        event.currentTarget.select();
+                                    }}
+                                    onChange={(event) => {
                                         updateField(
                                             "price",
-                                            Number(
-                                                event.target.value
-                                            )
-                                        )
-                                    }
+                                            event.target.value
+                                        );
+                                    }}
+                                    onWheel={(event) => {
+                                        event.currentTarget.blur();
+                                    }}
                                 />
 
                                 <span>ريال</span>
@@ -453,6 +476,7 @@ function EditSubscriptionModal({
                                 />
                             </div>
                         </div>
+
                         <div className="edit-modal-field full">
                             <label style={{ color: "#4F46E5", fontWeight: "bold" }}>
                             </label>
