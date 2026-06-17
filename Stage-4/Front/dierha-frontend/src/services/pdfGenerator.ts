@@ -25,17 +25,18 @@ function getMonthlyEquivalent(price: string, cycle: string): number {
 }
 
 export async function generatePdfClient(
-    subscriptions: BackendSubscription[],
+    subscriptions: BackendSubscription[] | undefined | null,
     userName: string,
     userEmail: string
 ): Promise<void> {
-    const activeOnes = subscriptions.filter(s => s.status === "active");
+    const safeSubscriptions = Array.isArray(subscriptions) ? subscriptions : [];
+    const activeOnes = safeSubscriptions.filter(s => s.status === "active");
     const monthlyTotal = activeOnes.reduce(
         (sum, s) => sum + getMonthlyEquivalent(s.price, s.billingCycle), 0
     );
     const yearlyTotal = monthlyTotal * 12;
 
-    const rows = subscriptions.map(s => `
+    const rows = safeSubscriptions.map(s => `
         <tr>
             <td>${s.name}</td>
             <td>${s.category?.name ?? "أخرى"}</td>
@@ -109,7 +110,7 @@ export async function generatePdfClient(
   </div>
   <div class="content">
     <div class="cards">
-      <div class="card"><div class="label">إجمالي الاشتراكات</div><div class="value">${subscriptions.length}</div></div>
+      <div class="card"><div class="label">إجمالي الاشتراكات</div><div class="value">${safeSubscriptions.length}</div></div>
       <div class="card"><div class="label">الإجمالي الشهري (النشطة)</div><div class="value">${monthlyTotal.toFixed(2)} ريال</div></div>
       <div class="card"><div class="label">الإجمالي السنوي (النشطة)</div><div class="value">${yearlyTotal.toFixed(2)} ريال</div></div>
     </div>
