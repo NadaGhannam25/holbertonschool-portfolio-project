@@ -175,12 +175,12 @@ export async function generatePdfClient(
     userEmail?: string,
 ): Promise<void> {
     const safe = Array.isArray(subscriptions)
-  ? subscriptions
-  : Array.isArray((subscriptions as any)?.data)
-    ? (subscriptions as any).data
-    : Array.isArray((subscriptions as any)?.subscriptions)
-      ? (subscriptions as any).subscriptions
-      : [];
+     ? subscriptions
+     : Array.isArray((subscriptions as any)?.data)
+       ? (subscriptions as any).data
+       : Array.isArray((subscriptions as any)?.subscriptions)
+         ? (subscriptions as any).subscriptions
+         : [];
     const user  = getUserData();
     const name  = (userName  && userName  !== "undefined") ? userName  : user.name;
     const email = (userEmail && userEmail !== "undefined") ? userEmail : user.email;
