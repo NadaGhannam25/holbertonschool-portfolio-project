@@ -2342,7 +2342,7 @@ a { text-decoration: none; color: inherit; }
   text-align: center;
 }
 
-.details-summary-item span { background: var(--logo-blue); color: #ffffff !important;padding: 0.22rem 0.6rem;border-radius: 999px;font-size: 0.72rem;font-weight: 900; }
+.details-summary-item span {display: block; color: var(--grey); font-size: 0.72rem; font-weight: 800;margin-bottom: 0.35rem; }
 .details-summary-item strong { color: var(--dark); font-size: 0.9rem; font-weight: 900; }
 .details-summary-item .status-text { color: #0f9f6e; }
 
