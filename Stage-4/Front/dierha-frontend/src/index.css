@@ -1,14 +1,11 @@
-/* # FONTS */
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap");
 
-/* # RESET */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* # THEME VARIABLES */
 :root {
   --logo-navy: #020B5C;
   --logo-blue: #1D47DA;
@@ -32,7 +29,6 @@
   --radius-medium: 16px;
 }
 
-/* # BASE */
 html { scroll-behavior: smooth; }
 
 body {
@@ -56,7 +52,6 @@ button, input, select, textarea {
 
 a { text-decoration: none; color: inherit; }
 
-/* # SHARED LAYOUT */
 .home-page {
   min-height: 100vh;
   display: flex;
@@ -97,7 +92,6 @@ a { text-decoration: none; color: inherit; }
   justify-content: flex-start;
 }
 
-/* # NAVIGATION */
 .top-navigation {
   position: sticky;
   top: 0;
@@ -245,14 +239,11 @@ a { text-decoration: none; color: inherit; }
 }
 
 
-
-/* Mobile authenticated navigation */
 .app-mobile-menu-button,
 .app-mobile-menu {
   display: none;
 }
 
-/* # TABLES + BADGES */
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -356,7 +347,6 @@ a { text-decoration: none; color: inherit; }
   border-radius: 12px;
 }
 
-/* # FOOTER */
 .main-footer {
   background: rgba(255, 255, 255, 0.92);
   border-top: 1px solid var(--border);
@@ -462,7 +452,6 @@ a { text-decoration: none; color: inherit; }
   color: var(--grey);
 }
 
-/* # AUTH PAGES */
 .top-logo {
   width: 100%;
   display: flex;
@@ -576,7 +565,6 @@ a { text-decoration: none; color: inherit; }
   cursor: not-allowed;
 }
 
-/* دائرة تحميل صغيرة داخل الأزرار */
 .btn-spinner {
   display: inline-block;
   width: 18px;
@@ -611,7 +599,6 @@ a { text-decoration: none; color: inherit; }
 
 .auth-switch button:hover { color: var(--logo-pink); }
 
-/* Password field */
 .password-input-wrapper {
   position: relative;
   width: 100%;
@@ -622,7 +609,6 @@ a { text-decoration: none; color: inherit; }
   padding-left: 2.75rem;
 }
 
-/* Hide the browser's default password reveal icon */
 .password-input-wrapper input::-ms-reveal,
 .password-input-wrapper input::-ms-clear {
   display: none;
@@ -684,7 +670,6 @@ a { text-decoration: none; color: inherit; }
   text-decoration: underline;
 }
 
-/* # LOADING */
 .loading-state-card {
   min-width: 0;
   width: max-content;
@@ -762,7 +747,6 @@ a { text-decoration: none; color: inherit; }
   to { transform: rotate(360deg); }
 }
 
-/* # TOAST */
 .toast-message {
   width: 100%;
   margin: 0 0 1rem;
@@ -791,7 +775,6 @@ a { text-decoration: none; color: inherit; }
 .toast-message.error { border-color: rgba(245, 111, 150, 0.28); }
 .toast-message.error .toast-dot { background: var(--logo-pink); }
 
-/* # HOME PAGE */
 .overview-strip {
   display: grid;
   grid-template-columns: 270px minmax(0, 1fr) 270px;
@@ -921,7 +904,6 @@ a { text-decoration: none; color: inherit; }
 .analysis-bar-fill.light { background: linear-gradient(90deg, var(--logo-light-blue), #6BA9F0); }
 .analysis-bar-fill.pink { background: linear-gradient(90deg, var(--logo-pink), #FF8CAE); }
 
-/* # METRIC CARDS */
 .metrics-section {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1008,7 +990,6 @@ a { text-decoration: none; color: inherit; }
   text-align: right;
 }
 
-/* # DASHBOARD GRID */
 .dashboard-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) 340px;
@@ -1098,7 +1079,6 @@ a { text-decoration: none; color: inherit; }
   border: 1px solid rgba(234, 179, 8, 0.30);
 }
 
-/* # SUBSCRIPTIONS PAGE */
 .subscriptions-alt-hero {
   background:
     linear-gradient(135deg, rgba(255,255,255,0.96), rgba(242,246,255,0.96)),
@@ -1150,7 +1130,6 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 12px 24px rgba(29, 71, 218, 0.14);
 }
 
-/* Toolbar */
 .subscriptions-alt-toolbar {
   direction: rtl;
   background: rgba(255,255,255,0.96);
@@ -1207,7 +1186,6 @@ a { text-decoration: none; color: inherit; }
   margin-top: 0.25rem;
 }
 
-/* View toggle */
 .view-mode-toggle {
   width: 118px;
   min-width: 118px;
@@ -1244,7 +1222,6 @@ a { text-decoration: none; color: inherit; }
 
 .view-mode-toggle button svg rect { fill: currentColor; }
 
-/* Month/year filter */
 .month-year-filter-wrapper { position: relative; width: 190px; min-width: 190px; }
 
 .month-year-filter-button {
@@ -1367,7 +1344,6 @@ a { text-decoration: none; color: inherit; }
   font-family: inherit;
 }
 
-/* Clear filters button */
 .clear-all-filters-btn {
   width: 140px;
   min-width: 140px;
@@ -1393,7 +1369,6 @@ a { text-decoration: none; color: inherit; }
   transform: translateY(-1px);
 }
 
-/* Category filter */
 .category-filter-wrapper { position: relative; }
 
 .compact-filter-btn {
@@ -1456,7 +1431,6 @@ a { text-decoration: none; color: inherit; }
   color: var(--logo-blue);
 }
 
-/* Export button */
 .subscriptions-export-btn,
 .export-pdf-btn {
   height: 50px;
@@ -1473,7 +1447,6 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 10px 22px rgba(29, 71, 218, 0.14);
 }
 
-/* # SUBSCRIPTION CARDS */
 .subscriptions-cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1647,7 +1620,6 @@ a { text-decoration: none; color: inherit; }
   outline-offset: 3px;
 }
 
-/* List view */
 .subscriptions-list-view {
   display: flex;
   flex-direction: column;
@@ -2011,7 +1983,6 @@ a { text-decoration: none; color: inherit; }
 .save-subscription-btn:disabled,
 .cancel-subscription-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* # SETTINGS DROPDOWN */
 .settings-dropdown-wrapper {
   position: relative;
   display: inline-flex;
@@ -2066,7 +2037,6 @@ a { text-decoration: none; color: inherit; }
   transform: translateX(-50%) rotate(45deg);
 }
 
-/* Person settings variant */
 .person-settings-wrapper { position: relative; }
 
 .profile-settings-trigger {
@@ -2106,7 +2076,6 @@ a { text-decoration: none; color: inherit; }
   right: auto !important;
 }
 
-/* Dropdown content */
 .settings-dropdown-profile {
   display: flex;
   align-items: center;
@@ -2232,7 +2201,6 @@ a { text-decoration: none; color: inherit; }
   font-family: inherit;
 }
 
-/* Account info */
 .settings-account-info {
   background: #fbfcff;
   border: 1px solid var(--border);
@@ -2275,7 +2243,6 @@ a { text-decoration: none; color: inherit; }
   font-size: 0.72rem !important;
 }
 
-/* # SUBSCRIPTION DETAILS */
 .subscription-details-header {
   display: flex;
   align-items: center;
@@ -2375,7 +2342,7 @@ a { text-decoration: none; color: inherit; }
   text-align: center;
 }
 
-.details-summary-item span { display: block; color: var(--grey); font-size: 0.72rem; font-weight: 800; margin-bottom: 0.35rem; }
+.details-summary-item span { background: var(--logo-blue); color: #ffffff !important;padding: 0.22rem 0.6rem;border-radius: 999px;font-size: 0.72rem;font-weight: 900; }
 .details-summary-item strong { color: var(--dark); font-size: 0.9rem; font-weight: 900; }
 .details-summary-item .status-text { color: #0f9f6e; }
 
