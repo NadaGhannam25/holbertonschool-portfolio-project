@@ -5,11 +5,8 @@ const LOGO_URL =
 
 function formatBillingCycle(cycle: string): string {
     const map: Record<string, string> = {
-        weekly: "أسبوعي",
-        monthly: "شهري",
-        quarterly: "كل 3 أشهر",
-        semi_annual: "كل 6 أشهر",
-        yearly: "سنوي",
+        weekly: "أسبوعي", monthly: "شهري", quarterly: "كل 3 أشهر",
+        semi_annual: "كل 6 أشهر", yearly: "سنوي",
     };
     return map[cycle] ?? cycle;
 }
@@ -35,6 +32,39 @@ function formatDateSafe(val: string | null | undefined): string {
     return d.toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" });
 }
 
+async function loadJsPDF(): Promise<any> {
+    if ((window as any).jspdf?.jsPDF) return (window as any).jspdf.jsPDF;
+    await new Promise<void>((res, rej) => {
+        const s = document.createElement("script");
+        s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+        s.onload = () => res();
+        s.onerror = rej;
+        document.head.appendChild(s);
+    });
+    await new Promise<void>((res, rej) => {
+        const s = document.createElement("script");
+        s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js";
+        s.onload = () => res();
+        s.onerror = rej;
+        document.head.appendChild(s);
+    });
+    return (window as any).jspdf.jsPDF;
+}
+
+async function toBase64(url: string): Promise<string | null> {
+    try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        return await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+        });
+    } catch {
+        return null;
+    }
+}
+
 export async function generatePdfClient(
     subscriptions: BackendSubscription[],
     userName: string,
@@ -43,135 +73,149 @@ export async function generatePdfClient(
     const safe = Array.isArray(subscriptions) ? subscriptions : [];
     const active = safe.filter((s) => s.status === "active" && !s.deletedAt);
     const monthlyTotal = active.reduce(
-        (sum, s) => sum + getMonthlyEquivalent(String(s.price), s.billingCycle),
-        0,
+        (sum, s) => sum + getMonthlyEquivalent(String(s.price), s.billingCycle), 0
     );
     const yearlyTotal = monthlyTotal * 12;
 
-    const tableRows = safe
-        .map(
-            (s) => `
-      <tr class="${s.deletedAt ? "deleted-row" : ""}">
-        <td>${s.name}</td>
-        <td>${s.category?.name ?? "أخرى"}</td>
-        <td>${Number(s.price).toFixed(2)} ريال</td>
-        <td>${formatBillingCycle(s.billingCycle)}</td>
-        <td>${formatDateSafe(s.startDate)}</td>
-        <td>${formatDateSafe(s.renewalDate)}</td>
-        <td>
-          <span class="status-badge status-${s.deletedAt ? "deleted" : (s.status ?? "active")}">
-            ${formatStatus(s.status ?? "active", s.deletedAt ?? null)}
-          </span>
-        </td>
-      </tr>`,
-        )
-        .join("");
+    const [jsPDF, logoBase64] = await Promise.all([
+        loadJsPDF(),
+        toBase64(LOGO_URL),
+    ]);
 
-    const html = `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8" />
-<style>
-  body { font-family: Tahoma, Arial, sans-serif; direction: rtl; margin: 0; padding: 0; background: #FAFBFC; color: #292B2E; }
-  .wrapper { width: 100%; min-height: 100vh; background: #FAFBFC; }
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const W = doc.internal.pageSize.getWidth();  
+    const H = doc.internal.pageSize.getHeight();  
 
-  /* ── زر الطباعة — يختفي عند الطباعة ── */
-  .print-bar { background: #F0F2FF; border-bottom: 1px solid #D6DAE1; padding: 16px 40px; text-align: center; }
-  .print-bar button {
-    background: linear-gradient(135deg, #666CC0, #6E87C0);
-    color: white; border: none; padding: 14px 48px; border-radius: 999px;
-    font-size: 16px; font-weight: 800; cursor: pointer;
-    font-family: Tahoma, Arial, sans-serif;
-    box-shadow: 0 8px 20px rgba(102,108,192,0.28);
-  }
-  @media print {
-    .print-bar { display: none !important; }
-    @page { size: A4; margin: 0; }
-    body { background: white; }
-    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .status-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .deleted-row td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  }
+    doc.setFillColor(102, 108, 192); 
+    doc.rect(0, 0, W * 0.45, 60, "F");
+    doc.setFillColor(110, 135, 192); 
+    doc.rect(W * 0.45, 0, W * 0.30, 60, "F");
+    doc.setFillColor(243, 176, 185); 
+    doc.rect(W * 0.75, 0, W * 0.25, 60, "F");
 
-  .header { background: linear-gradient(135deg, #666CC0 0%, #6E87C0 45%, #F3B0B9 100%); padding: 55px 40px 45px; text-align: center; color: white; }
-  .header img { width: 220px; margin-bottom: 22px; background: transparent; border-radius: 24px; padding: 12px; box-shadow: 0 12px 28px rgba(0,0,0,0.12); }
-  .header h1 { margin: 0; font-size: 38px; font-weight: 800; }
-  .header p { margin-top: 12px; font-size: 16px; opacity: .95; }
+    if (logoBase64) {
+        doc.addImage(logoBase64, "PNG", W / 2 - 18, 6, 36, 26);
+    }
 
-  .content { padding: 45px 55px; }
-  .info { background: white; border: 1px solid #D6DAE1; border-radius: 24px; padding: 24px; margin-bottom: 34px; line-height: 2.1; box-shadow: 0 6px 18px rgba(102,108,192,0.05); }
-  .info div { margin-bottom: 8px; font-size: 15px; }
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("Dierha", W / 2, logoBase64 ? 40 : 22, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text("Subscription Management Report", W / 2, logoBase64 ? 48 : 30, { align: "center" });
 
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 40px; }
-  .card { background: linear-gradient(180deg, #FFFFFF, #FAFBFC); border: 1px solid #D6DAE1; border-radius: 24px; padding: 26px; text-align: center; box-shadow: 0 6px 16px rgba(102,108,192,0.06); }
-  .card .label { color: #6E87C0; font-size: 14px; margin-bottom: 10px; font-weight: 700; }
-  .card .value { color: #292B2E; font-size: 28px; font-weight: 800; }
+    let y = 68;
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(214, 218, 225);
+    doc.roundedRect(14, y, W - 28, 24, 4, 4, "FD");
+    doc.setTextColor(41, 43, 46);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Account: ${userName}`, 20, y + 8);
+    doc.text(`Email: ${userEmail}`, 20, y + 15);
+    doc.text(`Date: ${new Date().toLocaleDateString("en-CA")}`, W - 20, y + 8, { align: "right" });
 
-  .section-title { color: #666CC0; font-size: 28px; font-weight: 800; margin: 0 0 20px; }
+    y += 30;
+    const cW = (W - 28 - 8) / 3;
+    const cards = [
+        { label: "Total Subscriptions", value: String(safe.length) },
+        { label: "Monthly Total (Active)", value: `${monthlyTotal.toFixed(2)} SAR` },
+        { label: "Yearly Total (Active)", value: `${yearlyTotal.toFixed(2)} SAR` },
+    ];
+    cards.forEach((card, i) => {
+        const cx = 14 + i * (cW + 4);
+        doc.setFillColor(250, 251, 252);
+        doc.setDrawColor(214, 218, 225);
+        doc.roundedRect(cx, y, cW, 22, 4, 4, "FD");
+        doc.setFontSize(8);
+        doc.setTextColor(110, 135, 192);
+        doc.text(card.label, cx + cW / 2, y + 8, { align: "center" });
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(41, 43, 46);
+        doc.text(card.value, cx + cW / 2, y + 17, { align: "center" });
+        doc.setFont("helvetica", "normal");
+    });
 
-  table { width: 100%; border-collapse: collapse; background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
-  th { background: linear-gradient(135deg, #666CC0, #6E87C0); color: white; padding: 18px; text-align: right; font-size: 13px; }
-  td { padding: 16px 18px; border-bottom: 1px solid #E5E9F1; color: #292B2E; font-size: 13px; }
-  tr:nth-child(even) td { background: #FAFBFC; }
-  .deleted-row td { opacity: 0.6; background: #FFF5F5 !important; }
+    y += 28;
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(102, 108, 192);
+    doc.text("Subscriptions Table", 14, y);
 
-  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
-  .status-active   { background: #E8F5E9; color: #2E7D32; }
-  .status-inactive { background: #FFF8E1; color: #F57F17; }
-  .status-deleted  { background: #FFEBEE; color: #C62828; }
+    y += 4;
+    const tableBody = safe.map((s) => [
+        s.name,
+        s.category?.name ?? "Other",
+        `${Number(s.price).toFixed(2)} SAR`,
+        formatBillingCycle(s.billingCycle),
+        formatDateSafe(s.startDate),
+        formatDateSafe(s.renewalDate),
+        formatStatus(s.status ?? "active", s.deletedAt ?? null),
+    ]);
 
-  .footer { margin-top: 40px; text-align: center; color: #63676E; font-size: 14px; padding-bottom: 30px; }
-</style>
-</head>
-<body>
-<div class="wrapper">
+    (doc as any).autoTable({
+        startY: y,
+        head: [["Service", "Category", "Price", "Billing", "Start Date", "Renewal", "Status"]],
+        body: tableBody,
+        styles: {
+            font: "helvetica",
+            fontSize: 9,
+            cellPadding: 4,
+            textColor: [41, 43, 46],
+        },
+        headStyles: {
+            fillColor: [102, 108, 192],
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+            fontSize: 9,
+        },
+        alternateRowStyles: {
+            fillColor: [250, 251, 252],
+        },
+        didParseCell: (data: any) => {
+            if (data.section === "body") {
+                const row = data.row.raw as string[];
+                if (row[6] === "محذوف" || row[6] === "Deleted") {
+                    data.cell.styles.textColor = [180, 180, 180];
+                    data.cell.styles.fillColor = [255, 245, 245];
+                }
+            }
+        },
+        didDrawCell: (data: any) => {
+            if (data.section === "body" && data.column.index === 6) {
+                const status = (data.row.raw as string[])[6];
+                const x = data.cell.x + 1.5;
+                const y2 = data.cell.y + 1.5;
+                const w = data.cell.width - 3;
+                const h = data.cell.height - 3;
+                if (status === "نشط") {
+                    doc.setFillColor(232, 245, 233);
+                    doc.setTextColor(46, 125, 50);
+                } else if (status === "غير نشط") {
+                    doc.setFillColor(255, 248, 225);
+                    doc.setTextColor(245, 127, 23);
+                } else {
+                    doc.setFillColor(255, 235, 238);
+                    doc.setTextColor(198, 40, 40);
+                }
+                doc.roundedRect(x, y2, w, h, 2, 2, "F");
+                doc.setFontSize(8);
+                doc.setFont("helvetica", "bold");
+                doc.text(status, x + w / 2, y2 + h / 2 + 1, { align: "center" });
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(41, 43, 46);
+            }
+        },
+        margin: { left: 14, right: 14 },
+    });
 
-  <div class="print-bar">
-    <button onclick="window.print()">⬇ تحميل PDF</button>
-  </div>
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.setFont("helvetica", "normal");
+    doc.text("Dierha | Subscription Management Platform", W / 2, H - 8, { align: "center" });
 
-  <div class="header">
-    <img src="${LOGO_URL}" alt="ديرها" />
-    <h1>ديرها</h1>
-    <p>تقرير إدارة الاشتراكات</p>
-  </div>
-
-  <div class="content">
-    <div class="info">
-      <div>الحساب: <strong>${userName}</strong></div>
-      <div>البريد الإلكتروني: <strong>${userEmail}</strong></div>
-      <div>تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA")}</strong></div>
-    </div>
-
-    <div class="cards">
-      <div class="card"><div class="label">إجمالي الاشتراكات</div><div class="value">${safe.length}</div></div>
-      <div class="card"><div class="label">الإجمالي الشهري (النشطة)</div><div class="value">${monthlyTotal.toFixed(2)} ريال</div></div>
-      <div class="card"><div class="label">الإجمالي السنوي (النشطة)</div><div class="value">${yearlyTotal.toFixed(2)} ريال</div></div>
-    </div>
-
-    <h2 class="section-title">جدول الاشتراكات</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>الخدمة</th><th>التصنيف</th><th>السعر</th><th>دورة الدفع</th><th>تاريخ البداية</th><th>تاريخ التجديد</th><th>الحالة</th>
-        </tr>
-      </thead>
-      <tbody>${tableRows}</tbody>
-    </table>
-
-    <div class="footer">ديرها | منصة إدارة الاشتراكات</div>
-  </div>
-</div>
-</body>
-</html>`;
-
-    const win = window.open("", "_blank");
-    if (!win) return;
-    setTimeout(() => {
-        win.document.open();
-        win.document.write(html);
-        win.document.close();
-    }, 0);
+    const date = new Date().toISOString().slice(0, 10);
+    doc.save(`dierha-subscriptions-${date}.pdf`);
 }
