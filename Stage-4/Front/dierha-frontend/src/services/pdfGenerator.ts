@@ -365,12 +365,15 @@ export async function generatePdfClient(
     );
     const yearlyTotal = monthlyTotal * 12;
 
+    // إزالة الاشتراكات المحذوفة قبل عرضها في الـ PDF
+    const visibleSubscriptions = safe.filter((s) => !s.deletedAt);
+
     const [{ html2canvas, jsPDF }, logoBase64] = await Promise.all([
         loadLibs(),
         logoToBase64(),
     ]);
 
-    const html = buildHTML(safe, name, email, logoBase64, monthlyTotal, yearlyTotal);
+    const html = buildHTML(visibleSubscriptions, name, email, logoBase64, monthlyTotal, yearlyTotal);
 
     const iframe = document.createElement("iframe");
     iframe.setAttribute("aria-hidden", "true");
