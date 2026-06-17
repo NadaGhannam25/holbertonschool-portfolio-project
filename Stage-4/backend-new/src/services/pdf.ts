@@ -4,31 +4,39 @@
 import puppeteer, { type Browser } from 'puppeteer';
 import { eq } from 'drizzle-orm';
 import { db } from '../db';
-import { categories, subscriptionProviders, subscriptions, users } from '../db/schema';
+import { categories, subscriptions, users } from '../db/schema';
 
 let browserInstance: Browser | null = null;
-let browserStarting = false;
+
+let browserStartingPromise: Promise<void> | null = null;
 
 export async function initBrowser(): Promise<void> {
   if (browserInstance?.connected) return;
-  browserStarting = true;
-  browserInstance = await puppeteer.launch({
-    headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-      '--disable-extensions',
-      '--disable-background-networking',
-      '--disable-sync',
-      '--disable-translate',
-      '--no-first-run',
-      '--safebrowsing-disable-auto-update',
-    ],
-  });
-  browserStarting = false;
-  console.log('[PDF] Browser ready');
+  // mutex: لو في launch قيد التنفيذ، ننتظره بدل ما نطلق ثاني
+  if (browserStartingPromise) {
+    await browserStartingPromise;
+    return;
+  }
+  browserStartingPromise = (async () => {
+    browserInstance = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--disable-extensions',
+        '--disable-background-networking',
+        '--disable-sync',
+        '--disable-translate',
+        '--no-first-run',
+        '--safebrowsing-disable-auto-update',
+      ],
+    });
+    console.log('[PDF] Browser ready');
+  })();
+  await browserStartingPromise;
+  browserStartingPromise = null;
 }
 
 async function getBrowser(): Promise<Browser> {
@@ -110,11 +118,9 @@ export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> 
       status: subscriptions.status,
       deletedAt: subscriptions.deletedAt,
       categoryName: categories.name,
-      providerLogoUrl: subscriptionProviders.logoUrl,
     })
     .from(subscriptions)
     .leftJoin(categories, eq(subscriptions.categoryId, categories.id))
-    .leftJoin(subscriptionProviders, eq(subscriptions.providerId, subscriptionProviders.id))
     .where(eq(subscriptions.userId, userId));
 
   const activeSubscriptions = rows.filter(
@@ -131,12 +137,7 @@ export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> 
     .map(
       (s) => `
       <tr class="${s.deletedAt ? 'deleted-row' : ''}">
-        <td>
-          <div style="display:flex;align-items:center;gap:8px;">
-            ${s.providerLogoUrl ? `<img src="${s.providerLogoUrl}" style="width:24px;height:24px;border-radius:6px;object-fit:contain;" onerror="this.style.display='none'" />` : ''}
-            ${s.name}
-          </div>
-        </td>
+        <td>${s.name}</td>
         <td>${s.categoryName ?? 'أخرى'}</td>
         <td>${s.price} ريال</td>
         <td>${formatBillingCycle(s.billingCycle)}</td>
@@ -221,7 +222,7 @@ tr:nth-child(even) td { background: #FAFBFC; }
   const page = await browser.newPage();
 
   try {
-    await page.setContent(html, { waitUntil: 'domcontentloaded' });
+    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
     const pdf = await page.pdf({
       format: 'A4',
