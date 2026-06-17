@@ -29,8 +29,7 @@ function formatBillingCycle(cycle: string): string {
     return map[cycle] ?? cycle;
 }
 
-function formatStatus(status: string | undefined, deletedAt: string | null | undefined): string {
-    if (deletedAt) return "محذوف";
+function formatStatus(status: string | undefined): string {
     return status === "active" ? "نشط" : "غير نشط";
 }
 
@@ -216,7 +215,7 @@ function buildTableRows(subscriptions: BackendSubscription[]): string {
                 index % 2 === 1 ? "background:#FAFBFC;" : "background:#FFFFFF;";
 
             const cellStyle =
-                "padding:11px 10px;border-bottom:1px solid #E5E9F1;font-size:11px;line-height:1.7;color:#292B2E;vertical-align:middle;text-align:right;";
+                "padding:11px 8px;border-bottom:1px solid #E5E9F1;font-size:11px;line-height:1.7;color:#292B2E;vertical-align:middle;text-align:center;";
 
             const statusStyle =
                 subscription.status === "active"
@@ -225,7 +224,7 @@ function buildTableRows(subscriptions: BackendSubscription[]): string {
 
             return `
                 <tr style="${rowBackground}">
-                    <td style="${cellStyle};font-weight:800;max-width:122px;word-break:break-word;">${escapeHtml(subscription.name)}</td>
+                    <td style="${cellStyle};font-weight:800;max-width:122px;word-break:break-word;text-align:right;">${escapeHtml(subscription.name)}</td>
                     <td style="${cellStyle}">${escapeHtml(subscription.category?.name ?? "أخرى")}</td>
                     <td style="${cellStyle};white-space:nowrap;font-weight:800;">${Number(subscription.price || 0).toFixed(2)} ريال</td>
                     <td style="${cellStyle};white-space:nowrap;">${formatBillingCycle(String(subscription.billingCycle))}</td>
@@ -233,7 +232,7 @@ function buildTableRows(subscriptions: BackendSubscription[]): string {
                     <td style="${cellStyle};white-space:nowrap;">${formatDateSafe(subscription.renewalDate)}</td>
                     <td style="${cellStyle};white-space:nowrap;">
                         <span style="display:inline-block;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:800;${statusStyle}">
-                            ${formatStatus(subscription.status, subscription.deletedAt ?? null)}
+                            ${formatStatus(subscription.status)}
                         </span>
                     </td>
                 </tr>
@@ -249,6 +248,7 @@ function buildHTML(
     logoBase64: string,
     monthlyTotal: number,
     yearlyTotal: number,
+    totalSubscriptionsCount: number,
 ): string {
     return `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -264,29 +264,29 @@ function buildHTML(
 <body>
   <div style="width:794px;min-height:1123px;background:#FAFBFC;font-family:Tahoma,Arial,sans-serif;direction:rtl;color:#292B2E;padding:34px 0;">
     <div style="width:700px;margin:0 auto;background:#FFFFFF;border:1px solid #D6DAE1;border-radius:24px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.04);">
-      <div style="background:#020B5C;padding:48px 40px 40px;text-align:center;color:white;">
+      <div style="background:linear-gradient(135deg,#666CC0 0%,#6E87C0 45%,#F3B0B9 100%);padding:48px 40px 40px;text-align:center;color:white;">
         ${logoBase64 ? `<img src="${logoBase64}" style="width:220px;margin:0 auto 18px;border-radius:24px;padding:12px;display:block;background:transparent;box-shadow:0 12px 28px rgba(0,0,0,0.12);" />` : ""}
         <div style="font-size:34px;font-weight:900;color:white;text-align:center;">تقرير إدارة الاشتراكات</div>
       </div>
 
       <div style="padding:38px 44px;">
-      <div style="background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:22px 26px;margin-bottom:24px;line-height:2.1;box-shadow:0 6px 16px rgba(2,11,92,0.06);">
+      <div style="background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:22px 26px;margin-bottom:24px;line-height:2.1;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
         <div style="font-size:13px;color:#292B2E;">الحساب: <strong>${escapeHtml(name)}</strong></div>
         <div style="font-size:13px;color:#292B2E;">البريد الإلكتروني: <strong>${escapeHtml(email || "غير متوفر")}</strong></div>
         <div style="font-size:13px;color:#292B2E;">تاريخ الإصدار: <strong>${new Date().toLocaleDateString("ar-SA-u-nu-latn")}</strong></div>
       </div>
 
       <div style="display:flex;gap:12px;margin-bottom:24px;">
-        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(2,11,92,0.06);">
-          <div style="color:#020B5C;font-size:11px;margin-bottom:7px;font-weight:800;">إجمالي الاشتراكات</div>
-          <div style="color:#292B2E;font-size:22px;font-weight:900;">${subscriptions.length}</div>
+        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
+          <div style="color:#6E87C0;font-size:11px;margin-bottom:7px;font-weight:800;">إجمالي الاشتراكات</div>
+          <div style="color:#292B2E;font-size:22px;font-weight:900;">${totalSubscriptionsCount}</div>
         </div>
-        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(2,11,92,0.06);">
-          <div style="color:#020B5C;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي الشهري النشط</div>
+        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
+          <div style="color:#6E87C0;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي الشهري النشط</div>
           <div style="color:#292B2E;font-size:20px;font-weight:900;">${monthlyTotal.toFixed(2)} ريال</div>
         </div>
-        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(2,11,92,0.06);">
-          <div style="color:#020B5C;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي السنوي النشط</div>
+        <div style="flex:1;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFC 100%);border:1px solid #D6DAE1;border-radius:24px;padding:18px 10px;text-align:center;box-shadow:0 6px 16px rgba(102,108,192,0.06);">
+          <div style="color:#6E87C0;font-size:11px;margin-bottom:7px;font-weight:800;">الإجمالي السنوي النشط</div>
           <div style="color:#292B2E;font-size:20px;font-weight:900;">${yearlyTotal.toFixed(2)} ريال</div>
         </div>
       </div>
@@ -296,13 +296,13 @@ function buildHTML(
       <table style="width:100%;background:white;border:1px solid #E5E9F1;border-radius:24px;overflow:hidden;">
         <thead>
           <tr>
-            <th style="width:19%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الخدمة</th>
-            <th style="width:13%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">التصنيف</th>
-            <th style="width:15%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">السعر</th>
-            <th style="width:14%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">دورة الدفع</th>
-            <th style="width:15%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ البداية</th>
-            <th style="width:15%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">تاريخ التجديد</th>
-            <th style="width:9%;background:#020B5C;color:white;padding:12px 10px;text-align:right;font-size:11px;font-weight:900;">الحالة</th>
+            <th style="width:19%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">الخدمة</th>
+            <th style="width:13%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">التصنيف</th>
+            <th style="width:15%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">السعر</th>
+            <th style="width:14%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">دورة الدفع</th>
+            <th style="width:15%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">تاريخ البداية</th>
+            <th style="width:15%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">تاريخ التجديد</th>
+            <th style="width:9%;background:#6E87C0;color:white;padding:12px 8px;text-align:center;font-size:11px;font-weight:900;">الحالة</th>
           </tr>
         </thead>
         <tbody>${buildTableRows(subscriptions)}</tbody>
@@ -360,11 +360,14 @@ export async function generatePdfClient(
         (subscription) => subscription.status === "active",
     );
 
+    const totalSubscriptionsCount = safe.length;
+
     const monthlyTotal = activeSubscriptions.reduce(
         (sum, subscription) =>
             sum + getMonthlyEquivalent(subscription.price, String(subscription.billingCycle)),
         0,
     );
+
     const yearlyTotal = monthlyTotal * 12;
 
     const [{ html2canvas, jsPDF }, logoBase64] = await Promise.all([
@@ -372,7 +375,15 @@ export async function generatePdfClient(
         logoToBase64(),
     ]);
 
-    const html = buildHTML(visibleSubscriptions, name, email, logoBase64, monthlyTotal, yearlyTotal);
+    const html = buildHTML(
+        visibleSubscriptions,
+        name,
+        email,
+        logoBase64,
+        monthlyTotal,
+        yearlyTotal,
+        totalSubscriptionsCount,
+    );
 
     const iframe = document.createElement("iframe");
     iframe.setAttribute("aria-hidden", "true");
