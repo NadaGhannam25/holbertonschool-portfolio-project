@@ -116,7 +116,7 @@ export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> 
     doc.text(card.value, x + cardW / 2, cardY + 15, { align: 'center' });
   });
 
-  const tableBody = rows.map((s) => [
+  const tableBody = rows.length > 0 ? rows.map((s) => [
     s.name,
     s.categoryName ?? 'Other',
     `${Number(s.price).toFixed(2)} SAR`,
@@ -124,10 +124,19 @@ export async function generateSubscriptionsPdf(userId: number): Promise<Buffer> 
     formatDateSafe(s.startDate),
     formatDateSafe(s.renewalDate),
     formatStatus(s.status ?? 'active', s.deletedAt),
-  ]);
+  ]) : [[
+    'No subscriptions yet',
+    '-',
+    '-',
+    '-',
+    '-',
+    '-',
+    '-',
+  ]];
 
   autoTable(doc, ({
     startY: cardY + 26,
+    showHead: 'everyPage',
     head: [['Service', 'Category', 'Price', 'Billing', 'Start Date', 'Renewal Date', 'Status']],
     body: tableBody,
     styles: { font: 'helvetica', fontSize: 9, cellPadding: 4 },
