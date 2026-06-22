@@ -216,17 +216,17 @@ async function updateExpiredSubscriptions() {
 }
 
 export function startCronJobs(): void {
-  cron.schedule('* * * * *', async () => {
+  cron.schedule('0 9 * * *', async () => {
     try {
       await runReminderJob();
     } catch (error) {
       console.error('[Cron] Reminder job failed:', error);
     }
+  }, {
+    timezone: 'Asia/Riyadh',
   });
 
-  const dailyCronTime = process.env.TZ === 'Asia/Riyadh' ? '5 9 * * *' : '5 6 * * *';
-
-  cron.schedule(dailyCronTime, async () => {
+  cron.schedule('5 9 * * *', async () => {
     try {
       console.log('[Cron] Running daily renewal update...');
       await updateExpiredSubscriptions();
@@ -234,8 +234,10 @@ export function startCronJobs(): void {
     } catch (error) {
       console.error('[Cron] Daily renewal update failed:', error);
     }
+  }, {
+    timezone: 'Asia/Riyadh',
   });
 
-  console.log('[Cron] Reminder sender scheduled every minute');
-  console.log(`[Cron] Renewal updater scheduled daily at 9:05 AM Riyadh (cron: ${dailyCronTime})`);
+  console.log('[Cron] Reminder sender scheduled daily at 9:00 AM Riyadh');
+  console.log('[Cron] Renewal updater scheduled daily at 9:05 AM Riyadh');
 }
